@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: airsentinel-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: DEBUG
+        value: "false"
+      - key: ALLOWED_ORIGINS
+        value: "[\"http://localhost:3000\",\"http://127.0.0.1:3000\",\"http://localhost:3001\",\"http://localhost:8501\",\"https://airsentinel.onrender.com\"]"
+      - key: DATASET_PATH
+        value: "data/processed/airsentinel_dataset.csv"
+      - key: ML_MODELS_PATH
+        value: "models/"
+      - key: DATABASE_URL
+        value: "postgresql+asyncpg://postgres.sbzjiekwrafzkscnrheu:XJ%40JRupSmYfrj4L@aws-1-eu-west-1.pooler.supabase.com:6543/postgres"
+      - key: DATABASE_URL_SYNC
+        value: "postgresql://postgres.sbzjiekwrafzkscnrheu:XJ%40JRupSmYfrj4L@aws-1-eu-west-1.pooler.supabase.com:5432/postgres"
+      - key: SUPABASE_URL
+        value: "https://sbzjiekwrafzkscnrheu.supabase.co"
+      - key: SUPABASE_KEY
+        value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiemppZWt3cmFmemtzY25yaGV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MDA0MDUsImV4cCI6MjA5MDQ3NjQwNX0.N8ZFaKL7fR0-_y4ws1Cj1-RKtnX341dooJbfB67P1VQ"
+      - key: SUPABASE_SERVICE_KEY
+        value: ""
+      - key: SECRET_KEY
+        value: "2c00bdfe30ae1167ace2edf6eb610dd678111d955c856613ea9de858320ca5c8"
+      - key: ALGORITHM
+        value: "HS256"
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+    healthCheckPath: /health
+    autoDeploy: true

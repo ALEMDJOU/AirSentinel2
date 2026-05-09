@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # --- Backend API FastAPI ---
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: airsentinel_api
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models:ro           # Montage lecture seule pour les modèles ML
+      - ./data/processed:/app/data/processed:ro  # Montage lecture seule pour les données
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+
+  # --- Frontend Dashboard Streamlit ---
+  # Note: Pour le développement local, on réutilise le même env (ou un build similaire)
+  dashboard:
+    build: .
+    container_name: airsentinel_dashboard
+    command: ["streamlit", "run", "dashboard/app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+    env_file:
+      - .env
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./dashboard:/app/dashboard:ro
+      - ./data/processed:/app/data/processed:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: always

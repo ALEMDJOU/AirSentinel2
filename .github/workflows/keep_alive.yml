@@ -1,0 +1,15 @@
+name: Keep Render Backend Alive
+
+on:
+  schedule:
+    # Exécution toutes les 10 minutes pour éviter le sleep de 15 min de Render
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Permet de lancer manuellement pour tester
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping AirSentinel API
+        run: |
+          curl -I https://airsentinel-api.onrender.com/health

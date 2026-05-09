@@ -1,0 +1,49 @@
+*.xlsx
+*.csv
+# Allow data files
+!data/**/*.csv
+!data/**/*.xlsx
+!data/**/*.parquet
+# Allow model files
+!models/**/*.pkl
+__pycache__/
+*.pyc
+.env
+.env.local
+.env.production
+.ipynb_checkpoints/
+.DS_Store
+node_modules/
+.venv/
+venv/
+test.md
+*:Zone.Identifier
+
+# Firebase Security
+api/firebase-service-account.json
+# Android & Capacitor Build Files
+**/.gradle/
+**/android/app/build/
+**/android/local.properties
+**/android/captures/
+**/android/.idea/
+**/android/*.iml
+**/android/app/src/main/assets/
+**/android/app/src/main/res/xml/config.xml
+**/android/capacitor-cordova-android-plugins/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Bubblewrap / Android wrapper files
+/pwa/airsentinel/app/
+/pwa/airsentinel/gradle/
+/pwa/airsentinel/build.gradle
+/pwa/airsentinel/gradle.properties
+/pwa/airsentinel/gradlew*
+/pwa/airsentinel/settings.gradle
+/pwa/airsentinel/twa-manifest.json
+/pwa/airsentinel/manifest-checksum.txt
+/pwa/airsentinel/store_icon.png
+/pwa/airsentinel/android-wrapper

@@ -1,0 +1,16 @@
+{
+  "name": "AirSentinel Cameroun",
+  "short_name": "AirSentinel",
+  "description": "Surveillance et prédiction de la qualité de l'air au Cameroun par IA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020c18",
+  "theme_color": "#00d4b1",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/LogoAir.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/LogoAir.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["health", "utilities"],
+  "lang": "fr"
+}

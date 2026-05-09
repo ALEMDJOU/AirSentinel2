@@ -1,0 +1,67 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{booktabs}
+
+\title{Résumé Technique : API AirSentinel Cameroun (Bakend Final)}
+\author{Antigravity AI - Documentation Technique}
+\date{Avril 2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Aperçu Global}
+Le backend d'AirSentinel est une API REST haute performance développée avec \textbf{FastAPI}, utilisant une architecture asynchrone et connectée à une base de données \textbf{PostgreSQL} (Supabase). Elle intègre un pipeline complet de Machine Learning pour la prédiction de la pollution atmosphérique au Cameroun.
+
+\section{Configuration \& Sécurité}
+\begin{itemize}
+    \item \textbf{Base de données} : PostgreSQL (Supabase) via \texttt{SQLAlchemy Async}. Compatibilité \textbf{PgBouncer} assurée (\texttt{NullPool} + \texttt{UUID names}).
+    \item \textbf{Authentification} : JWT (JSON Web Tokens). Endpoints \texttt{/register} et \texttt{/login} au format \textbf{JSON pur}.
+    \item \textbf{Stockage} : Upload des avatars utilisateur vers \textbf{Supabase Storage} (Bucket \texttt{avatars}).
+\end{itemize}
+
+\section{Intelligence Artificielle \& Modèles}
+L'API charge 8 composants IA au démarrage via un cycle de vie (\textit{lifespan}) :
+\begin{itemize}
+    \item \textbf{Régression Linéaire} (\texttt{meilleur\_modele.pkl}) : Prédiction PM2.5 à J+1 utilisant \textbf{28 variables} (Météo, Vent, Lags PM2.5).
+    \item \textbf{Calculateur IRS} (\texttt{pca\_irs.pkl}) : Indice de Risque Sanitaire basé sur 5 axes (PM2.5, Co, Dust, UV, O3).
+    \item \textbf{ARIMA} (\texttt{arima\_par\_zone.pkl}) : Support pour prévisions temporelles par ville (28 Mo de modèles).
+\end{itemize}
+
+\section{Catalogue des Endpoints (API V1)}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Endpoint} & \textbf{Méthode} & \textbf{Rôle} \\ \midrule
+\texttt{/auth/register} & POST (JSON) & Inscription utilisateur \\
+\texttt{/auth/login} & POST (JSON) & Connexion \& Obtention Token \\
+\texttt{/kpis} & GET & 6 indicateurs nationaux \\
+\texttt{/carte} & GET & Points GPS des villes (PM2.5 + IRS) \\
+\texttt{/carte/analyses} & GET & 6 analyses métiers (Top villes, etc.) \\
+\texttt{/predictions/short-term} & GET & Prédictions J+1 IA (params: \texttt{city}) \\
+\texttt{/predictions/simulate-irs} & POST & Simulateur de risque IA \\
+\texttt{/users/me/avatar} & POST (Form) & Upload d'avatar (Protégé) \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section{Déploiement \& Conteneurisation}
+Le projet est prêt pour la production avec :
+\begin{itemize}
+    \item \textbf{Dockerfile} : Image sécurisée (non-root) de 8000.
+    \item \textbf{Docker Compose} : Orchestration API + Dashboard Streamlit.
+    \item \textbf{Render.yaml} : Configuration de déploiement Cloud (Infra-as-Code).
+\end{itemize}
+
+\section{Conclusion}
+L'API est stable, sécurisée et documentée via Swagger sur \texttt{/api/v1/docs}. Elle fournit tous les points de données nécessaires pour une PWA LinkedIn-style haute performance.
+
+\end{document}
