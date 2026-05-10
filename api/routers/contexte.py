@@ -60,6 +60,8 @@ def get_contexte(city: Optional[str] = None):
     except FileNotFoundError as e:
         raise HTTPException(status_code=503, detail=str(e))
 
+    city_col = _find_col(df, ["ville", "city", "Ville", "City"])
+
     # Filtre par ville si spécifiée (et différente de CAMEROON)
     if city and city.upper() != "CAMEROON":
         from api.services.data_service import apply_filters
@@ -67,7 +69,13 @@ def get_contexte(city: Optional[str] = None):
         if df.empty:
             raise HTTPException(status_code=404, detail=f"Aucune donnée pour la ville '{city}'.")
 
-    pm25_col = _find_col(df, ["pm2_5_moyen", "pm2_5", "pm25", "PM2.5", "PM25"])
+    # ─── EXTRACTION DES DONNÉES RÉCENTES POUR S'ALIGNER AVEC LA CARTE ───
+    if city_col and "date" in df.columns:
+        latest_df = df.sort_values(by="date", ascending=False).drop_duplicates(subset=[city_col])
+    else:
+        latest_df = df.drop_duplicates(subset=[city_col]) if city_col else df
+
+    pm25_col = _find_col(latest_df, ["pm2_5_moyen", "pm2_5", "pm25", "PM2.5", "PM25"])
 
     # ─── 1. Donut niveaux IRS ────────────────────────────────────────
     def classify_pm25(val):
@@ -85,7 +93,7 @@ def get_contexte(city: Optional[str] = None):
 
     donut_niveaux = []
     if pm25_col:
-        niveaux = df[pm25_col].dropna().apply(classify_pm25).value_counts(normalize=True) * 100
+        niveaux = latest_df[pm25_col].dropna().apply(classify_pm25).value_counts(normalize=True) * 100
         for niveau, pct in niveaux.items():
             donut_niveaux.append(DonutEntry(
                 label=niveau,
@@ -96,10 +104,10 @@ def get_contexte(city: Optional[str] = None):
     # ─── 2. Donut polluants ─────────────────────────────────────────
     polluant_cols = {
         "PM2.5": pm25_col,
-        "PM10":  _find_col(df, ["pm10_moyen", "pm10"]),
-        "NO2":   _find_col(df, ["no2_moyen", "no2"]),
-        "O3":    _find_col(df, ["o3_moyen", "ozone_moyen", "o3"]),
-        "SO2":   _find_col(df, ["so2_moyen", "so2"]),
+        "PM10":  _find_col(latest_df, ["pm10_moyen", "pm10"]),
+        "NO2":   _find_col(latest_df, ["no2_moyen", "no2"]),
+        "O3":    _find_col(latest_df, ["o3_moyen", "ozone_moyen", "o3"]),
+        "SO2":   _find_col(latest_df, ["so2_moyen", "so2"]),
     }
     polluant_couleurs = {
         "PM2.5": "#2196F3",
@@ -108,7 +116,7 @@ def get_contexte(city: Optional[str] = None):
         "O3":    "#00BCD4",
         "SO2":   "#F44336",
     }
-    available = {k: float(df[v].mean()) for k, v in polluant_cols.items() if v}
+    available = {k: float(latest_df[v].mean()) for k, v in polluant_cols.items() if v}
     total_pol = sum(available.values()) or 1
     donut_polluants = [
         DonutEntry(

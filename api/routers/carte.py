@@ -147,10 +147,16 @@ def get_analyses(city: Optional[str] = None):
     region_col = _find_col(df, ["region", "Region", "Area"])
     city_col   = _find_col(df, ["ville", "city", "Ville", "City"])
 
+    # ─── EXTRACTION DES DONNÉES RÉCENTES POUR S'ALIGNER AVEC LA CARTE ───
+    if city_col and "date" in df.columns:
+        latest_df = df.sort_values(by="date", ascending=False).drop_duplicates(subset=[city_col])
+    else:
+        latest_df = df.drop_duplicates(subset=[city_col]) if city_col else df
+
     # 1. PM2.5 par région
     pm25_par_region = {}
     if region_col and pm25_col:
-        pm25_par_region = df.groupby(region_col)[pm25_col].mean().round(2).to_dict()
+        pm25_par_region = latest_df.groupby(region_col)[pm25_col].mean().round(2).to_dict()
 
     # 2. Tendance 12 mois
     tendance_12_mois = {}
@@ -163,16 +169,16 @@ def get_analyses(city: Optional[str] = None):
 
     # 3. Top 3 polluants
     polluant_cols = {
-        "PM2.5": _find_col(df, ["pm2_5", "pm25"]),
-        "PM10":  _find_col(df, ["pm10"]),
-        "NO2":   _find_col(df, ["no2"]),
-        "O3":    _find_col(df, ["o3"]),
-        "SO2":   _find_col(df, ["so2"]),
+        "PM2.5": _find_col(latest_df, ["pm2_5", "pm25"]),
+        "PM10":  _find_col(latest_df, ["pm10"]),
+        "NO2":   _find_col(latest_df, ["no2"]),
+        "O3":    _find_col(latest_df, ["o3"]),
+        "SO2":   _find_col(latest_df, ["so2"]),
     }
     available = {
-        k: round(float(df[v].mean()), 2)
+        k: round(float(latest_df[v].mean()), 2)
         for k, v in polluant_cols.items()
-        if v and not df[v].isna().all()  # FIX: skip columns that are all-NaN
+        if v and not latest_df[v].isna().all()  # FIX: skip columns that are all-NaN
     }
     top_3 = sorted(available.items(), key=lambda x: x[1], reverse=True)[:3]
     top_3_polluants = [{"polluant": k, "moyenne": v} for k, v in top_3]
@@ -180,7 +186,7 @@ def get_analyses(city: Optional[str] = None):
     # 4. Top 5 villes critiques
     top_5_villes = []
     if city_col and pm25_col:
-        city_means = df.groupby(city_col)[pm25_col].mean().sort_values(ascending=False)
+        city_means = latest_df.groupby(city_col)[pm25_col].mean().sort_values(ascending=False)
         top_5 = city_means.head(5)
         top_5_villes = [{"city": c, "pm25_moyen": round(v, 2)} for c, v in top_5.items()]
 
@@ -191,10 +197,10 @@ def get_analyses(city: Optional[str] = None):
         daily = df.resample("D", on="date")[pm25_col].mean()
         episodes = int((daily > seuil_episode).sum())
 
-    # 6. % dépassement OMS (10 µg/m³)
+    # 6. % dépassement OMS (15 µg/m³ - cible 2021)
     pct_oms = 0.0
     if pm25_col:
-        pct_oms = round(float((df[pm25_col] > 10).mean() * 100), 2)
+        pct_oms = round(float((latest_df[pm25_col] > 15).mean() * 100), 2)
 
     return CarteAnalyses(
         pm25_par_region=pm25_par_region,

@@ -47,32 +47,39 @@ def get_kpis(city: Optional[str] = None):
     if df.empty:
         raise HTTPException(status_code=404, detail=f"Aucune donnée pour la ville '{city}'.")
 
+    city_col = _find_col(df, ["city", "ville", "Ville", "City"])
+    
+    # ─── EXTRACTION DES DONNÉES RÉCENTES POUR S'ALIGNER AVEC LA CARTE ───
+    if city_col and "date" in df.columns:
+        latest_df = df.sort_values(by="date", ascending=False).drop_duplicates(subset=[city_col])
+    else:
+        latest_df = df.drop_duplicates(subset=[city_col]) if city_col else df
+
     # --- PM2.5 moyen ---
-    pm25_col = _find_col(df, ["pm2_5_moyen", "pm2_5", "pm25", "PM2.5", "PM25"])
-    pm25_moyen = float(df[pm25_col].mean()) if pm25_col else 0.0
+    pm25_col = _find_col(latest_df, ["pm2_5_moyen", "pm2_5", "pm25", "PM2.5", "PM25"])
+    pm25_moyen = float(latest_df[pm25_col].mean()) if pm25_col else 0.0
 
     # --- IRS moyen ---
-    irs_col = _find_col(df, ["IRS", "irs", "irs_value"])
-    irs_moyen = float(df[irs_col].mean()) if irs_col else None
+    irs_col = _find_col(latest_df, ["IRS", "irs", "irs_value"])
+    irs_moyen = float(latest_df[irs_col].mean()) if irs_col else None
 
-    # --- Villes dépassant le seuil OMS (PM2.5 > 10 µg/m³) ---
-    city_col = _find_col(df, ["city", "ville", "Ville", "City"])
+    # --- Villes dépassant le seuil OMS (PM2.5 > 15 µg/m³) ---
     if city_col and pm25_col:
-        city_means = df.groupby(city_col)[pm25_col].mean()
-        villes_depassant_oms = int((city_means > 10).sum())
+        city_latest_vals = latest_df.groupby(city_col)[pm25_col].mean()
+        villes_depassant_oms = int((city_latest_vals > 15).sum())
     else:
         villes_depassant_oms = 0
 
     # --- Polluant dominant ---
     polluant_cols = {
         "PM2.5": pm25_col,
-        "PM10": _find_col(df, ["pm10", "PM10"]),
-        "NO2": _find_col(df, ["no2", "NO2"]),
-        "O3": _find_col(df, ["o3", "O3"]),
-        "SO2": _find_col(df, ["so2", "SO2"]),
+        "PM10": _find_col(latest_df, ["pm10", "PM10"]),
+        "NO2": _find_col(latest_df, ["no2", "NO2"]),
+        "O3": _find_col(latest_df, ["o3", "O3"]),
+        "SO2": _find_col(latest_df, ["so2", "SO2"]),
     }
-    # FIX: Logique de polluant dominant correcte (ancienne version était redondante et cassée)
-    available_polluants = {k: float(df[v].mean()) for k, v in polluant_cols.items() if v}
+    # FIX: Logique de polluant dominant correcte
+    available_polluants = {k: float(latest_df[v].mean()) for k, v in polluant_cols.items() if v}
     polluant_dominant = max(available_polluants, key=available_polluants.get) if available_polluants else "PM2.5"
 
     # --- Tendance nationale sur les 12 derniers mois ---
