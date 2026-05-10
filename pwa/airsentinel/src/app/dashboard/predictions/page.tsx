@@ -14,7 +14,7 @@ import CitySelector from "@/components/CitySelector";
 
 export default function PredictionsPage() {
   const { ville, setVille } = useVille();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [data, setData] = useState<PredictionPoint[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -80,7 +80,7 @@ export default function PredictionsPage() {
         setInteractiveResult(res);
       } catch (err) {
         console.error("Erreur simulation:", err);
-        setSimulationError("Le service de simulation est temporairement indisponible.");
+        setSimulationError(t('sim_error'));
       } finally {
         setIsComputing(false);
       }
@@ -191,7 +191,7 @@ export default function PredictionsPage() {
                                dataKey="date" 
                                stroke="#475569"
                                fontSize={10}
-                               tickFormatter={(val) => new Date(val).toLocaleDateString('fr', { day: '2-digit', month: 'short' })}
+                               tickFormatter={(val) => new Date(val).toLocaleDateString(lang, { day: '2-digit', month: 'short' })}
                                axisLine={false}
                                tickLine={false}
                                dy={10}
@@ -222,7 +222,7 @@ export default function PredictionsPage() {
                                   x={history[history.length-1].date} 
                                   stroke="#64748b" 
                                   strokeDasharray="5 5" 
-                                  label={{ value: 'PRÉDICTION IA', position: 'top', fill: '#64748b', fontSize: 8, fontWeight: 900 }} 
+                                  label={{ value: t('chart_ai_prediction'), position: 'top', fill: '#64748b', fontSize: 8, fontWeight: 900 }} 
                                />
                             )}
                          </AreaChart>

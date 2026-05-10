@@ -6,7 +6,7 @@ Endpoints de prédiction ML AirSentinel.
 
 import pandas as pd
 from datetime import datetime, timedelta
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from typing import Optional
 
@@ -163,12 +163,16 @@ def simulate_irs(payload: IRSInput):
 
 
 @router.post("/compute", response_model=ComputeResponse)
-def compute_interactive(payload: ComputeInput):
+def compute_interactive(payload: ComputeInput, request: Request):
     """
     Simulateur Interactif : Calcule le PM2.5 prédit selon la ville et les features.
     Utilise le modèle ML réel AirSentinel si disponible.
     """
     logger.info(f"Simulation PM2.5 demandée pour la ville: {payload.city}")
+    
+    # Détection de la langue
+    accept_lang = request.headers.get("accept-language", "fr")
+    lang = "en" if "en" in accept_lang.lower() else "fr"
     # 1. Charger les données réelles les plus récentes pour cette ville (pour les lags et métadonnées)
     f = {}
     try:
@@ -225,22 +229,36 @@ def compute_interactive(payload: ComputeInput):
         logger.error(f"Erreur modèle ML : {e}")
         predicted = 30.0
 
-    # Classification (Seuils unifiés AirSentinel / OMS)
-    if predicted <= 12:
-        level, color = "BON", "#4CAF50"
-        desc = "Qualité de l'air optimale. Aucune restriction pour les activités en extérieur."
-    elif predicted <= 35.4:
-        level, color = "MODÉRÉ", "#FFC107"
-        desc = "Qualité acceptable. Les personnes ultra-sensibles devraient limiter les efforts prolongés."
-    elif predicted <= 55.4:
-        level, color = "SÉVÈRE", "#FF9800"
-        desc = "Effets possibles sur la santé. Réduisez les activités physiques intenses en plein air."
-    elif predicted <= 150.4:
-        level, color = "DANGEREUX", "#FF5722"
-        desc = "Risques sanitaires accrus. Port du masque recommandé pour les personnes sensibles."
-    else:
-        level, color = "CRITIQUE", "#B71C1C"
-        desc = "Urgence sanitaire. Évitez toute sortie non essentielle. Port du masque obligatoire."
+    # MODIFICATION DE LA SIGNATURE (ajout de request)
+    return _generate_compute_response(predicted, lang)
+
+def _generate_compute_response(predicted: float, lang: str = "fr"):
+    translations = {
+        "fr": {
+            "BON": ("BON", "#4CAF50", "Qualité de l'air optimale. Aucune restriction pour les activités en extérieur."),
+            "MODERE": ("MODÉRÉ", "#FFC107", "Qualité acceptable. Les personnes ultra-sensibles devraient limiter les efforts."),
+            "SEVERE": ("SÉVÈRE", "#FF9800", "Effets possibles sur la santé. Réduisez les activités physiques en plein air."),
+            "DANGEREUX": ("DANGEREUX", "#FF5722", "Risques sanitaires accrus. Port du masque recommandé."),
+            "CRITIQUE": ("CRITIQUE", "#B71C1C", "Urgence sanitaire. Évitez toute sortie. Port du masque obligatoire.")
+        },
+        "en": {
+            "BON": ("GOOD", "#4CAF50", "Optimal air quality. No restrictions for outdoor activities."),
+            "MODERE": ("MODERATE", "#FFC107", "Acceptable quality. Sensitive groups should limit prolonged exertion."),
+            "SEVERE": ("SEVERE", "#FF9800", "Possible health effects. Reduce intense outdoor physical activities."),
+            "DANGEREUX": ("DANGEROUS", "#FF5722", "Increased health risks. Mask recommended for sensitive groups."),
+            "CRITIQUE": ("CRITICAL", "#B71C1C", "Health emergency. Avoid unnecessary outings. Mask mandatory.")
+        }
+    }
+    
+    t = translations.get(lang, translations["fr"])
+    
+    if predicted <= 12: key = "BON"
+    elif predicted <= 35.4: key = "MODERE"
+    elif predicted <= 55.4: key = "SEVERE"
+    elif predicted <= 150.4: key = "DANGEREUX"
+    else: key = "CRITIQUE"
+    
+    level, color, desc = t[key]
 
     return ComputeResponse(
         predicted_pm25=round(predicted, 2),

@@ -107,6 +107,10 @@ const translations: Record<Language, Record<string, string>> = {
     city_empty: "Aucun Résultat",
     city_not_found: "La ville \"{}\" n'est pas encore sous surveillance active.",
     city_loading: "Chargement des zones...",
+    
+    // Onboarding additional
+    onboarding_aha_title: "Félicitations !",
+    onboarding_alert_config: "Configuration des alertes pour {}...",
 
     // Loading
     loading_ai: "Initialisation de l'IA...",
@@ -144,6 +148,7 @@ const translations: Record<Language, Record<string, string>> = {
     sim_est_realtime: "Estimation PM2.5 Temps-Réel",
     sim_calc: "Calcul Intelligent...",
     sim_retry: "Réessayer",
+    sim_error: "Le service de simulation est temporairement indisponible.",
     sim_db: "Base de Données",
     sim_ai_precision: "Precision IA",
     sim_lab_control: "AI Lab Control",
@@ -151,6 +156,7 @@ const translations: Record<Language, Record<string, string>> = {
     today: "Aujourd'hui",
     tomorrow: "Demain",
     after_tomorrow_j2: "Après-demain",
+    chart_ai_prediction: "PRÉDICTION IA",
 
     // Stats Page
     stats_national: "Situation Nationale",
@@ -320,6 +326,13 @@ const translations: Record<Language, Record<string, string>> = {
     onboarding_cta_next: "Suivant",
     onboarding_cta_finish: "Accéder au tableau de bord",
     onboarding_skip: "Passer",
+    
+    // API Levels fallback mapping
+    "BON": "BON",
+    "MODERE": "MODÉRÉ",
+    "SEVERE": "SÉVÈRE",
+    "DANGEREUX": "DANGEREUX",
+    "CRITIQUE": "CRITIQUE"
   },
   en: {
     // Navbar
@@ -419,6 +432,10 @@ const translations: Record<Language, Record<string, string>> = {
     city_not_found: "The city \"{}\" is not currently under active surveillance.",
     city_loading: "Loading zones...",
 
+    // Onboarding additional
+    onboarding_aha_title: "Congratulations!",
+    onboarding_alert_config: "Configuring alerts for {}...",
+
     // Loading
     loading_ai: "Initializing AI Engine...",
     loading_map: "Loading satellite map...",
@@ -455,6 +472,7 @@ const translations: Record<Language, Record<string, string>> = {
     sim_est_realtime: "Real-Time PM2.5 Estimation",
     sim_calc: "Smart Computing...",
     sim_retry: "Retry",
+    sim_error: "Simulation service is temporarily unavailable.",
     sim_db: "Database",
     sim_ai_precision: "AI Precision",
     sim_lab_control: "AI Lab Control",
@@ -462,6 +480,7 @@ const translations: Record<Language, Record<string, string>> = {
     today: "Today",
     tomorrow: "Tomorrow",
     after_tomorrow_j2: "After tomorrow",
+    chart_ai_prediction: "AI PREDICTION",
     // Stats Page
     stats_national: "National Overview",
     stats_insights: "Insights: {}",
@@ -630,6 +649,13 @@ const translations: Record<Language, Record<string, string>> = {
     onboarding_cta_next: "Next",
     onboarding_cta_finish: "Access Dashboard",
     onboarding_skip: "Skip",
+
+    // API Levels fallback mapping
+    "BON": "GOOD",
+    "MODERE": "MODERATE",
+    "SEVERE": "SEVERE",
+    "DANGEREUX": "DANGEROUS",
+    "CRITIQUE": "CRITICAL"
   }
 };
 
