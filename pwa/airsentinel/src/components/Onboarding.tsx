@@ -164,7 +164,7 @@ export default function Onboarding() {
               <div className="mt-10 space-y-2">
                 <div className="flex items-center gap-3 text-white/40 text-[10px] font-bold uppercase tracking-widest bg-white/5 px-4 py-2 rounded-lg">
                   <div className="w-1 h-1 rounded-full bg-[#00d4b1] animate-ping" />
-                  Initialisation du profil...
+                  Configuration des alertes pour {ville}...
                 </div>
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function Onboarding() {
                 Félicitations !
               </h2>
               <p className="text-white text-lg font-bold leading-relaxed max-w-[320px] mb-12 bg-white/10 py-5 px-6 rounded-3xl backdrop-blur-xl border border-white/10">
-                Vous recevrez désormais les alertes de qualité de l'air pour la ville de <span className="text-[#00d4b1]">{ville || "votre ville"}</span>.
+                {t('onboarding_aha_desc').replace('{}', ville || t('nav_user_placeholder'))}
               </p>
               <button 
                 onClick={handleFinish}

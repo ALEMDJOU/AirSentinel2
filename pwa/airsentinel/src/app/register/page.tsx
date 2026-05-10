@@ -9,6 +9,7 @@ import SearchableSelect from "@/components/ui/SearchableSelect";
 import { Mail, Lock, Eye, EyeOff, ArrowLeft, Image as ImageIcon, User, Loader2, MapPin } from "lucide-react";
 import { notify } from "@/utils/toast";
 import { useLanguage } from "@/context/LanguageContext";
+import { useVille } from "@/context/VilleContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 import { DATASET_CITIES } from "@/services/dataService";
@@ -24,6 +25,7 @@ export default function RegisterPage() {
   const [avatar, setAvatar] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { t, lang } = useLanguage();
+  const { setVille } = useVille();
 
   const router = useRouter();
 
@@ -56,6 +58,9 @@ export default function RegisterPage() {
       });
 
       notify.success(t('reg_success'));
+
+      // Mise à jour immédiate du contexte de ville pour l'onboarding
+      setVille(city);
 
       // 2. Upload de l'avatar si présent
       if (avatar) {
