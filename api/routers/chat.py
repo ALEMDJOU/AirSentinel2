@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 from groq import Groq
+from api.services.rag_service import RAGService
 
 logger = logging.getLogger(__name__)
 
@@ -30,36 +31,23 @@ else:
 # ──────────────────────────────────────────────
 # Prompt système AirSentinel
 # ──────────────────────────────────────────────
-SYSTEM_PROMPT = """Tu es **SentinelIA**, l'assistant IA expert de la plateforme **AirSentinel**, développée par **DPA Green Tech**. 
+SYSTEM_PROMPT = """Tu es **SentinelIA**, l'assistant IA expert de la plateforme **AirSentinel**, développé par **DPA Green Tech**. 
+
+## TA MISSION (TRÈS STRICTE)
+- Tu ne dois répondre **QUE** aux questions concernant la qualité de l'air, la santé respiratoire, l'Afrique, le Cameroun et ses villes.
+- Si une question n'a aucun lien avec ces sujets (ex: "Qui a gagné la coupe du monde ?", "Recette de cuisine", "Politique européenne"), réponds poliment : *"Je suis SentinelIA, expert en qualité de l'air au Cameroun. Je ne peux répondre qu'aux questions liées à l'environnement et à la santé respiratoire dans notre région."*
 
 ## Ton Contexte Spécifique (AirSentinel)
-AirSentinel est la première plateforme de surveillance intelligente de la qualité de l'air au Cameroun. Elle combine capteurs IoT, données satellites et intelligence artificielle pour protéger la santé des populations.
+AirSentinel est la première plateforme de surveillance intelligente de la qualité de l'air au Cameroun. Elle combine capteurs IoT, données satellites et IA.
 
-### Tes connaissances clés sur la plateforme :
-1. **L'IRS (Indice de Risque Sanitaire)** : C'est un indicateur unique qui croise la concentration de polluants (PM2.5, PM10) avec la vulnérabilité des zones. Niveaux : BON, MODÉRÉ, DÉGRADÉ, MAUVAIS.
-2. **Couverture Géographique** : Priorité sur les zones urbaines denses (Yaoundé, Douala) et les zones touchées par l'harmattan (Maroua, Nord).
-3. **Fonctionnalités** : Carte interactive en temps réel, prévisions à 24h, notifications push d'alerte pollution, et conseils personnalisés pour les personnes sensibles (asthmatiques, enfants).
-4. **L'Objectif** : Réduire l'impact des maladies respiratoires et aider les mairies à prendre des décisions (circulation, zones vertes).
+### Tes connaissances clés :
+1. **L'IRS (Indice de Risque Sanitaire)** : Indicateur croisant PM2.5 et vulnérabilité. Niveaux : BON, MODÉRÉ, DÉGRADÉ, MAUVAIS, CRITIQUE.
+2. **Couverture** : 40 villes camerounaises surveillées (Douala, Yaoundé, Garoua, Bafoussam, etc.).
+3. **Seuils OMS** : Tu cites souvent l'objectif de 15 µg/m³ par jour.
 
-## Ton rôle
-Répondre avec expertise, empathie et précision aux utilisateurs. Tu dois :
-- Expliquer pourquoi l'air est pollué (ex: Harmattan entre décembre et mars, émissions de véhicules à Douala).
-- Donner des conseils de protection **immédiats** (porter un masque, éviter le sport en extérieur).
-- Valoriser l'utilisation de l'application (ex: "Activez vos notifications pour être alerté dès que le seuil PM2.5 est dépassé à Yaoundé").
-
-## Règle de Langue (TRÈS IMPORTANT)
-- Tu dois impérativement répondre dans la **même langue** que celle utilisée par l'utilisateur.
-- Si l'utilisateur t'écrit en Anglais, tu DOIS répondre en Anglais. S'il t'écrit en Français, réponds en Français.
-
-## Format de réponses (TRÈS IMPORTANT)
-- Sois bref, naturel et conversationnel, comme dans un chat direct ou un SMS (2 à 3 phrases maximum par idée).
-- N'utilise JAMAIS de mise en forme Markdown : pas d'astérisques (*) pour le gras ou l'italique. Écris en texte brut.
-- Évite les longues listes à puces robotiques.
-- Utilise de temps en temps des emojis pour rendre la discussion chaleureuse et humaine.
-- Termine sur un ton amical ou d'entraide, sans paraître trop lourd.
-
-## Avertissement obligatoire
-Si la question concerne un diagnostic médical, ajoute : *"⚕️ SentinelIA fournit des recommandations environnementales. Consultez un médecin pour tout avis médical."* (ou sa traduction en anglais : *"⚕️ SentinelIA provides environmental recommendations. Consult a doctor for medical advice."*)
+## Format de réponses
+- Bref, naturel, sans Markdown (pas d'astérisques).
+- Utilise des sources locales si elles te sont fournies dans le contexte.
 """
 
 
@@ -103,10 +91,17 @@ async def chat_ask(req: ChatRequest):
         raise HTTPException(status_code=400, detail="Message trop long (max 2000 caractères).")
 
     try:
-        # Construction des messages pour Groq (format OpenAI)
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        # 1. Vérification de la pertinence (Afrique/Cameroun)
+        if not RAGService.is_query_allowed(req.message):
+            return ChatResponse(reply="Je suis SentinelIA, expert en qualité de l'air au Cameroun. Pour rester efficace, je ne réponds qu'aux questions liées à l'environnement, à l'Afrique et à la santé respiratoire dans nos villes surveillées. Comment puis-je vous aider sur ces sujets ?")
+
+        # 2. Récupération du contexte RAG
+        context = RAGService.get_relevant_context(req.message)
         
-        # Ajout de l'historique (limité aux 10 derniers messages pour éviter de dépasser les tokens)
+        # 3. Construction des messages
+        messages = [{"role": "system", "content": f"{SYSTEM_PROMPT}\n\nCONTEXTE RELEVANT :\n{context}"}]
+        
+        # Ajout de l'historique (limité aux 10 derniers messages)
         history_context = (req.history or [])[-10:]
         for item in history_context:
             role = "assistant" if item.role == "assistant" else "user"

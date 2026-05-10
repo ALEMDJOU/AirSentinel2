@@ -13,6 +13,7 @@ from typing import Optional
 from api.services.data_service import get_dataframe
 from api.services.prediction_service import get_model
 from api.services.irs_service import classify_irs_score
+from api.services.cache_service import cached_endpoint
 
 router = APIRouter(prefix="/carte", tags=["Carte"])
 
@@ -73,6 +74,7 @@ def _irs_label_color(irs_val, status_label=None):
 
 # ─── Endpoints ─────────────────────────────────────────────────────
 @router.get("", response_model=list[VillePoint])
+@cached_endpoint(ttl=300) # Cache de 5 minutes
 def get_carte():
     """
     Retourne une liste de points géolocalisés par ville avec PM2.5 et IRS.
@@ -121,6 +123,7 @@ def get_carte():
 
 
 @router.get("/analyses", response_model=CarteAnalyses)
+@cached_endpoint(ttl=600) # Cache de 10 minutes (calculs lourds)
 def get_analyses(city: Optional[str] = None):
     """
     Retourne 6 analyses enrichies :

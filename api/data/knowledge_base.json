@@ -1,0 +1,25 @@
+{
+  "general_cameroon": {
+    "decree_2011": "Décret n° 2011/2582/PM du 23 août 2011 fixant les modalités de protection de l'atmosphère au Cameroun. Ce texte définit les seuils de pollution et les sanctions pour les émissions industrielles et mobiles.",
+    "major_pollutants": "Au Cameroun, les polluants majeurs sont les PM2.5 (particules fines), le CO (monoxyde de carbone issu du trafic), et les poussières désertiques durant l'Harmattan.",
+    "harmattan_period": "L'Harmattan survient généralement entre décembre et mars au Cameroun, provoquant des pics de PM2.5 dépassant souvent 150 µg/m³ dans le Nord et l'Extrême-Nord.",
+    "who_target": "AirSentinel suit les recommandations 2021 de l'OMS qui fixent la limite annuelle de PM2.5 à 5 µg/m³ et la limite journalière à 15 µg/m³."
+  },
+  "city_specific": {
+    "Douala": "Capitale économique, forte pollution liée au trafic portuaire et aux zones industrielles de Bassa et Bonabéri.",
+    "Yaoundé": "Forte pollution liée au relief (cuvette) qui emprisonne les gaz d'échappement des véhicules, surtout aux heures de pointe à Poste Centrale et Mvan.",
+    "Maroua": "Zone critique pour les poussières minérales. L'IRS y est souvent ÉLEVÉ à cause de la proximité du Sahara.",
+    "Kribi": "Ville côtière avec une qualité d'air généralement BONNE grâce aux brises marines, malgré l'activité portuaire croissante."
+  },
+  "health_recommendations_cameroon": {
+    "children": "Pour les enfants camerounais, limiter les activités physiques en extérieur lors des pics de brume sèche (Harmattan).",
+    "mask": "Le port du masque est recommandé lors des épisodes de poussière intense à Garoua, Maroua et Ngaoundéré.",
+    "ventilation": "Fermer les fenêtres pendant les pics de pollution urbaine à Douala et Yaoundé."
+  },
+  "eligible_cities": [
+    "Abong-Mbang", "Akonolinga", "Ambam", "Bafia", "Bafoussam", "Bamenda", "Batouri", "Bertoua", "Buea", "Douala", 
+    "Dschang", "Ebolowa", "Edea", "Foumban", "Garoua", "Guider", "Kousseri", "Kribi", "Kumba", "Kumbo", 
+    "Limbe", "Loum", "Mamfe", "Maroua", "Mbalmayo", "Mbengwi", "Mbouda", "Meiganga", "Mokolo", "Ngaoundere", 
+    "Nkongsamba", "Poli", "Sangmelima", "Tibati", "Tignere", "Touboro", "Wum", "Yagoua", "Yaounde", "Yokadouma"
+  ]
+}
