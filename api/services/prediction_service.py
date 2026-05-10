@@ -24,7 +24,9 @@ def load_all_models() -> None:
         "scaler": "scaler_acp_irs.pkl",
         "pca": "pca_irs.pkl",
         "cols": "cols_irs.pkl",
-        "seuils": "seuils_irs.pkl"
+        "seuils": "seuils_irs.pkl",
+        "scaler_pm25": "scaler.pkl",
+        "features_list": "features.pkl"
     }
     
     for key, filename in files_to_load.items():
@@ -32,14 +34,13 @@ def load_all_models() -> None:
         
         if not file_path.exists():
             logger.error(f"Le fichier de modèle '{file_path}' est introuvable.")
-            raise FileNotFoundError(f"Erreur critique: Le modèle requis '{file_path}' n'existe pas.")
+            continue # Ne pas bloquer tout le chargement si un fichier manque
         
         try:
             _models[key] = joblib.load(file_path)
             logger.info(f"Modèle '{key}' chargé avec succès depuis {filename}.")
         except Exception as e:
             logger.error(f"Erreur inattendue lors du chargement du modèle {filename}: {e}")
-            raise
 
 def get_model(name: str):
     """
@@ -57,3 +58,29 @@ def get_model(name: str):
         )
         
     return _models[name]
+
+def predict_pm25(features_dict: dict) -> float:
+    """
+    Effectue une prédiction PM2.5 réelle en utilisant le meilleur_modele.pkl
+    et le scaler associé.
+    """
+    try:
+        model = get_model("modele")
+        scaler = get_model("scaler_pm25")
+        features_list = get_model("features_list")
+        
+        import pandas as pd
+        # S'assurer que toutes les colonnes sont présentes, sinon mettre des valeurs par défaut (0.0)
+        input_data = {}
+        for col in features_list:
+            input_data[col] = float(features_dict.get(col, 0.0))
+            
+        X = pd.DataFrame([input_data])[features_list]
+        X_scaled = scaler.transform(X)
+        prediction = model.predict(X_scaled)
+        
+        return float(prediction[0])
+    except Exception as e:
+        logger.error(f"Erreur lors de la prédiction PM2.5 réelle : {e}")
+        # Fallback sur une valeur par défaut ou lever l'exception
+        return 0.0

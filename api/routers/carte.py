@@ -112,17 +112,18 @@ def get_carte():
         try:
             from api.routers.predictions import compute_interactive
             from api.schemas.prediction import ComputeInput
-            features = {
-                "dust":     float(row.get("dust_moyen", 50.0)),
-                "co":       float(row.get("co_moyen", 15.0)),
-                "uv":       float(row.get("uv_moyen", 6.0)),
-                "temp":     float(row.get("temperature_2m_mean", 25.0)),
-                "humidity": float(row.get("humidity_moyen", row.get("precipitation_sum", 60.0))),
-                "ozone":    float(row.get("ozone_moyen", 40.0)),
-            }
-            pred = compute_interactive(ComputeInput(city=city_name, features=features))
+            
+            # Passer TOUTES les colonnes de la ligne pour que le modèle ait accès aux lags, lat/lon, etc.
+            row_dict = row.to_dict()
+            
+            # Mapping pour compatibilité si nécessaire
+            row_dict["temp"] = row_dict.get("temperature_2m_mean", row_dict.get("temp"))
+            row_dict["humidity"] = row_dict.get("humidity_moyen", row_dict.get("humidity"))
+            
+            pred = compute_interactive(ComputeInput(city=city_name, features=row_dict))
             ml_pm25 = pred.predicted_pm25
-        except Exception:
+        except Exception as e:
+            logger.error(f"Erreur ML sur la carte pour {city_name}: {e}")
             ml_pm25 = round(float(row[pm25_col]), 2) if pm25_col else 0.0
 
         label, color = _irs_label_color(irs_val, status_text)

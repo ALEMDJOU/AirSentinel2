@@ -139,49 +139,52 @@ def simulate_irs(payload: IRSInput):
 @router.post("/compute", response_model=ComputeResponse)
 def compute_interactive(payload: ComputeInput):
     """
-    Simulateur Interactif : Calcule le PM2.5 prédit selon la ville et les features ajustées par les jauges.
+    Simulateur Interactif : Calcule le PM2.5 prédit selon la ville et les features.
+    Utilise le modèle ML réel AirSentinel si disponible.
     """
     logger.info(f"Simulation PM2.5 demandée pour la ville: {payload.city}")
-    city = payload.city.lower()
-    f = payload.features
+    f = payload.features.copy()
     
-    # Baselines par ville (µg/m³) - Basé sur les moyennes IndabaX
-    baselines = {
-        "douala": 35.0,
-        "yaoundé": 28.0,
-        "yaounde": 28.0,
-        "bafoussam": 22.0,
-        "garoua": 45.0,
-        "bamenda": 25.0,
-        "maroua": 50.0,
-        "kribi": 15.0,
-        "bertoua": 32.0,
-        "ebolowa": 20.0,
-        "ngaoundéré": 38.0,
-        "ngaoundere": 38.0,
-        "buéa": 18.0,
-        "buea": 18.0,
-        "touboro": 42.0,
+    # Ajouter les métadonnées temporelles et géographiques si absentes
+    now = datetime.now()
+    if "mois" not in f: f["mois"] = now.month
+    if "jour_annee" not in f: f["jour_annee"] = now.timetuple().tm_yday
+    
+    # Baselines lat/lon pour les villes principales si non fournies
+    city_coords = {
+        "douala": (4.05, 9.70), "yaoundé": (3.87, 11.52), "yaounde": (3.87, 11.52),
+        "bafoussam": (5.48, 10.42), "garoua": (9.30, 13.40), "bamenda": (5.96, 10.15)
     }
-    
-    baseline = baselines.get(city, 30.0)
-    
-    # Poids des features (Simule l'impact physique)
-    # PM2.5 = Baseline + sum(feature * weight)
-    # Les valeurs en entrée sont supposées être "normalisées" ou dans des ranges standards
-    weights = {
-        "dust": 0.15,       # Impact fort des particules sahariennes
-        "co": 1.5,          # Impact fort du trafic urbain
-        "uv": 0.3,          # Impact photochimique
-        "ozone": 0.2,       # Corrélation forte
-        "temp": 0.1,        # La chaleur peut augmenter la suspension
-        "humidity": -0.05,  # L'humidité peut faire tomber les particules
+    if "latitude" not in f or "longitude" not in f:
+        lat, lon = city_coords.get(payload.city.lower(), (4.0, 11.0))
+        f["latitude"] = f.get("latitude", lat)
+        f["longitude"] = f.get("longitude", lon)
+
+    # Mapper les noms des colonnes du payload vers ceux attendus par le modèle (si nécessaire)
+    mapping = {
+        "temp": "temperature_2m_mean",
+        "humidity": "humidity_moyen",
+        "dust": "dust_moyen",
+        "co": "co_moyen",
+        "uv": "uv_moyen",
+        "ozone": "ozone_moyen"
     }
-    
-    adjustment = sum(f.get(k, 0) * w for k, w in weights.items())
-    predicted = max(2.0, baseline + adjustment)
-    
-    # Classification
+    for k, v in mapping.items():
+        if k in f: f[v] = f.get(v, f[k])
+
+    try:
+        from api.services.prediction_service import predict_pm25
+        predicted = predict_pm25(f)
+        # Si le modèle retourne une valeur aberrante (ex: 0.0 suite à erreur), utiliser une fallback
+        if predicted <= 0:
+             # Fallback sur l'ancienne logique de baseline simplifiée
+             baselines = {"douala": 35.0, "yaoundé": 28.0, "bafoussam": 22.0}
+             predicted = baselines.get(payload.city.lower(), 30.0)
+    except Exception as e:
+        logger.error(f"Erreur modèle ML : {e}")
+        predicted = 30.0
+
+    # Classification (seuils OMS/AirSentinel)
     if predicted <= 12:
         level, color = "BON", "#10b981"
         desc = "La qualité de l'air est jugée satisfaisante."

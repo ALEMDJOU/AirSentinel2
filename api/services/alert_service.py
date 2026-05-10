@@ -26,15 +26,8 @@ def _load_city_features_map() -> dict:
         df_latest["ville_key"] = df_latest["ville"].str.lower().str.strip()
         result = {}
         for _, row in df_latest.iterrows():
-            result[row["ville_key"]] = {
-                "dust":     float(row.get("dust_moyen", 50.0)),
-                "co":       float(row.get("co_moyen", 15.0)),
-                "uv":       float(row.get("uv_moyen", 6.0)),
-                "temp":     float(row.get("temperature_2m_mean", 25.0)),
-                "humidity": float(row.get("humidity_moyen", row.get("precipitation_sum", 60.0))),
-                "ozone":    float(row.get("ozone_moyen", 40.0)),
-                "ville_nom": str(row.get("ville", "")),
-            }
+            # On passe tout le dictionnaire de la ligne (lags, meteo, etc.)
+            result[row["ville_key"]] = row.to_dict()
         return result
     except Exception as e:
         logger.error(f"[AlertService] Impossible de charger le dataset : {e}")
