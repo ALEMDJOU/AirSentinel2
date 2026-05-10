@@ -9,12 +9,14 @@ import pandas as pd
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
+import logging
 
 from api.services.data_service import get_dataframe
 from api.services.prediction_service import get_model
 from api.services.irs_service import classify_irs_score
 
 router = APIRouter(prefix="/carte", tags=["Carte"])
+logger = logging.getLogger(__name__)
 
 
 # ─── Schémas inline ────────────────────────────────────────────────
