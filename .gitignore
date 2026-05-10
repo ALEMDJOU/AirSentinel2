@@ -1,8 +1,11 @@
 *.xlsx
 *.csv
-# Ignore all data by default, allow only parquet
-data/*
-!data/**/*.parquet
+# Allow data directory and specifically parquet files
+!data/
+!data/processed/
+!data/processed/*.parquet
+!data/raw/
+!data/raw/*.parquet
 # Allow model files
 !models/**/*.pkl
 __pycache__/
