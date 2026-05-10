@@ -61,42 +61,39 @@ def get_short_term():
     today_dt = pd.Timestamp.now().normalize()
     last_real_date = today_dt
     
-    # 1. Récupérer l'historique (jusqu'à aujourd'hui inclus)
-    hist_df = df_sorted[df_sorted[date_col] <= last_real_date].tail(21)
+    # 1. Récupérer uniquement le point d'Aujourd'hui (le dernier réel)
+    hist_df = df_sorted[df_sorted[date_col] <= last_real_date].tail(1)
     
-    hist_agg = (
-        hist_df.resample("D", on=date_col)[pm25_col]
-        .mean()
-        .dropna()
-        .reset_index()
-    )
-    
-    result = [
-        PredictionPoint(date=str(row[date_col].date()), pm25=round(float(row[pm25_col]), 2))
-        for _, row in hist_agg.iterrows()
-    ]
+    result = []
+    if not hist_df.empty:
+        row = hist_df.iloc[0]
+        result.append(PredictionPoint(
+            date=str(row[date_col].date()), 
+            pm25=round(float(row[pm25_col]), 2),
+            is_prediction=False
+        ))
 
-    # 2. Récupérer les prédictions (Après aujourd'hui)
-    # On regarde si le dataset contient déjà des données futures (ex: importées d'une API de forecast)
-    future_df = df_sorted[df_sorted[date_col] > last_real_date].head(3)
+    # 2. Récupérer les prédictions (J+1 et J+2)
+    # On cherche les 2 jours suivants dans le parquet
+    future_df = df_sorted[df_sorted[date_col] > last_real_date].head(2)
     
     if not future_df.empty:
-        # Utilisation des données réelles du parquet pour le futur
         for _, row in future_df.iterrows():
             result.append(PredictionPoint(
                 date=str(row[date_col].date()), 
                 pm25=round(float(row[pm25_col]), 2), 
                 is_prediction=True
             ))
-        logger.info(f"Prédictions basées sur le DATASET pour {len(future_df)} jours.")
     else:
-        # Fallback : Simulation si pas de données futures dans le parquet
-        logger.info("Aucune donnée future dans le parquet. Passage en mode SIMULATION.")
-        pm25_base = hist_agg[pm25_col].tail(7).mean() if not hist_agg.empty else 25.0
-        for i in range(1, 4):
+        # Fallback simulation si pas de données futures
+        pm25_base = result[0].pm25 if result else 25.0
+        for i in range(1, 3):
             pred_date = last_real_date + timedelta(days=i)
-            pred_val = round(float(pm25_base) * (1 + 0.01 * i), 2)
-            result.append(PredictionPoint(date=str(pred_date.date()), pm25=pred_val, is_prediction=True))
+            result.append(PredictionPoint(
+                date=str(pred_date.date()), 
+                pm25=round(float(pm25_base) * (1 + 0.01 * i), 2), 
+                is_prediction=True
+            ))
 
     return result
 
