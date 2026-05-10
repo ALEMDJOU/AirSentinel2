@@ -13,7 +13,6 @@ from typing import Optional
 from api.services.data_service import get_dataframe
 from api.services.prediction_service import get_model
 from api.services.irs_service import classify_irs_score
-from api.services.cache_service import cached_endpoint
 
 router = APIRouter(prefix="/carte", tags=["Carte"])
 
@@ -74,7 +73,6 @@ def _irs_label_color(irs_val, status_label=None):
 
 # ─── Endpoints ─────────────────────────────────────────────────────
 @router.get("", response_model=list[VillePoint])
-@cached_endpoint(ttl=300) # Cache de 5 minutes
 def get_carte():
     """
     Retourne une liste de points géolocalisés par ville avec PM2.5 et IRS.
@@ -123,7 +121,6 @@ def get_carte():
 
 
 @router.get("/analyses", response_model=CarteAnalyses)
-@cached_endpoint(ttl=600) # Cache de 10 minutes (calculs lourds)
 def get_analyses(city: Optional[str] = None):
     """
     Retourne 6 analyses enrichies :
@@ -150,15 +147,11 @@ def get_analyses(city: Optional[str] = None):
     region_col = _find_col(df, ["region", "Region", "Area"])
     city_col   = _find_col(df, ["ville", "city", "Ville", "City"])
 
-    # On ne garde que les données jusqu'à aujourd'hui pour les analyses (situation actuelle)
-    today = pd.Timestamp.now().normalize()
-    df_current = df[df["date"] <= today] if "date" in df.columns else df
-
     # ─── EXTRACTION DES DONNÉES RÉCENTES POUR S'ALIGNER AVEC LA CARTE ───
     if city_col and "date" in df.columns:
-        latest_df = df_current.sort_values(by="date", ascending=False).drop_duplicates(subset=[city_col])
+        latest_df = df.sort_values(by="date", ascending=False).drop_duplicates(subset=[city_col])
     else:
-        latest_df = df_current.drop_duplicates(subset=[city_col]) if city_col else df_current
+        latest_df = df.drop_duplicates(subset=[city_col]) if city_col else df
 
     # 1. PM2.5 par région
     pm25_par_region = {}

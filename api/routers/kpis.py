@@ -12,7 +12,6 @@ import logging
 
 from api.services.data_service import get_dataframe, apply_filters
 from api.schemas.pollution import KPIResponse
-from api.services.cache_service import cached_endpoint
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +27,6 @@ def _find_col(df: pd.DataFrame, candidates: list[str]):
 
 
 @router.get("", response_model=KPIResponse)
-@cached_endpoint(ttl=300) # Cache de 5 minutes
 def get_kpis(city: Optional[str] = None):
     """
     Retourne les 6 indicateurs clés nationaux :
