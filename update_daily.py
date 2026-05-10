@@ -147,8 +147,11 @@ def main():
     if not os.path.exists(DATASET_PATH): return
     df_old = pd.read_parquet(DATASET_PATH)
     start = (df_old['date'].max() + timedelta(days=1)).strftime('%Y-%m-%d')
-    end = datetime.now().strftime('%Y-%m-%d')
-    if start > end: return
+    # On récupère aussi les prévisions pour les 3 prochains jours
+    end = (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d')
+    if start > end:
+        # Même si le dataset est à jour pour aujourd'hui, on veut peut-être rafraîchir les prévisions
+        start = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
     df_new = fetch_data(CITIES, start, end)
     if not df_new.empty:
         df_f = compute_irs(process_features(df_new, df_old))
