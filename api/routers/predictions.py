@@ -61,20 +61,27 @@ def get_short_term():
     today_dt = pd.Timestamp.now().normalize()
     last_real_date = today_dt
     
-    # 1. Récupérer uniquement le point d'Aujourd'hui (le dernier réel)
-    hist_df = df_sorted[df_sorted[date_col] <= last_real_date].tail(1)
+    # 1. Récupérer l'historique (jusqu'à aujourd'hui inclus) - 21 jours
+    hist_df = df_sorted[df_sorted[date_col] <= last_real_date].tail(21)
     
-    result = []
-    if not hist_df.empty:
-        row = hist_df.iloc[0]
-        result.append(PredictionPoint(
+    # Agrégation journalière pour l'historique
+    hist_agg = (
+        hist_df.resample("D", on=date_col)[pm25_col]
+        .mean()
+        .dropna()
+        .reset_index()
+    )
+    
+    result = [
+        PredictionPoint(
             date=str(row[date_col].date()), 
             pm25=round(float(row[pm25_col]), 2),
             is_prediction=False
-        ))
+        )
+        for _, row in hist_agg.iterrows()
+    ]
 
     # 2. Récupérer les prédictions (J+1 et J+2)
-    # On cherche les 2 jours suivants dans le parquet
     future_df = df_sorted[df_sorted[date_col] > last_real_date].head(2)
     
     if not future_df.empty:
@@ -85,8 +92,8 @@ def get_short_term():
                 is_prediction=True
             ))
     else:
-        # Fallback simulation si pas de données futures
-        pm25_base = result[0].pm25 if result else 25.0
+        # Fallback simulation
+        pm25_base = result[-1].pm25 if result else 25.0
         for i in range(1, 3):
             pred_date = last_real_date + timedelta(days=i)
             result.append(PredictionPoint(
