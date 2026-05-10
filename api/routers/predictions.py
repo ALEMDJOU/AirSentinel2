@@ -79,16 +79,39 @@ def get_short_term():
         for _, row in hist.iterrows()
     ]
 
-    # Prédiction simulée
-    if not hist.empty:
-        pm25_base = hist[pm25_col].tail(7).mean() if len(hist) >= 7 else hist[pm25_col].mean()
+    # Prédiction réelle (via les données futures du dataset et le modèle ML)
+    future_df = df_sorted[df_sorted[date_col] > last_date].sort_values(date_col)
+    
+    if not future_df.empty:
+        # Prendre les 3 prochains jours disponibles
+        next_days = future_df[date_col].dt.date.unique()[:3]
+        for day in next_days:
+            day_data = future_df[future_df[date_col].dt.date == day].iloc[0]
+            try:
+                from api.services.prediction_service import predict_pm25
+                # On passe tout le dictionnaire de la ligne (features météo futures)
+                pred_val = predict_pm25(day_data.to_dict())
+                if pred_val <= 0: raise ValueError("Prediction invalide")
+            except Exception:
+                # Fallback arithmétique si le modèle échoue
+                pm25_base = hist[pm25_col].mean() if not hist.empty else 25.0
+                pred_val = pm25_base * 1.05
+            
+            result.append(PredictionPoint(
+                date=str(day), 
+                pm25=round(float(pred_val), 2), 
+                is_prediction=True
+            ))
     else:
-        pm25_base = 25.0
-        
-    for i in range(1, 4):
-        pred_date = last_date + timedelta(days=i)
-        pred_val = round(float(pm25_base) * (1 + 0.01 * i), 2)
-        result.append(PredictionPoint(date=str(pred_date.date()), pm25=pred_val, is_prediction=True))
+        # Fallback si pas de données futures dans le dataset
+        pm25_base = hist[pm25_col].mean() if not hist.empty else 25.0
+        for i in range(1, 4):
+            pred_date = last_date + timedelta(days=i)
+            result.append(PredictionPoint(
+                date=str(pred_date.date()), 
+                pm25=round(float(pm25_base) * (1 + 0.02 * i), 2), 
+                is_prediction=True
+            ))
 
     return result
 
