@@ -70,26 +70,25 @@ def get_short_term(city: Optional[str] = None):
         logger.warning("Dataset filtré vide pour les prédictions.")
         return []
 
-    last_date = df_sorted[date_col].max()
+    # Définir aujourd'hui comme point de bascule
+    today_now = pd.Timestamp.now().normalize()
+    last_date_val = today_now.date()
 
-    # Préparation des points (Historique + Futur)
-    # On prend les 21 jours passés + les 3 jours futurs disponibles
     all_dates = sorted(df_sorted[date_col].dt.date.unique())
     try:
-        today_idx = all_dates.index(last_date.date())
+        today_idx = all_dates.index(last_date_val)
     except ValueError:
         today_idx = len(all_dates) - 1
 
     start_idx = max(0, today_idx - 20)
-    selected_dates = all_dates[start_idx : today_idx + 4] # 21 jours passés (incluant aujourd'hui) + 3 futurs
+    selected_dates = all_dates[start_idx : today_idx + 3]
 
     result = []
     from api.services.prediction_service import predict_pm25
     
     for day in selected_dates:
-        # Prendre la première ligne pour ce jour
         day_data = df_sorted[df_sorted[date_col].dt.date == day].iloc[0]
-        is_future = day > last_date.date()
+        is_future = day > last_date_val
         
         try:
             # On passe toutes les caractéristiques du jour au modèle ML
