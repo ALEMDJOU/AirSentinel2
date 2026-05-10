@@ -64,7 +64,7 @@ def get_short_term(city: Optional[str] = None):
         logger.error(f"Colonnes requises absentes: pm25={pm25_col}, date={date_col}")
         return [] # Retourner une liste vide plutôt que de crasher
 
-    df_sorted = df.sort_values(date_col).dropna(subset=[pm25_col])
+    df_sorted = df.sort_values(date_col)
     
     if df_sorted.empty:
         logger.warning("Dataset filtré vide pour les prédictions.")

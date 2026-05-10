@@ -110,7 +110,7 @@ def fetch_data(villes_info, start_date, end_date):
             df_aq_d['date'] = pd.to_datetime(df_aq_d['date']).dt.normalize()
             df_w['date'] = df_w['date'].dt.normalize()
 
-            df_city = pd.merge(df_w, df_aq_d, on="date", how="inner")
+            df_city = pd.merge(df_w, df_aq_d, on="date", how="left")
             df_city["ville"], df_city["region"], df_city["latitude"], df_city["longitude"] = city['ville'], city['region'], city['lat'], city['lon']
             df_city["polluant_dominant"] = "pm2_5"
             df_city["niveau_alerte"] = df_city["pm2_5_moyen"].apply(lambda x: get_air_quality_level(x)[0])
