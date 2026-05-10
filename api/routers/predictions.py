@@ -158,24 +158,23 @@ def compute_interactive(payload: ComputeInput):
     Utilise le modèle ML réel AirSentinel si disponible.
     """
     logger.info(f"Simulation PM2.5 demandée pour la ville: {payload.city}")
-    f = payload.features.copy()
-    
-    # Ajouter les métadonnées temporelles et géographiques si absentes
-    now = datetime.now()
-    if "mois" not in f: f["mois"] = now.month
-    if "jour_annee" not in f: f["jour_annee"] = now.timetuple().tm_yday
-    
-    # Baselines lat/lon pour les villes principales si non fournies
-    city_coords = {
-        "douala": (4.05, 9.70), "yaoundé": (3.87, 11.52), "yaounde": (3.87, 11.52),
-        "bafoussam": (5.48, 10.42), "garoua": (9.30, 13.40), "bamenda": (5.96, 10.15)
-    }
-    if "latitude" not in f or "longitude" not in f:
-        lat, lon = city_coords.get(payload.city.lower(), (4.0, 11.0))
-        f["latitude"] = f.get("latitude", lat)
-        f["longitude"] = f.get("longitude", lon)
+    # 1. Charger les données réelles les plus récentes pour cette ville (pour les lags et métadonnées)
+    f = {}
+    try:
+        df = get_dataframe()
+        city_col = _find_col(df, ["ville", "city", "City", "Ville"])
+        if city_col:
+            city_data = df[df[city_col].str.lower() == payload.city.lower()]
+            if not city_data.empty:
+                # Prendre la ligne la plus récente pour avoir les vrais lags
+                f = city_data.sort_values("date", ascending=False).iloc[0].to_dict()
+    except Exception as e:
+        logger.warning(f"Impossible de charger les données réelles pour la simulation: {e}")
 
-    # Mapper les noms des colonnes du payload vers ceux attendus par le modèle (si nécessaire)
+    # 2. Fusionner avec les features du payload (les jauges de l'utilisateur gagnent)
+    payload_f = payload.features.copy()
+    
+    # Mapper les noms courts du payload vers les noms longs du modèle
     mapping = {
         "temp": "temperature_2m_mean",
         "humidity": "humidity_moyen",
@@ -184,8 +183,24 @@ def compute_interactive(payload: ComputeInput):
         "uv": "uv_moyen",
         "ozone": "ozone_moyen"
     }
-    for k, v in mapping.items():
-        if k in f: f[v] = f.get(v, f[k])
+    for short_name, long_name in mapping.items():
+        if short_name in payload_f:
+            f[long_name] = payload_f[short_name]
+
+    # 3. Ajouter les métadonnées temporelles et géographiques si toujours absentes
+    now = datetime.now()
+    if "mois" not in f: f["mois"] = now.month
+    if "jour_annee" not in f: f["jour_annee"] = now.timetuple().tm_yday
+    
+    # Baselines lat/lon pour les villes principales
+    city_coords = {
+        "douala": (4.05, 9.70), "yaoundé": (3.87, 11.52), "yaounde": (3.87, 11.52),
+        "bafoussam": (5.48, 10.42), "garoua": (9.30, 13.40), "bamenda": (5.96, 10.15)
+    }
+    if "latitude" not in f or "longitude" not in f:
+        lat, lon = city_coords.get(payload.city.lower(), (4.0, 11.0))
+        f["latitude"] = f.get("latitude", lat)
+        f["longitude"] = f.get("longitude", lon)
 
     try:
         from api.services.prediction_service import predict_pm25
