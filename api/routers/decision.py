@@ -23,78 +23,114 @@ class ProfilRecommandation(BaseModel):
     actions: list[str]
 
 
-# Recommandations statiques par niveau IRS × profil
+# Recommandations statiques par niveau IRS × profil (Optimisé OMS 2021)
 RECOMMANDATIONS = {
-    "FAIBLE": {
+    "EXCELLENT": {
+        "enfant": {
+            "message": "Air d'une pureté exceptionnelle. Activités extérieures vivement encouragées.",
+            "actions": ["Sport intense sans limite", "Aération maximale"]
+        },
+        "adulte": {
+            "message": "Qualité d'air idéale. Aucune restriction pour les activités sportives.",
+            "actions": ["Activités de plein air", "Ventilation naturelle"]
+        },
+        "personne_agee": {
+            "message": "Conditions parfaites. Sorties conseillées pour la santé.",
+            "actions": ["Promenade", "Aération des chambres"]
+        },
+        "asthmatique": {
+            "message": "Air très pur. Profitez du plein air sereinement.",
+            "actions": ["Activités normales", "Surveillance habituelle"]
+        },
+    },
+    "BON": {
         "enfant": {
             "message": "Qualité de l'air satisfaisante. Les activités extérieures sont conseillées.",
             "actions": ["Activités sportives possibles", "Pas de restriction"]
         },
         "adulte": {
             "message": "Air sain. Profitez des activités en plein air sans restriction.",
-            "actions": ["Activités normales", "Ventilation naturelle recommandée"]
+            "actions": ["Activités normales", "Ventilation recommandée"]
         },
         "personne_agee": {
-            "message": "Conditions favorables. Sortie possible sans précaution particulière.",
-            "actions": ["Promenade conseillée", "Pas de masque nécessaire"]
+            "message": "Conditions favorables. Sortie possible sans précaution.",
+            "actions": ["Promenade conseillée", "Pas de masque"]
         },
         "asthmatique": {
             "message": "Risque faible. Gardez votre inhalateur par précaution.",
-            "actions": ["Sortie possible", "Surveiller vos symptômes"]
+            "actions": ["Sortie possible", "Surveiller les symptômes"]
         },
     },
-    "MODÉRÉ": {
+    "MODERE": {
         "enfant": {
-            "message": "Qualité d'air modérée. Limitez les efforts intenses prolongés en extérieur.",
-            "actions": ["Réduire les activités sportives intenses", "Aérer les locaux en dehors des heures de pointe"]
+            "message": "Qualité d'air modérée. Limitez les efforts intenses prolongés.",
+            "actions": ["Réduire le sport intense", "Aérer hors heures de pointe"]
         },
         "adulte": {
-            "message": "Léger risque pour les personnes sensibles. Réduisez les expositions prolongées.",
-            "actions": ["Limiter les activités physiques prolongées", "Éviter les zones à fort trafic"]
+            "message": "Léger risque pour les sensibles. Réduisez les expositions prolongées.",
+            "actions": ["Limiter les efforts physiques", "Éviter les zones de trafic"]
         },
         "personne_agee": {
-            "message": "Prudence conseillée. Privilégiez les activités en intérieur.",
-            "actions": ["Rester à l'intérieur si possible", "Consulter un médecin si gêne respiratoire"]
+            "message": "Prudence conseillée. Privilégiez les activités calmes.",
+            "actions": ["Limiter les sorties longues", "Aération filtrée"]
         },
         "asthmatique": {
-            "message": "Risque modéré. Portez masque FFP2 en extérieur et ayez votre traitement.",
-            "actions": ["Porter un masque FFP2", "Éviter les efforts physiques", "Avoir bronchodilatateur à portée"]
+            "message": "Risque modéré. Portez un masque FFP2 par précaution.",
+            "actions": ["Porter un masque FFP2", "Avoir bronchodilatateur à portée"]
         },
     },
-    "ÉLEVÉ": {
+    "DEGRADE": {
         "enfant": {
-            "message": "Qualité d'air dégradée. Restez à l'intérieur autant que possible.",
-            "actions": ["Annuler les sorties scolaires", "Fermer les fenêtres", "Purificateur d'air si disponible"]
+            "message": "Air pollué. Réduisez significativement les sorties.",
+            "actions": ["Activités en intérieur", "Fermer les fenêtres", "Pas de sport extérieur"]
         },
         "adulte": {
-            "message": "Air de mauvaise qualité. Limitez toute activité extérieure.",
-            "actions": ["Télétravail si possible", "Porter masque FFP2", "Éviter tout effort en extérieur"]
+            "message": "Qualité médiocre. Évitez les efforts physiques en extérieur.",
+            "actions": ["Porter un masque", "Privilégier le sport en salle", "Limiter les déplacements"]
         },
         "personne_agee": {
-            "message": "Danger pour les personnes vulnérables. Restez en intérieur.",
-            "actions": ["Ne pas sortir", "Fermer portes et fenêtres", "Contacter les services médicaux si symptômes"]
+            "message": "Vulnérabilité accrue. Restez à l'intérieur autant que possible.",
+            "actions": ["Sorties brèves uniquement", "Vérifier la ventilation", "Surveiller le pouls"]
         },
         "asthmatique": {
-            "message": "Risque élevé. Activation du plan d'action asthme recommandée.",
-            "actions": ["Rester en intérieur obligatoirement", "Augmenter traitement préventif si prescrit", "Alerter un médecin"]
+            "message": "Alerte dégradation. Risque de crise accru.",
+            "actions": ["Rester en intérieur", "Doubler de vigilance", "Traitement de fond rigoureux"]
+        },
+    },
+    "MAUVAIS": {
+        "enfant": {
+            "message": "Air de mauvaise qualité. Interdiction de sport en extérieur.",
+            "actions": ["Annuler sorties scolaires", "Fermer fenêtres", "Purificateur d'air"]
+        },
+        "adulte": {
+            "message": "Pollution marquée. Limitez toute activité extérieure.",
+            "actions": ["Télétravail conseillé", "Masque FFP2 obligatoire", "Éviter tout effort"]
+        },
+        "personne_agee": {
+            "message": "Danger pour les vulnérables. Restez confiné.",
+            "actions": ["Ne pas sortir", "Fermer tout accès", "Contact médical si besoin"]
+        },
+        "asthmatique": {
+            "message": "Risque élevé. Activation du plan d'action asthme.",
+            "actions": ["Confinement strict", "Prévenir un proche", "Inhalateur à portée de main"]
         },
     },
     "CRITIQUE": {
         "enfant": {
             "message": "🚨 Urgence sanitaire. Ne pas exposer les enfants à l'extérieur.",
-            "actions": ["Évacuation des zones les plus exposées si possible", "Fermer hermétiquement", "Appeler le 115 si détresse"]
+            "actions": ["Évacuation si possible", "Fermer hermétiquement", "Appeler urgences si détresse"]
         },
         "adulte": {
-            "message": "🚨 Pollution critique. Confinement recommandé.",
-            "actions": ["Rester confiné", "Masque FFP3 si sortie indispensable", "Rester près d'un téléphone"]
+            "message": "🚨 Pollution critique. Confinement obligatoire.",
+            "actions": ["Rester confiné", "Masque FFP3 impératif", "Rester près d'un téléphone"]
         },
         "personne_agee": {
-            "message": "🚨 Risque vital. Alerte rouge pour les personnes âgées.",
-            "actions": ["Confinement total", "Contact famille/services sociaux", "Assistance médicale immédiate si symptômes"]
+            "message": "🚨 Risque vital. Alerte rouge absolue.",
+            "actions": ["Confinement total", "Surveillance médicale constante", "Oxygène si besoin"]
         },
         "asthmatique": {
-            "message": "🚨 Situation critique. Protocole d'urgence asthme à activer.",
-            "actions": ["Appeler le 115", "Utilisation immédiate des bronchodilatateurs", "Ne pas sortir sous aucun prétexte"]
+            "message": "🚨 Situation critique. Protocole d'urgence vitale.",
+            "actions": ["Appeler secours", "Utilisation bronchodilatateurs", "Confinement hermétique"]
         },
     },
 }
@@ -107,9 +143,11 @@ PROFIL_META = {
 }
 
 NIVEAU_COULEUR = {
-    "FAIBLE": "#4CAF50",
-    "MODÉRÉ": "#FFC107",
-    "ÉLEVÉ": "#FF5722",
+    "EXCELLENT": "#008000",
+    "BON": "#4CAF50",
+    "MODERE": "#FFC107",
+    "DEGRADE": "#FF9800",
+    "MAUVAIS": "#FF5722",
     "CRITIQUE": "#B71C1C",
 }
 

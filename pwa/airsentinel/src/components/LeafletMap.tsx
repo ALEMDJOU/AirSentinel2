@@ -196,12 +196,44 @@ function MapOverlayControls({ map }: { map: L.Map | null }) {
 
 // ── Composant Principal ──────────────────────────────────────────────────────
 
+// Niveaux de qualité OMS 2021 pour le filtre
+const LEVELS = [
+  { key: "ALL",       color: "#94a3b8" },
+  { key: "EXCELLENT", color: "#008000" },
+  { key: "BON",       color: "#4CAF50" },
+  { key: "MODERE",    color: "#FFC107" },
+  { key: "DEGRADE",   color: "#FF9800" },
+  { key: "MAUVAIS",   color: "#FF5722" },
+  { key: "CRITIQUE",  color: "#B71C1C" },
+] as const;
+
+type LevelKey = typeof LEVELS[number]["key"];
+
+function getPointLevel(pm25: number): LevelKey {
+  if (pm25 <= 5)   return "EXCELLENT";
+  if (pm25 <= 15)  return "BON";
+  if (pm25 <= 25)  return "MODERE";
+  if (pm25 <= 50)  return "DEGRADE";
+  if (pm25 <= 100) return "MAUVAIS";
+  return "CRITIQUE";
+}
+
+function getPointColor(pm25: number): string {
+  if (pm25 <= 5)   return "#008000";
+  if (pm25 <= 15)  return "#4CAF50";
+  if (pm25 <= 25)  return "#FFC107";
+  if (pm25 <= 50)  return "#FF9800";
+  if (pm25 <= 100) return "#FF5722";
+  return "#B71C1C";
+}
+
 export default function LeafletMap() {
   const { t } = useLanguage();
   const cameroonCenter: [number, number] = [7.3697, 12.3547];
   const [map, setMap] = useState<L.Map | null>(null);
   const [points, setPoints] = useState<VillePoint[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<LevelKey>("ALL");
   const { selectVille } = useVille();
   const router = useRouter();
 
@@ -232,6 +264,16 @@ export default function LeafletMap() {
   const handleSelectCity = (lat: number, lon: number) => {
     map?.flyTo([lat, lon], 12, { animate: true, duration: 1.5 });
   };
+
+  // Points filtrés selon le niveau actif
+  const filteredPoints = points.filter(p =>
+    p.lat !== null && p.lon !== null &&
+    (activeFilter === "ALL" || getPointLevel(p.pm25_moyen) === activeFilter)
+  );
+
+  // Comptage par niveau pour afficher les badges
+  const countByLevel = (key: LevelKey) =>
+    key === "ALL" ? points.length : points.filter(p => getPointLevel(p.pm25_moyen) === key).length;
 
   return (
     <div className="w-full h-full relative overflow-hidden">
@@ -272,21 +314,14 @@ export default function LeafletMap() {
           </LayersControl.BaseLayer>
 
           <LayersControl.Overlay checked name={t('map_heatmap')}>
-            <HeatmapLayer points={points} />
+            <HeatmapLayer points={filteredPoints} />
           </LayersControl.Overlay>
 
            <LayersControl.Overlay checked name={t('map_stations')}>
-               {points.filter(p => p.lat !== null && p.lon !== null).map((point) => {
-                  // Couleur basée sur PM2.5 (seuils OMS)
-                  const pm25 = point.pm25_moyen;
-                  let color = "#10b981"; // Bon
-                  let pm25Label = t('level_good') || "Bon";
-                  if (pm25 > 75) { color = "#7e22ce"; pm25Label = t('level_crit') || "Dangereux"; }
-                  else if (pm25 > 50) { color = "#ef4444"; pm25Label = t('level_vhigh') || "Très Mauvais"; }
-                  else if (pm25 > 35) { color = "#f97316"; pm25Label = t('level_high') || "Mauvais"; }
-                  else if (pm25 > 15) { color = "#fbbf24"; pm25Label = t('level_mod') || "Modéré"; }
-                  
-                  const pm25Value = pm25.toFixed(1);
+               {filteredPoints.map((point) => {
+                  const color = getPointColor(point.pm25_moyen);
+                  const pm25Label = t(getPointLevel(point.pm25_moyen));
+                  const pm25Value = point.pm25_moyen.toFixed(1);
                  
                  return (
                    <CircleMarker
@@ -318,7 +353,6 @@ export default function LeafletMap() {
                           <div className="text-lg font-bold mb-1 border-b pb-1">{point.city}</div>
                           
                           <div className="space-y-2 mt-2">
-                            {/* Section PM2.5 principale */}
                             <div className="flex flex-col gap-0.5">
                               <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">{t('map_pollution')}</span>
                               <div className="flex items-center gap-1.5 bg-gray-50 p-1.5 rounded-lg border border-gray-100">
@@ -329,7 +363,6 @@ export default function LeafletMap() {
                               </div>
                             </div>
 
-                            {/* Niveau de qualité */}
                             <div className="flex flex-col gap-0.5">
                               <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">{t('map_quality')}</span>
                               <div className="flex items-center gap-2">
@@ -361,36 +394,45 @@ export default function LeafletMap() {
         </LayersControl>
       </MapContainer>
 
-      {/* ── Unified Legend (AirSentinel Standards) ── */}
+      {/* ── Légende cliquable ── */}
       <div className="absolute bottom-6 left-4 z-[1000] space-y-3">
-        <div className="glass-card p-4 border-white/10 flex flex-col gap-3 min-w-[200px] backdrop-blur-3xl bg-slate-950/80 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <div className="glass-card p-4 border-white/10 flex flex-col gap-2.5 min-w-[200px] backdrop-blur-3xl bg-slate-950/80 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           <div className="flex flex-col gap-1 mb-1 border-b border-white/5 pb-2">
             <span className="text-[10px] font-black text-[#00d4b1] uppercase tracking-widest flex items-center gap-2">
               <Wind size={14} /> {t('map_pollution') || "Qualité de l'Air"}
             </span>
+            <span className="text-[8px] font-bold text-gray-500 uppercase tracking-tighter opacity-50">Standards OMS 2021 · Cliquer pour filtrer</span>
           </div>
           {[
-            { key: 'BON',      color: "#4CAF50", desc: "0–12",  defaultLabel: "Bon" },
-            { key: 'MODERE',   color: "#FFC107", desc: "12–35", defaultLabel: "Modéré" },
-            { key: 'SEVERE',   color: "#FF9800", desc: "35–55", defaultLabel: "Sévère" },
-            { key: 'DANGEREUX',color: "#FF5722", desc: "55–150",defaultLabel: "Dangereux" },
-            { key: 'CRITIQUE', color: "#B71C1C", desc: ">150",  defaultLabel: "Critique" },
-          ].map((item) => (
-            <div key={item.key} className="flex items-center gap-3 group/item">
-              <div className="w-2.5 h-2.5 rounded-full shrink-0 shadow-lg group-hover/item:scale-125 transition-transform" style={{ backgroundColor: item.color, boxShadow: `0 0 10px ${item.color}44` }} />
-              <div className="flex justify-between items-center w-full">
-                <span className="text-[10px] font-black text-white/90 uppercase tracking-tighter leading-none">
-                  {t(item.key) || item.defaultLabel}
-                </span>
-                <span className="text-[8px] text-gray-500 font-bold tabular-nums">
-                  {item.desc} <span className="opacity-50 font-normal">µg/m³</span>
-                </span>
-              </div>
-            </div>
-          ))}
+            { key: 'EXCELLENT', color: "#008000", desc: "0–5",    defaultLabel: "Excellent" },
+            { key: 'BON',       color: "#4CAF50", desc: "5–15",   defaultLabel: "Bon" },
+            { key: 'MODERE',    color: "#FFC107", desc: "15–25",  defaultLabel: "Modéré" },
+            { key: 'DEGRADE',   color: "#FF9800", desc: "25–50",  defaultLabel: "Dégradé" },
+            { key: 'MAUVAIS',   color: "#FF5722", desc: "50–100", defaultLabel: "Mauvais" },
+            { key: 'CRITIQUE',  color: "#B71C1C", desc: ">100",   defaultLabel: "Critique" },
+          ].map((item) => {
+            const isActive = activeFilter === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => setActiveFilter(isActive ? "ALL" : item.key as LevelKey)}
+                className={`flex items-center gap-3 group/item w-full text-left rounded-lg px-1.5 py-1 transition-all ${isActive ? "bg-white/10" : "hover:bg-white/5"}`}
+              >
+                <div className="w-2.5 h-2.5 rounded-full shrink-0 shadow-lg group-hover/item:scale-125 transition-transform" style={{ backgroundColor: item.color, boxShadow: `0 0 10px ${item.color}44` }} />
+                <div className="flex justify-between items-center w-full">
+                  <span className={`text-[10px] font-black uppercase tracking-tighter leading-none ${isActive ? "text-white" : "text-white/70"}`}>
+                    {t(item.key) || item.defaultLabel}
+                  </span>
+                  <span className="text-[8px] text-gray-500 font-bold tabular-nums">
+                    {item.desc} <span className="opacity-50 font-normal">µg/m³</span>
+                  </span>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
-      
+
       <style dangerouslySetInnerHTML={{__html: `
         .leaflet-container { z-index: 0 !important; }
         .leaflet-popup-content-wrapper { border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }

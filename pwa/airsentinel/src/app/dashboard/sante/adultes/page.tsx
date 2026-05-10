@@ -121,7 +121,7 @@ export default function AdultesPage() {
   }
 
   const rec = recommendations[0];
-  const isCritical = rec?.niveau_risque === "CRITIQUE" || rec?.niveau_risque === "ÉLEVÉ";
+  const isCritical = rec?.niveau_risque === "CRITIQUE" || rec?.niveau_risque === "MAUVAIS" || rec?.niveau_risque === "DEGRADE";
   const globalColor = rec?.couleur || "#FFC107";
 
   return (
@@ -149,7 +149,7 @@ export default function AdultesPage() {
         {isCritical && (
           <div className="bg-red-600 px-6 py-3 flex items-center gap-3">
             <AlertTriangle className="text-white" size={24} />
-            <span className="text-white font-black text-lg tracking-wide">{t('health_alert_pollution').replace('{}', rec?.niveau_risque?.toUpperCase() || "")}</span>
+            <span className="text-white font-black text-lg tracking-wide">{t('health_alert_pollution').replace('{}', t(rec?.niveau_risque || "").toUpperCase())}</span>
           </div>
         )}
         <div className="p-6 md:p-8">
@@ -160,7 +160,7 @@ export default function AdultesPage() {
               <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-white/10 bg-white/5">
                 <div className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: globalColor, boxShadow: `0 0 12px ${globalColor}` }} />
                 <span className="text-base font-black uppercase tracking-[0.2em]" style={{ color: globalColor }}>
-                  {t('health_level').replace('{}', rec?.niveau_risque || "MODÉRÉ")}
+                  {t('health_level').replace('{}', t(rec?.niveau_risque || "MODERE"))}
                 </span>
               </div>
             </div>
@@ -175,7 +175,7 @@ export default function AdultesPage() {
           {t('health_alert_msg')}
         </h4>
         <p className="text-lg text-white leading-relaxed font-medium">
-          &quot;{rec?.message || t('health_loading')}&quot;
+          &quot;{t(rec?.message || "") || t('health_loading')}&quot;
         </p>
       </div>
 
@@ -191,7 +191,7 @@ export default function AdultesPage() {
                 <ShieldCheck size={20} />
               </div>
               <span className="text-base font-bold text-gray-200">
-                {action}
+                {t(action)}
               </span>
             </div>
           ))}

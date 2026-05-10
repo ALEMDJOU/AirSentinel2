@@ -60,10 +60,11 @@ CITIES = [
 DATASET_PATH = "data/processed/dataset_final.parquet"
 
 def get_air_quality_level(pm25):
-    if pm25 <= 12: return "BON", "#4CAF50"
-    if pm25 <= 35.4: return "MODERE", "#FFC107"
-    if pm25 <= 55.4: return "SEVERE", "#FF9800"
-    if pm25 <= 150.4: return "DANGEREUX", "#FF5722"
+    if pm25 <= 5: return "EXCELLENT", "#008000"
+    if pm25 <= 15: return "BON", "#4CAF50"
+    if pm25 <= 25: return "MODERE", "#FFC107"
+    if pm25 <= 50: return "DEGRADE", "#FF9800"
+    if pm25 <= 100: return "MAUVAIS", "#FF5722"
     return "CRITIQUE", "#B71C1C"
 
 def fetch_data(villes_info, start_date, end_date):

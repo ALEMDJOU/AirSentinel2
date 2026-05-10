@@ -235,27 +235,30 @@ def compute_interactive(payload: ComputeInput, request: Request):
 def _generate_compute_response(predicted: float, lang: str = "fr"):
     translations = {
         "fr": {
-            "BON": ("BON", "#4CAF50", "Qualité de l'air optimale. Aucune restriction pour les activités en extérieur."),
+            "EXCELLENT": ("EXCELLENT", "#008000", "Qualité de l'air exceptionnelle. Idéal pour toutes les activités."),
+            "BON": ("BON", "#4CAF50", "Qualité de l'air satisfaisante selon les normes OMS 2021."),
             "MODERE": ("MODÉRÉ", "#FFC107", "Qualité acceptable. Les personnes ultra-sensibles devraient limiter les efforts."),
-            "SEVERE": ("SÉVÈRE", "#FF9800", "Effets possibles sur la santé. Réduisez les activités physiques en plein air."),
-            "DANGEREUX": ("DANGEREUX", "#FF5722", "Risques sanitaires accrus. Port du masque recommandé."),
+            "DEGRADE": ("DÉGRADÉ", "#FF9800", "Qualité médiocre. Réduisez les activités physiques prolongées en extérieur."),
+            "MAUVAIS": ("MAUVAIS", "#FF5722", "Air pollué. Risques sanitaires accrus pour toute la population."),
             "CRITIQUE": ("CRITIQUE", "#B71C1C", "Urgence sanitaire. Évitez toute sortie. Port du masque obligatoire.")
         },
         "en": {
-            "BON": ("GOOD", "#4CAF50", "Optimal air quality. No restrictions for outdoor activities."),
+            "EXCELLENT": ("EXCELLENT", "#008000", "Exceptional air quality. Ideal for all activities."),
+            "BON": ("GOOD", "#4CAF50", "Satisfactory air quality according to WHO 2021 standards."),
             "MODERE": ("MODERATE", "#FFC107", "Acceptable quality. Sensitive groups should limit prolonged exertion."),
-            "SEVERE": ("SEVERE", "#FF9800", "Possible health effects. Reduce intense outdoor physical activities."),
-            "DANGEREUX": ("DANGEROUS", "#FF5722", "Increased health risks. Mask recommended for sensitive groups."),
+            "DEGRADE": ("DEGRADED", "#FF9800", "Poor quality. Reduce prolonged outdoor physical activities."),
+            "MAUVAIS": ("UNHEALTHY", "#FF5722", "Polluted air. Increased health risks for the general population."),
             "CRITIQUE": ("CRITICAL", "#B71C1C", "Health emergency. Avoid unnecessary outings. Mask mandatory.")
         }
     }
     
     t = translations.get(lang, translations["fr"])
     
-    if predicted <= 12: key = "BON"
-    elif predicted <= 35.4: key = "MODERE"
-    elif predicted <= 55.4: key = "SEVERE"
-    elif predicted <= 150.4: key = "DANGEREUX"
+    if predicted <= 5: key = "EXCELLENT"
+    elif predicted <= 15: key = "BON"
+    elif predicted <= 25: key = "MODERE"
+    elif predicted <= 50: key = "DEGRADE"
+    elif predicted <= 100: key = "MAUVAIS"
     else: key = "CRITIQUE"
     
     level, color, desc = t[key]

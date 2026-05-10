@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
+
 
 type Language = "fr" | "en";
 
@@ -151,6 +152,102 @@ const translations: Record<Language, Record<string, string>> = {
     today: "Aujourd'hui",
     tomorrow: "Demain",
     after_tomorrow_j2: "Après-demain",
+    chart_ai_prediction: "PRÉDICTION IA",
+
+    // Air Levels (WHO 2021)
+    EXCELLENT: "Excellent",
+    BON: "Bon",
+    MODERE: "Modéré",
+    DEGRADE: "Dégradé",
+    MAUVAIS: "Mauvais",
+    CRITIQUE: "Critique",
+    map_all: "Tous",
+
+    // Health Recommendations - Messages
+    "Air d'une pureté exceptionnelle. Activités extérieures vivement encouragées.": "Air d'une pureté exceptionnelle. Activités extérieures vivement encouragées.",
+    "Qualité d'air idéale. Aucune restriction pour les activités sportives.": "Qualité d'air idéale. Aucune restriction pour les activités sportives.",
+    "Conditions parfaites. Sorties conseillées pour la santé.": "Conditions parfaites. Sorties conseillées pour la santé.",
+    "Air très pur. Profitez du plein air sereinement.": "Air très pur. Profitez du plein air sereinement.",
+    "Qualité de l'air satisfaisante. Les activités extérieures sont conseillées.": "Qualité de l'air satisfaisante. Les activités extérieures sont conseillées.",
+    "Air sain. Profitez des activités en plein air sans restriction.": "Air sain. Profitez des activités en plein air sans restriction.",
+    "Conditions favorables. Sortie possible sans précaution.": "Conditions favorables. Sortie possible sans précaution.",
+    "Risque faible. Gardez votre inhalateur par précaution.": "Risque faible. Gardez votre inhalateur par précaution.",
+    "Qualité d'air modérée. Limitez les efforts intenses prolongés.": "Qualité d'air modérée. Limitez les efforts intenses prolongés.",
+    "Léger risque pour les sensibles. Réduisez les expositions prolongées.": "Léger risque pour les sensibles. Réduisez les expositions prolongées.",
+    "Prudence conseillée. Privilégiez les activités calmes.": "Prudence conseillée. Privilégiez les activités calmes.",
+    "Risque modéré. Portez un masque FFP2 par précaution.": "Risque modéré. Portez un masque FFP2 par précaution.",
+    "Air pollué. Réduisez significativement les sorties.": "Air pollué. Réduisez significativement les sorties.",
+    "Qualité médiocre. Évitez les efforts physiques en extérieur.": "Qualité médiocre. Évitez les efforts physiques en extérieur.",
+    "Vulnérabilité accrue. Restez à l'intérieur autant que possible.": "Vulnérabilité accrue. Restez à l'intérieur autant que possible.",
+    "Alerte dégradation. Risque de crise accru.": "Alerte dégradation. Risque de crise accru.",
+    "Air de mauvaise qualité. Interdiction de sport en extérieur.": "Air de mauvaise qualité. Interdiction de sport en extérieur.",
+    "Pollution marquée. Limitez toute activité extérieure.": "Pollution marquée. Limitez toute activité extérieure.",
+    "Danger pour les vulnérables. Restez confiné.": "Danger pour les vulnérables. Restez confiné.",
+    "Risque élevé. Activation du plan d'action asthme.": "Risque élevé. Activation du plan d'action asthme.",
+    "🚨 Urgence sanitaire. Ne pas exposer les enfants à l'extérieur.": "🚨 Urgence sanitaire. Ne pas exposer les enfants à l'extérieur.",
+    "🚨 Pollution critique. Confinement obligatoire.": "🚨 Pollution critique. Confinement obligatoire.",
+    "🚨 Risque vital. Alerte rouge absolue.": "🚨 Risque vital. Alerte rouge absolue.",
+    "🚨 Situation critique. Protocole d'urgence vitale.": "🚨 Situation critique. Protocole d'urgence vitale.",
+
+    // Health Recommendations - Actions
+    "Sport intense sans limite": "Sport intense sans limite",
+    "Aération maximale": "Aération maximale",
+    "Activités de plein air": "Activités de plein air",
+    "Ventilation naturelle": "Ventilation naturelle",
+    "Promenade": "Promenade",
+    "Aération des chambres": "Aération des chambres",
+    "Activités normales": "Activités normales",
+    "Surveillance habituelle": "Surveillance habituelle",
+    "Activités sportives possibles": "Activités sportives possibles",
+    "Pas de restriction": "Pas de restriction",
+    "Ventilation recommandée": "Ventilation recommandée",
+    "Promenade conseillée": "Promenade conseillée",
+    "Pas de masque": "Pas de masque",
+    "Sortie possible": "Sortie possible",
+    "Surveiller les symptômes": "Surveiller les symptômes",
+    "Réduire le sport intense": "Réduire le sport intense",
+    "Aérer hors heures de pointe": "Aérer hors heures de pointe",
+    "Limiter les efforts physiques": "Limiter les efforts physiques",
+    "Éviter les zones de trafic": "Éviter les zones de trafic",
+    "Limiter les sorties longues": "Limiter les sorties longues",
+    "Aération filtrée": "Aération filtrée",
+    "Porter un masque FFP2": "Porter un masque FFP2",
+    "Avoir bronchodilatateur à portée": "Avoir bronchodilatateur à portée",
+    "Activités en intérieur": "Activités en intérieur",
+    "Fermer les fenêtres": "Fermer les fenêtres",
+    "Pas de sport extérieur": "Pas de sport extérieur",
+    "Porter un masque": "Porter un masque",
+    "Privilégier le sport en salle": "Privilégier le sport en salle",
+    "Limiter les déplacements": "Limiter les déplacements",
+    "Sorties brèves uniquement": "Sorties brèves uniquement",
+    "Vérifier la ventilation": "Vérifier la ventilation",
+    "Surveiller le pouls": "Surveiller le pouls",
+    "Rester en intérieur": "Rester en intérieur",
+    "Doubler de vigilance": "Doubler de vigilance",
+    "Traitement de fond rigoureux": "Traitement de fond rigoureux",
+    "Annuler sorties scolaires": "Annuler sorties scolaires",
+    "Purificateur d'air": "Purificateur d'air",
+    "Télétravail conseillé": "Télétravail conseillé",
+    "Masque FFP2 obligatoire": "Masque FFP2 obligatoire",
+    "Éviter tout effort": "Éviter tout effort",
+    "Ne pas sortir": "Ne pas sortir",
+    "Fermer tout accès": "Fermer tout accès",
+    "Contact médical si besoin": "Contact médical si besoin",
+    "Confinement strict": "Confinement strict",
+    "Prévenir un proche": "Prévenir un proche",
+    "Inhalateur à portée de main": "Inhalateur à portée de main",
+    "Évacuation si possible": "Évacuation si possible",
+    "Fermer hermétiquement": "Fermer hermétiquement",
+    "Appeler urgences si détresse": "Appeler urgences si détresse",
+    "Rester confiné": "Rester confiné",
+    "Masque FFP3 impératif": "Masque FFP3 impératif",
+    "Rester près d'un téléphone": "Rester près d'un téléphone",
+    "Confinement total": "Confinement total",
+    "Surveillance médicale constante": "Surveillance médicale constante",
+    "Oxygène si besoin": "Oxygène si besoin",
+    "Appeler secours": "Appeler secours",
+    "Utilisation bronchodilatateurs": "Utilisation bronchodilatateurs",
+    "Confinement hermétique": "Confinement hermétique",
 
     // Stats Page
     stats_national: "Situation Nationale",
@@ -462,6 +559,101 @@ const translations: Record<Language, Record<string, string>> = {
     today: "Today",
     tomorrow: "Tomorrow",
     after_tomorrow_j2: "After tomorrow",
+    chart_ai_prediction: "AI PREDICTION",
+
+    // Air Levels (WHO 2021)
+    EXCELLENT: "Excellent",
+    BON: "Good",
+    MODERE: "Moderate",
+    DEGRADE: "Degraded",
+    MAUVAIS: "Unhealthy",
+    CRITIQUE: "Critical",
+
+    // Health Recommendations - Messages
+    "Air d'une pureté exceptionnelle. Activités extérieures vivement encouragées.": "Exceptionally pure air. Outdoor activities are strongly encouraged.",
+    "Qualité d'air idéale. Aucune restriction pour les activités sportives.": "Ideal air quality. No restrictions for sporting activities.",
+    "Conditions parfaites. Sorties conseillées pour la santé.": "Perfect conditions. Outings recommended for health.",
+    "Air très pur. Profitez du plein air sereinement.": "Very pure air. Enjoy the outdoors peacefully.",
+    "Qualité de l'air satisfaisante. Les activités extérieures sont conseillées.": "Satisfactory air quality. Outdoor activities are recommended.",
+    "Air sain. Profitez des activités en plein air sans restriction.": "Healthy air. Enjoy outdoor activities without restriction.",
+    "Conditions favorables. Sortie possible sans précaution.": "Favorable conditions. Outing possible without precaution.",
+    "Risque faible. Gardez votre inhalateur par précaution.": "Low risk. Keep your inhaler as a precaution.",
+    "Qualité d'air modérée. Limitez les efforts intenses prolongés.": "Moderate air quality. Limit prolonged intense efforts.",
+    "Léger risque pour les sensibles. Réduisez les expositions prolongées.": "Slight risk for sensitive people. Reduce prolonged exposure.",
+    "Prudence conseillée. Privilégiez les activités calmes.": "Caution advised. Prioritize calm activities.",
+    "Risque modéré. Portez un masque FFP2 par précaution.": "Moderate risk. Wear an FFP2 mask as a precaution.",
+    "Air pollué. Réduisez significativement les sorties.": "Polluted air. Significantly reduce outings.",
+    "Qualité médiocre. Évitez les efforts physiques en extérieur.": "Poor quality. Avoid physical exertion outdoors.",
+    "Vulnérabilité accrue. Restez à l'intérieur autant que possible.": "Increased vulnerability. Stay indoors as much as possible.",
+    "Alerte dégradation. Risque de crise accru.": "Degradation alert. Increased risk of attack.",
+    "Air de mauvaise qualité. Interdiction de sport en extérieur.": "Poor quality air. Outdoor sports prohibited.",
+    "Pollution marquée. Limitez toute activité extérieure.": "Marked pollution. Limit all outdoor activities.",
+    "Danger pour les vulnérables. Restez confiné.": "Danger for the vulnerable. Stay confined.",
+    "Risque élevé. Activation du plan d'action asthme.": "High risk. Asthma action plan activation.",
+    "🚨 Urgence sanitaire. Ne pas exposer les enfants à l'extérieur.": "🚨 Health emergency. Do not expose children to the outdoors.",
+    "🚨 Pollution critique. Confinement obligatoire.": "🚨 Critical pollution. Mandatory confinement.",
+    "🚨 Risque vital. Alerte rouge absolue.": "🚨 Vital risk. Absolute red alert.",
+    "🚨 Situation critique. Protocole d'urgence vitale.": "🚨 Critical situation. Vital emergency protocol.",
+
+    // Health Recommendations - Actions
+    "Sport intense sans limite": "Intense sport without limit",
+    "Aération maximale": "Maximum ventilation",
+    "Activités de plein air": "Outdoor activities",
+    "Ventilation naturelle": "Natural ventilation",
+    "Promenade": "Walk",
+    "Aération des chambres": "Bedroom ventilation",
+    "Activités normales": "Normal activities",
+    "Surveillance habituelle": "Regular monitoring",
+    "Activités sportives possibles": "Sporting activities possible",
+    "Pas de restriction": "No restriction",
+    "Ventilation recommandée": "Recommended ventilation",
+    "Promenade conseillée": "Recommended walk",
+    "Pas de masque": "No mask",
+    "Sortie possible": "Outing possible",
+    "Surveiller les symptômes": "Monitor symptoms",
+    "Réduire le sport intense": "Reduce intense sport",
+    "Aérer hors heures de pointe": "Ventilate outside peak hours",
+    "Limiter les efforts physiques": "Limit physical effort",
+    "Éviter les zones de trafic": "Avoid traffic areas",
+    "Limiter les sorties longues": "Limit long outings",
+    "Aération filtrée": "Filtered ventilation",
+    "Porter un masque FFP2": "Wear an FFP2 mask",
+    "Avoir bronchodilatateur à portée": "Have bronchodilator within reach",
+    "Activités en intérieur": "Indoor activities",
+    "Fermer les fenêtres": "Close windows",
+    "Pas de sport extérieur": "No outdoor sport",
+    "Porter un masque": "Wear a mask",
+    "Privilégier le sport en salle": "Prioritize indoor sport",
+    "Limiter les déplacements": "Limit travel",
+    "Sorties brèves uniquement": "Brief outings only",
+    "Vérifier la ventilation": "Check ventilation",
+    "Surveiller le pouls": "Monitor pulse",
+    "Rester en intérieur": "Stay indoors",
+    "Doubler de vigilance": "Double vigilance",
+    "Traitement de fond rigoureux": "Rigorous baseline treatment",
+    "Annuler sorties scolaires": "Cancel school outings",
+    "Purificateur d'air": "Air purifier",
+    "Télétravail conseillé": "Teleworking recommended",
+    "Masque FFP2 obligatoire": "FFP2 mask mandatory",
+    "Éviter tout effort": "Avoid all effort",
+    "Ne pas sortir": "Do not go out",
+    "Fermer tout accès": "Close all access",
+    "Contact médical si besoin": "Medical contact if needed",
+    "Confinement strict": "Strict confinement",
+    "Prévenir un proche": "Notify a relative",
+    "Inhalateur à portée de main": "Inhaler within reach",
+    "Évacuation si possible": "Evacuation if possible",
+    "Fermer hermétiquement": "Seal hermetically",
+    "Appeler urgences si détresse": "Call emergency if in distress",
+    "Rester confiné": "Stay confined",
+    "Masque FFP3 impératif": "FFP3 mask imperative",
+    "Rester près d'un téléphone": "Stay near a phone",
+    "Confinement total": "Total confinement",
+    "Surveillance médicale constante": "Constant medical monitoring",
+    "Oxygène si besoin": "Oxygen if needed",
+    "Appeler secours": "Call for help",
+    "Utilisation bronchodilatateurs": "Use of bronchodilators",
+    "Confinement hermétique": "Hermetic confinement",
     // Stats Page
     stats_national: "National Overview",
     stats_insights: "Insights: {}",
@@ -636,17 +828,14 @@ const translations: Record<Language, Record<string, string>> = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLang] = useState<Language>("fr");
-
-  // Charger la préférence au montage
-  useEffect(() => {
+  // Initialisation synchrone depuis localStorage pour éviter le flash de langue
+  const [lang, setLang] = useState<Language>(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("app_lang") as Language;
-      if (stored === "fr" || stored === "en") {
-        setLang(stored);
-      }
+      if (stored === "fr" || stored === "en") return stored;
     }
-  }, []);
+    return "fr";
+  });
 
   // Sauvegarder la préférence
   const handleSetLang = (newLang: Language) => {

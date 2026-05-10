@@ -103,51 +103,48 @@ def get_carte():
         # Fallback si pas de date : on garde la première occurrence
         latest_df = df.drop_duplicates(subset=[city_col])
 
+    # Import du service ML (meilleur_modele.pkl) — appel direct, pas via le simulateur
+    from api.services.prediction_service import predict_pm25
+    import math
+
+    def _pm25_level(pm25: float):
+        """Classifie le PM2.5 selon les seuils OMS 2021."""
+        if pm25 <= 5:   return "EXCELLENT", "#008000"
+        if pm25 <= 15:  return "BON",       "#4CAF50"
+        if pm25 <= 25:  return "MODERE",    "#FFC107"
+        if pm25 <= 50:  return "DEGRADE",   "#FF9800"
+        if pm25 <= 100: return "MAUVAIS",   "#FF5722"
+        return "CRITIQUE", "#B71C1C"
+
     result = []
     for _, row in latest_df.iterrows():
-        irs_val = float(row[irs_col]) if irs_col else None
-        status_text = str(row[status_col]) if status_col else None
+        irs_val    = float(row[irs_col]) if irs_col else None
+        city_name  = str(row[city_col])
 
-        # Utiliser le modèle ML pour le PM2.5 (cohérent avec les alertes)
-        city_name = str(row[city_col])
-        ml_pm25 = None
+        # ── Prédiction ML directe (meilleur_modele.pkl + scaler.pkl) ──────────
+        # On passe le dict complet de la ligne : predict_pm25 sélectionne
+        # lui-même les colonnes attendues par le modèle via features.pkl.
+        raw_dict = row.to_dict()
+        # Nettoyage : seules les valeurs numériques sont utilisables par le modèle
+        clean_features = {}
+        for k, v in raw_dict.items():
+            try:
+                val = float(v)
+                clean_features[k] = 0.0 if math.isnan(val) else val
+            except (ValueError, TypeError):
+                pass
+
         try:
-            from api.routers.predictions import compute_interactive
-            from api.schemas.prediction import ComputeInput
-            
-            # 1. Convertir la ligne en dict
-            row_raw = row.to_dict()
-            
-            # 2. Nettoyer : ne garder que les valeurs numériques pour les features
-            # (Pydantic dict[str, float] n'aime pas les strings ou les dates)
-            row_features = {}
-            for k, v in row_raw.items():
-                if k in ["ville", "city", "date", "latitude", "longitude"]: # Garder lat/lon si numériques
-                    try:
-                        row_features[k] = float(v)
-                    except (ValueError, TypeError):
-                        continue
-                    continue
-                
-                # Pour les autres, on ne prend que si c'est convertible en float et pas NaN
-                try:
-                    val = float(v)
-                    import math
-                    row_features[k] = val if not math.isnan(val) else 0.0
-                except (ValueError, TypeError):
-                    continue
-
-            # Mapping pour compatibilité
-            row_features["temp"] = row_features.get("temperature_2m_mean", row_features.get("temp", 25.0))
-            row_features["humidity"] = row_features.get("humidity_moyen", row_features.get("humidity", 60.0))
-            
-            pred = compute_interactive(ComputeInput(city=city_name, features=row_features))
-            ml_pm25 = pred.predicted_pm25
+            ml_pm25 = predict_pm25(clean_features)
+            # Sanity check : si le modèle retourne une valeur aberrante, fallback
+            if ml_pm25 <= 0 or math.isnan(ml_pm25):
+                raise ValueError(f"Valeur ML aberrante : {ml_pm25}")
+            ml_pm25 = round(ml_pm25, 2)
         except Exception as e:
-            logger.error(f"Erreur ML sur la carte pour {city_name}: {e}")
-            ml_pm25 = round(float(row[pm25_col]), 2) if pm25_col else 0.0
+            logger.warning(f"[Carte ML] Fallback dataset pour {city_name} : {e}")
+            ml_pm25 = round(float(raw_dict[pm25_col]), 2) if pm25_col and pm25_col in raw_dict else 25.0
 
-        label, color = _irs_label_color(irs_val, status_text)
+        label, color = _pm25_level(ml_pm25)
 
         result.append(VillePoint(
             city=city_name,
