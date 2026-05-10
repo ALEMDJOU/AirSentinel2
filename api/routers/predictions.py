@@ -60,58 +60,38 @@ def get_short_term():
 
     last_date = df_sorted[date_col].max()
 
-    # Historique : 21 derniers jours
-    start_hist = last_date - timedelta(days=21)
-    hist_df = df_sorted[df_sorted[date_col] >= start_hist]
-    
-    if hist_df.empty:
-        return []
+    # Préparation des points (Historique + Futur)
+    # On prend les 21 jours passés + les 3 jours futurs disponibles
+    all_dates = sorted(df_sorted[date_col].dt.date.unique())
+    try:
+        today_idx = all_dates.index(last_date.date())
+    except ValueError:
+        today_idx = len(all_dates) - 1
 
-    hist = (
-        hist_df.resample("D", on=date_col)[pm25_col]
-        .mean()
-        .dropna()
-        .reset_index()
-    )
-    
-    result = [
-        PredictionPoint(date=str(row[date_col].date()), pm25=round(float(row[pm25_col]), 2))
-        for _, row in hist.iterrows()
-    ]
+    start_idx = max(0, today_idx - 20)
+    selected_dates = all_dates[start_idx : today_idx + 4] # 21 jours passés (incluant aujourd'hui) + 3 futurs
 
-    # Prédiction réelle (via les données futures du dataset et le modèle ML)
-    future_df = df_sorted[df_sorted[date_col] > last_date].sort_values(date_col)
+    result = []
+    from api.services.prediction_service import predict_pm25
     
-    if not future_df.empty:
-        # Prendre les 3 prochains jours disponibles
-        next_days = future_df[date_col].dt.date.unique()[:3]
-        for day in next_days:
-            day_data = future_df[future_df[date_col].dt.date == day].iloc[0]
-            try:
-                from api.services.prediction_service import predict_pm25
-                # On passe tout le dictionnaire de la ligne (features météo futures)
-                pred_val = predict_pm25(day_data.to_dict())
-                if pred_val <= 0: raise ValueError("Prediction invalide")
-            except Exception:
-                # Fallback arithmétique si le modèle échoue
-                pm25_base = hist[pm25_col].mean() if not hist.empty else 25.0
-                pred_val = pm25_base * 1.05
+    for day in selected_dates:
+        # Prendre la première ligne pour ce jour
+        day_data = df_sorted[df_sorted[date_col].dt.date == day].iloc[0]
+        is_future = day > last_date.date()
+        
+        try:
+            # On passe toutes les caractéristiques du jour au modèle ML
+            pred_val = predict_pm25(day_data.to_dict())
+            if pred_val <= 0: raise ValueError
+        except Exception:
+            # Fallback sur la valeur brute si le modèle échoue
+            pred_val = float(day_data[pm25_col]) if pm25_col in day_data else 25.0
             
-            result.append(PredictionPoint(
-                date=str(day), 
-                pm25=round(float(pred_val), 2), 
-                is_prediction=True
-            ))
-    else:
-        # Fallback si pas de données futures dans le dataset
-        pm25_base = hist[pm25_col].mean() if not hist.empty else 25.0
-        for i in range(1, 4):
-            pred_date = last_date + timedelta(days=i)
-            result.append(PredictionPoint(
-                date=str(pred_date.date()), 
-                pm25=round(float(pm25_base) * (1 + 0.02 * i), 2), 
-                is_prediction=True
-            ))
+        result.append(PredictionPoint(
+            date=str(day),
+            pm25=round(float(pred_val), 2),
+            is_prediction=is_future
+        ))
 
     return result
 
