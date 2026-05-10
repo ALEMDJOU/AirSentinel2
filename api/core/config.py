@@ -10,10 +10,9 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://localhost:3001",
-        "http://localhost:8501", 
-        "https://airsentinel.onrender.com",
         "https://airsentinel-cameroon.vercel.app",
         "https://airsentinel-chi.vercel.app",
+        "https://air-sentinel2.vercel.app",
         "https://project-uo7uo-7zvnt09fu-fofack-alemdjou-henri-joels-projects.vercel.app"
     ]
     
