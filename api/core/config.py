@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: Optional[str] = None
     SMTP_PASSWORD: Optional[str] = None
-    EMAILS_FROM_EMAIL: str = "alerts@airsentinel.cm"
+    EMAILS_FROM_EMAIL: str = "fofackhenri36@gmail.com"
     EMAILS_FROM_NAME: str = "AirSentinel Alerts"
     BREVO_API_KEY: Optional[str] = None
     FRONTEND_URL: str = "https://airsentinel-chi.vercel.app"
