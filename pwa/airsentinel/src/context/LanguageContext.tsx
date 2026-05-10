@@ -107,10 +107,6 @@ const translations: Record<Language, Record<string, string>> = {
     city_empty: "Aucun Résultat",
     city_not_found: "La ville \"{}\" n'est pas encore sous surveillance active.",
     city_loading: "Chargement des zones...",
-    
-    // Onboarding additional
-    onboarding_aha_title: "Félicitations !",
-    onboarding_alert_config: "Configuration des alertes pour {}...",
 
     // Loading
     loading_ai: "Initialisation de l'IA...",
@@ -148,7 +144,6 @@ const translations: Record<Language, Record<string, string>> = {
     sim_est_realtime: "Estimation PM2.5 Temps-Réel",
     sim_calc: "Calcul Intelligent...",
     sim_retry: "Réessayer",
-    sim_error: "Le service de simulation est temporairement indisponible.",
     sim_db: "Base de Données",
     sim_ai_precision: "Precision IA",
     sim_lab_control: "AI Lab Control",
@@ -156,7 +151,6 @@ const translations: Record<Language, Record<string, string>> = {
     today: "Aujourd'hui",
     tomorrow: "Demain",
     after_tomorrow_j2: "Après-demain",
-    chart_ai_prediction: "PRÉDICTION IA",
 
     // Stats Page
     stats_national: "Situation Nationale",
@@ -227,14 +221,6 @@ const translations: Record<Language, Record<string, string>> = {
     health_ai_note: "Note IA : Ces recommandations sont basées sur les normes de l'OMS et adaptées à chaque profil. Si vous ressentez des difficultés respiratoires persistantes, contactez immédiatement les services de santé de votre district.",
     
     // Sub pages common
-    health_title_1: "Bilan ",
-    health_title_2: "Santé",
-    health_dash_link: "Tableau de Bord",
-    health_sub_city_selected: "Basé sur les données en temps réel de votre ville.",
-    health_sub_no_city: "Veuillez choisir une ville pour des conseils personnalisés.",
-    health_where_are_you: "Où êtes-vous ?",
-    health_where_desc: "Sélectionnez votre zone pour adapter les recommandations médicales à la pollution locale.",
-    health_select_city: "Choisir une ville",
     health_city_choose: "Choisissez la ville",
     health_req_city: "Sélectionnez une ville pour obtenir les recommandations pour les {}.",
     health_alert_pollution: "ALERTE : POLLUTION {}",
@@ -334,13 +320,6 @@ const translations: Record<Language, Record<string, string>> = {
     onboarding_cta_next: "Suivant",
     onboarding_cta_finish: "Accéder au tableau de bord",
     onboarding_skip: "Passer",
-    
-    // API Levels fallback mapping
-    "BON": "BON",
-    "MODERE": "MODÉRÉ",
-    "SEVERE": "SÉVÈRE",
-    "DANGEREUX": "DANGEREUX",
-    "CRITIQUE": "CRITIQUE"
   },
   en: {
     // Navbar
@@ -440,19 +419,6 @@ const translations: Record<Language, Record<string, string>> = {
     city_not_found: "The city \"{}\" is not currently under active surveillance.",
     city_loading: "Loading zones...",
 
-    // Onboarding additional
-    onboarding_aha_title: "Congratulations!",
-    onboarding_alert_config: "Configuring alerts for {}...",
-    // API Levels fallback mapping
-    "BON": "GOOD",
-    "MODERE": "MODERATE",
-    "SEVERE": "SEVERE",
-    "DANGEREUX": "DANGEROUS",
-    "CRITIQUE": "CRITICAL",
-    "FAIBLE": "LOW",
-    "MODÉRÉ": "MODERATE",
-    "ÉLEVÉ": "HIGH"
-
     // Loading
     loading_ai: "Initializing AI Engine...",
     loading_map: "Loading satellite map...",
@@ -489,7 +455,6 @@ const translations: Record<Language, Record<string, string>> = {
     sim_est_realtime: "Real-Time PM2.5 Estimation",
     sim_calc: "Smart Computing...",
     sim_retry: "Retry",
-    sim_error: "Simulation service is temporarily unavailable.",
     sim_db: "Database",
     sim_ai_precision: "AI Precision",
     sim_lab_control: "AI Lab Control",
@@ -497,7 +462,6 @@ const translations: Record<Language, Record<string, string>> = {
     today: "Today",
     tomorrow: "Tomorrow",
     after_tomorrow_j2: "After tomorrow",
-    chart_ai_prediction: "AI PREDICTION",
     // Stats Page
     stats_national: "National Overview",
     stats_insights: "Insights: {}",
@@ -567,14 +531,6 @@ const translations: Record<Language, Record<string, string>> = {
     health_ai_note: "AI Note : These recommendations are based on WHO standards and tailored to each profile. If you experience persistent breathing difficulties, contact your local health services immediately.",
 
     // Sub pages common
-    health_title_1: "Health ",
-    health_title_2: "Assessment",
-    health_dash_link: "Dashboard",
-    health_sub_city_selected: "Based on real-time data from your city.",
-    health_sub_no_city: "Please choose a city for personalized advice.",
-    health_where_are_you: "Where are you?",
-    health_where_desc: "Select your zone to adapt medical recommendations to local pollution.",
-    health_select_city: "Select a city",
     health_city_choose: "Choose city",
     health_req_city: "Select a city to get recommendations for {}.",
     health_alert_pollution: "ALERT: {} POLLUTION",
@@ -674,13 +630,6 @@ const translations: Record<Language, Record<string, string>> = {
     onboarding_cta_next: "Next",
     onboarding_cta_finish: "Access Dashboard",
     onboarding_skip: "Skip",
-
-    // API Levels fallback mapping
-    "BON": "GOOD",
-    "MODERE": "MODERATE",
-    "SEVERE": "SEVERE",
-    "DANGEREUX": "DANGEROUS",
-    "CRITIQUE": "CRITICAL"
   }
 };
 
