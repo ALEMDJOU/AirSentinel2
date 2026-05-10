@@ -115,14 +115,33 @@ def get_carte():
             from api.routers.predictions import compute_interactive
             from api.schemas.prediction import ComputeInput
             
-            # Passer TOUTES les colonnes de la ligne pour que le modèle ait accès aux lags, lat/lon, etc.
-            row_dict = row.to_dict()
+            # 1. Convertir la ligne en dict
+            row_raw = row.to_dict()
             
-            # Mapping pour compatibilité si nécessaire
-            row_dict["temp"] = row_dict.get("temperature_2m_mean", row_dict.get("temp"))
-            row_dict["humidity"] = row_dict.get("humidity_moyen", row_dict.get("humidity"))
+            # 2. Nettoyer : ne garder que les valeurs numériques pour les features
+            # (Pydantic dict[str, float] n'aime pas les strings ou les dates)
+            row_features = {}
+            for k, v in row_raw.items():
+                if k in ["ville", "city", "date", "latitude", "longitude"]: # Garder lat/lon si numériques
+                    try:
+                        row_features[k] = float(v)
+                    except (ValueError, TypeError):
+                        continue
+                    continue
+                
+                # Pour les autres, on ne prend que si c'est convertible en float et pas NaN
+                try:
+                    val = float(v)
+                    import math
+                    row_features[k] = val if not math.isnan(val) else 0.0
+                except (ValueError, TypeError):
+                    continue
+
+            # Mapping pour compatibilité
+            row_features["temp"] = row_features.get("temperature_2m_mean", row_features.get("temp", 25.0))
+            row_features["humidity"] = row_features.get("humidity_moyen", row_features.get("humidity", 60.0))
             
-            pred = compute_interactive(ComputeInput(city=city_name, features=row_dict))
+            pred = compute_interactive(ComputeInput(city=city_name, features=row_features))
             ml_pm25 = pred.predicted_pm25
         except Exception as e:
             logger.error(f"Erreur ML sur la carte pour {city_name}: {e}")

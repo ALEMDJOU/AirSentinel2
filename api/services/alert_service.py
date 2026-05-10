@@ -67,15 +67,25 @@ class AlertService:
                     continue
 
                 city_key = user.subscribed_city.lower().strip()
-                features = features_map.get(city_key, {
-                    "dust": 50.0, "co": 15.0, "uv": 6.0,
-                    "temp": 30.0, "humidity": 60.0, "ozone": 42.0
-                })
+                row_raw = features_map.get(city_key, {})
+                
+                # Nettoyage des features pour le modèle (uniquement numériques)
+                row_features = {}
+                for k, v in row_raw.items():
+                    if k in ["latitude", "longitude"]:
+                        try: row_features[k] = float(v)
+                        except: continue
+                    if k in ["ville", "city", "date", "ville_key"]: continue
+                    try:
+                        val = float(v)
+                        import math
+                        row_features[k] = val if not math.isnan(val) else 0.0
+                    except: continue
 
-                # Prédiction ML — même modèle que la carte
+                # Prédiction ML
                 prediction = compute_interactive(ComputeInput(
                     city=user.subscribed_city,
-                    features={k: v for k, v in features.items() if k != "ville_nom"}
+                    features=row_features
                 ))
 
                 pm25 = prediction.predicted_pm25
@@ -123,14 +133,24 @@ class AlertService:
 
             features_map = _load_city_features_map()
             city_key = user.subscribed_city.lower().strip()
-            features = features_map.get(city_key, {
-                "dust": 50.0, "co": 15.0, "uv": 6.0,
-                "temp": 30.0, "humidity": 60.0, "ozone": 42.0
-            })
+            row_raw = features_map.get(city_key, {})
+
+            # Nettoyage
+            row_features = {}
+            for k, v in row_raw.items():
+                if k in ["latitude", "longitude"]:
+                    try: row_features[k] = float(v)
+                    except: continue
+                if k in ["ville", "city", "date", "ville_key"]: continue
+                try:
+                    val = float(v)
+                    import math
+                    row_features[k] = val if not math.isnan(val) else 0.0
+                except: continue
 
             prediction = compute_interactive(ComputeInput(
                 city=user.subscribed_city,
-                features={k: v for k, v in features.items() if k != "ville_nom"}
+                features=row_features
             ))
 
             pm25 = prediction.predicted_pm25
