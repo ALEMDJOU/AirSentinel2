@@ -44,12 +44,21 @@ class RAGService:
             if key in query or any(word in query for word in key.split("_")):
                 context_parts.append(val)
 
+        # Recherche technique
+        for key, val in cls._knowledge_base.get("technical_details", {}).items():
+            if key in query:
+                context_parts.append(f"TECHNIQUE: {val}")
+
         # Recherche dans les villes
         for city, info in cls._knowledge_base.get("city_specific", {}).items():
             if city.lower() in query:
-                context_parts.append(f"{city}: {info}")
+                context_parts.append(f"VVILLE {city}: {info}")
 
         # Recherche dans les recos santé
+        for target, info in cls._knowledge_base.get("health_tips_pro", {}).items():
+            if target in query:
+                context_parts.append(f"CONSEIL SANTÉ: {info}")
+        
         for target, info in cls._knowledge_base.get("health_recommendations_cameroon", {}).items():
             if target in query:
                 context_parts.append(info)
