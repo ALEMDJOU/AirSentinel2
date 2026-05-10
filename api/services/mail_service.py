@@ -54,6 +54,9 @@ class EmailService:
         html_template = f"""
         <html>
         <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <img src="https://raw.githubusercontent.com/ALEMDJOU/AirSentinel2/master/pwa/airsentinel/public/LogoAir.png" alt="AirSentinel Logo" style="height: 55px;">
+            </div>
             <div style="max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
                 <div style="background: {color}; padding: 30px; text-align: center;">
                     <h1 style="color: white; margin: 0; font-size: 28px;">AirSentinel Alerts</h1>
@@ -94,6 +97,9 @@ class EmailService:
         html_template = f"""
         <html>
         <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <img src="https://raw.githubusercontent.com/ALEMDJOU/AirSentinel2/master/pwa/airsentinel/public/LogoAir.png" alt="AirSentinel Logo" style="height: 55px;">
+            </div>
             <div style="max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
                 <div style="background: linear-gradient(135deg, #10b981, #0ea5e9); padding: 40px; text-align: center;">
                     <h1 style="color: white; margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -1px;">Bienvenue, {name or 'Sentinel'} !</h1>
@@ -140,6 +146,9 @@ class EmailService:
         html_template = f"""
         <html>
         <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <img src="https://raw.githubusercontent.com/ALEMDJOU/AirSentinel2/master/pwa/airsentinel/public/LogoAir.png" alt="AirSentinel Logo" style="height: 55px;">
+            </div>
             <div style="max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
                 <div style="background: #10b981; padding: 30px; text-align: center;">
                     <h1 style="color: white; margin: 0; font-size: 28px;">AirSentinel News</h1>
