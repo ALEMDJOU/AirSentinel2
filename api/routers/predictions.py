@@ -225,22 +225,22 @@ def compute_interactive(payload: ComputeInput):
         logger.error(f"Erreur modèle ML : {e}")
         predicted = 30.0
 
-    # Classification (seuils OMS/AirSentinel)
+    # Classification (Seuils unifiés AirSentinel / OMS)
     if predicted <= 12:
-        level, color = "BON", "#10b981"
-        desc = "La qualité de l'air est jugée satisfaisante."
-    elif predicted <= 35:
-        level, color = "MODÉRÉ", "#f59e0b"
-        desc = "La qualité de l'air est acceptable."
-    elif predicted <= 55:
-        level, color = "DÉGRADÉ", "#f97316"
-        desc = "Les membres des groupes sensibles peuvent ressentir des effets sur la santé."
-    elif predicted <= 150:
-        level, color = "MAUVAIS", "#ef4444"
-        desc = "Tout le monde peut commencer à ressentir des effets sur la santé."
+        level, color = "BON", "#4CAF50"
+        desc = "Qualité de l'air optimale. Aucune restriction pour les activités en extérieur."
+    elif predicted <= 35.4:
+        level, color = "MODÉRÉ", "#FFC107"
+        desc = "Qualité acceptable. Les personnes ultra-sensibles devraient limiter les efforts prolongés."
+    elif predicted <= 55.4:
+        level, color = "SÉVÈRE", "#FF9800"
+        desc = "Effets possibles sur la santé. Réduisez les activités physiques intenses en plein air."
+    elif predicted <= 150.4:
+        level, color = "DANGEREUX", "#FF5722"
+        desc = "Risques sanitaires accrus. Port du masque recommandé pour les personnes sensibles."
     else:
-        level, color = "TRÈS MAUVAIS", "#7f1d1d"
-        desc = "Avertissements sanitaires de conditions d'urgence."
+        level, color = "CRITIQUE", "#B71C1C"
+        desc = "Urgence sanitaire. Évitez toute sortie non essentielle. Port du masque obligatoire."
 
     return ComputeResponse(
         predicted_pm25=round(predicted, 2),
