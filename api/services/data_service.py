@@ -34,14 +34,17 @@ def get_dataframe() -> pd.DataFrame:
             _df = pd.read_parquet(dataset_path, engine='pyarrow')
 
         # ─── VIRTUAL TIME SHIFT (Live Demo Mode) ───
-        # Pour que l'app paraisse "Live", on décale les dates pour que le dataset finisse AUJOURD'HUI.
+        # On ne décale QUE si les données sont anciennes (max < today)
+        # Cela permet de conserver les prédictions futures (J+1, J+2) si elles existent.
         if 'date' in _df.columns:
             max_date = _df['date'].max()
             today = pd.Timestamp.now().normalize()
-            if not pd.isna(max_date):
+            if not pd.isna(max_date) and max_date < today:
                 delta = today - max_date
                 _df['date'] = _df['date'] + delta
-                logger.info(f"Dataset décalé de {delta.days} jours pour correspondre à la date actuelle ({today.date()})")
+                logger.info(f"Dataset décalé de {delta.days} jours pour correspondre à aujourd'hui ({today.date()})")
+            elif not pd.isna(max_date) and max_date >= today:
+                logger.info(f"Dataset déjà à jour ou contenant des prévisions (max={max_date.date()}). Pas de décalage.")
 
         logger.info(f"Dataset chargé avec succès depuis {dataset_path}")
     except Exception as e:

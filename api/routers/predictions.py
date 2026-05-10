@@ -58,16 +58,13 @@ def get_short_term():
         logger.warning("Dataset filtré vide pour les prédictions.")
         return []
 
-    last_date = df_sorted[date_col].max()
-
-    # Historique : 21 derniers jours
-    start_hist = last_date - timedelta(days=21)
-    hist_df = df_sorted[df_sorted[date_col] >= start_hist]
+    today_dt = pd.Timestamp.now().normalize()
+    last_real_date = today_dt
     
-    if hist_df.empty:
-        return []
-
-    hist = (
+    # 1. Récupérer l'historique (jusqu'à aujourd'hui inclus)
+    hist_df = df_sorted[df_sorted[date_col] <= last_real_date].tail(21)
+    
+    hist_agg = (
         hist_df.resample("D", on=date_col)[pm25_col]
         .mean()
         .dropna()
@@ -76,19 +73,30 @@ def get_short_term():
     
     result = [
         PredictionPoint(date=str(row[date_col].date()), pm25=round(float(row[pm25_col]), 2))
-        for _, row in hist.iterrows()
+        for _, row in hist_agg.iterrows()
     ]
 
-    # Prédiction simulée
-    if not hist.empty:
-        pm25_base = hist[pm25_col].tail(7).mean() if len(hist) >= 7 else hist[pm25_col].mean()
+    # 2. Récupérer les prédictions (Après aujourd'hui)
+    # On regarde si le dataset contient déjà des données futures (ex: importées d'une API de forecast)
+    future_df = df_sorted[df_sorted[date_col] > last_real_date].head(3)
+    
+    if not future_df.empty:
+        # Utilisation des données réelles du parquet pour le futur
+        for _, row in future_df.iterrows():
+            result.append(PredictionPoint(
+                date=str(row[date_col].date()), 
+                pm25=round(float(row[pm25_col]), 2), 
+                is_prediction=True
+            ))
+        logger.info(f"Prédictions basées sur le DATASET pour {len(future_df)} jours.")
     else:
-        pm25_base = 25.0
-        
-    for i in range(1, 4):
-        pred_date = last_date + timedelta(days=i)
-        pred_val = round(float(pm25_base) * (1 + 0.01 * i), 2)
-        result.append(PredictionPoint(date=str(pred_date.date()), pm25=pred_val, is_prediction=True))
+        # Fallback : Simulation si pas de données futures dans le parquet
+        logger.info("Aucune donnée future dans le parquet. Passage en mode SIMULATION.")
+        pm25_base = hist_agg[pm25_col].tail(7).mean() if not hist_agg.empty else 25.0
+        for i in range(1, 4):
+            pred_date = last_real_date + timedelta(days=i)
+            pred_val = round(float(pm25_base) * (1 + 0.01 * i), 2)
+            result.append(PredictionPoint(date=str(pred_date.date()), pm25=pred_val, is_prediction=True))
 
     return result
 
