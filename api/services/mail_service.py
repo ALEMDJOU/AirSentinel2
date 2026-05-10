@@ -1,7 +1,10 @@
 # api/services/mail_service.py
 
 import httpx
+import smtplib
 import logging
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from typing import Optional
 
 from api.core.config import settings
@@ -9,12 +12,35 @@ from api.core.config import settings
 logger = logging.getLogger(__name__)
 
 class EmailService:
+
+    @staticmethod
+    async def _send_email_smtp(to_email: str, subject: str, html_content: str) -> bool:
+        """Envoi d'email via SMTP (Gmail, Brevo SMTP Relay, etc.). Retourne True si succès."""
+        if not all([settings.SMTP_HOST, settings.SMTP_USER, settings.SMTP_PASSWORD]):
+            return False
+        try:
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = subject
+            msg["From"] = f"{settings.EMAILS_FROM_NAME} <{settings.EMAILS_FROM_EMAIL}>"
+            msg["To"] = to_email
+            msg.attach(MIMEText(html_content, "html", "utf-8"))
+            with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
+                server.ehlo()
+                server.starttls()
+                server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+                server.sendmail(settings.EMAILS_FROM_EMAIL, to_email, msg.as_string())
+            logger.info(f"[Mail] Email SMTP envoyé avec succès à {to_email}")
+            return True
+        except Exception as e:
+            logger.error(f"[Mail] Échec SMTP : {e}")
+            return False
+
     @staticmethod
     async def _send_email_brevo(to_email: str, subject: str, html_content: str):
-        """Envoi d'email via l'API Brevo v3."""
+        """Envoi d'email via l'API Brevo v3. Fallback sur SMTP si Brevo échoue."""
         if not settings.BREVO_API_KEY:
-            logger.warning("[Mail] BREVO_API_KEY non configuré. L'email est affiché dans les logs au lieu d'être envoyé.")
-            logger.info(f"[SIMULATED BREVO MAIL] To: {to_email} | Subject: {subject}\nContent: {html_content[:200]}...")
+            logger.warning("[Mail] BREVO_API_KEY absent — tentative SMTP.")
+            await EmailService._send_email_smtp(to_email, subject, html_content)
             return
 
         url = "https://api.brevo.com/v3/smtp/email"
@@ -37,14 +63,15 @@ class EmailService:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(url, headers=headers, json=payload)
-                
                 if response.status_code in [201, 200, 202]:
                     logger.info(f"[Mail] Email Brevo envoyé avec succès à {to_email}")
                 else:
                     logger.error(f"[Mail] Erreur Brevo ({response.status_code}): {response.text}")
-                    
+                    logger.info(f"[Mail] Fallback SMTP pour {to_email}")
+                    await EmailService._send_email_smtp(to_email, subject, html_content)
         except Exception as e:
-            logger.error(f"[Mail] Échec de l'envoi via Brevo : {str(e)}")
+            logger.error(f"[Mail] Échec Brevo : {e} — tentative SMTP")
+            await EmailService._send_email_smtp(to_email, subject, html_content)
 
     @classmethod
     async def send_air_quality_alert(cls, email: str, city: str, pm25: float, level: str, color: str):
