@@ -334,6 +334,13 @@ const translations: Record<Language, Record<string, string>> = {
     onboarding_cta_next: "Suivant",
     onboarding_cta_finish: "Accéder au tableau de bord",
     onboarding_skip: "Passer",
+    
+    // API Levels fallback mapping
+    "BON": "BON",
+    "MODERE": "MODÉRÉ",
+    "SEVERE": "SÉVÈRE",
+    "DANGEREUX": "DANGEREUX",
+    "CRITIQUE": "CRITIQUE"
   },
   en: {
     // Navbar
@@ -436,7 +443,6 @@ const translations: Record<Language, Record<string, string>> = {
     // Onboarding additional
     onboarding_aha_title: "Congratulations!",
     onboarding_alert_config: "Configuring alerts for {}...",
-    
     // API Levels fallback mapping
     "BON": "GOOD",
     "MODERE": "MODERATE",
@@ -668,6 +674,13 @@ const translations: Record<Language, Record<string, string>> = {
     onboarding_cta_next: "Next",
     onboarding_cta_finish: "Access Dashboard",
     onboarding_skip: "Skip",
+
+    // API Levels fallback mapping
+    "BON": "GOOD",
+    "MODERE": "MODERATE",
+    "SEVERE": "SEVERE",
+    "DANGEREUX": "DANGEROUS",
+    "CRITIQUE": "CRITICAL"
   }
 };
 

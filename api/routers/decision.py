@@ -23,267 +23,148 @@ class ProfilRecommandation(BaseModel):
     actions: list[str]
 
 
-# Recommandations statiques par niveau IRS × profil × langue
-RECOMMANDATIONS_BILINGUE = {
+# Structure unifiée des recommandations (Français/Anglais)
+RECOMMANDATIONS = {
     "fr": {
-        "FAIBLE": {
-            "enfant": {
-                "message": "Qualité de l'air satisfaisante. Les activités extérieures sont conseillées.",
-                "actions": ["Activités sportives possibles", "Pas de restriction"]
-            },
-            "adulte": {
-                "message": "Air sain. Profitez des activités en plein air sans restriction.",
-                "actions": ["Activités normales", "Ventilation naturelle recommandée"]
-            },
-            "personne_agee": {
-                "message": "Conditions favorables. Sortie possible sans précaution particulière.",
-                "actions": ["Promenade conseillée", "Pas de masque nécessaire"]
-            },
-            "asthmatique": {
-                "message": "Risque faible. Gardez votre inhalateur par précaution.",
-                "actions": ["Sortie possible", "Surveiller vos symptômes"]
-            },
+        "BON": {
+            "label": "BON", "color": "#4CAF50",
+            "enfant": {"msg": "Air sain. Idéal pour jouer dehors.", "acts": ["Activités normales", "Aération maximale"]},
+            "adulte": {"msg": "Qualité optimale. Profitez du plein air.", "acts": ["Sport possible", "Aucune restriction"]},
+            "senior": {"msg": "Conditions idéales. Sortie recommandée.", "acts": ["Promenade", "Aération des pièces"]},
+            "asthmatique": {"msg": "Air pur. Risque d'irritation minimal.", "acts": ["Activités normales", "Précaution habituelle"]}
         },
-        "MODÉRÉ": {
-            "enfant": {
-                "message": "Qualité d'air modérée. Limitez les efforts intenses prolongés en extérieur.",
-                "actions": ["Réduire les activités sportives intenses", "Aérer les locaux"]
-            },
-            "adulte": {
-                "message": "Léger risque pour les personnes sensibles. Réduisez les expositions prolongées.",
-                "actions": ["Limiter les activités physiques", "Éviter les zones à fort trafic"]
-            },
-            "personne_agee": {
-                "message": "Prudence conseillée. Privilégiez les activités en intérieur.",
-                "actions": ["Rester à l'intérieur si possible", "Consulter si gêne respiratoire"]
-            },
-            "asthmatique": {
-                "message": "Risque modéré. Portez masque FFP2 en extérieur.",
-                "actions": ["Porter un masque FFP2", "Éviter les efforts physiques"]
-            },
+        "MODERE": {
+            "label": "MODÉRÉ", "color": "#FFC107",
+            "enfant": {"msg": "Air acceptable. Évitez les jeux trop intenses.", "acts": ["Jeux calmes", "Aération ponctuelle"]},
+            "adulte": {"msg": "Léger voile de pollution. Prudence pour les sensibles.", "acts": ["Réduire cardio intense", "Éviter les grands axes"]},
+            "senior": {"msg": "Prudence conseillée. Sorties brèves.", "acts": ["Limiter exposition", "Rester hydraté"]},
+            "asthmatique": {"msg": "Sensibilité accrue. Gardez vos médicaments.", "acts": ["Masque recommandé", "Surveiller le souffle"]}
         },
-        "ÉLEVÉ": {
-            "enfant": {
-                "message": "Qualité d'air dégradée. Restez à l'intérieur autant que possible.",
-                "actions": ["Annuler les sorties", "Fermer les fenêtres"]
-            },
-            "adulte": {
-                "message": "Air de mauvaise qualité. Limitez toute activité extérieure.",
-                "actions": ["Télétravail si possible", "Porter masque FFP2"]
-            },
-            "personne_agee": {
-                "message": "Danger pour les personnes vulnérables. Restez en intérieur.",
-                "actions": ["Ne pas sortir", "Fermer portes et fenêtres"]
-            },
-            "asthmatique": {
-                "message": "Risque élevé. Activation du plan d'action asthme recommandée.",
-                "actions": ["Rester en intérieur", "Augmenter traitement préventif si prescrit"]
-            },
+        "SEVERE": {
+            "label": "SÉVÈRE", "color": "#FF9800",
+            "enfant": {"msg": "Air dégradé. Privilégiez les jeux en intérieur.", "acts": ["Pas de sport dehors", "Fenêtres fermées"]},
+            "adulte": {"msg": "Pollution marquée. Limitez vos efforts.", "acts": ["Télétravail conseillé", "Masque FFP2 dehors"]},
+            "senior": {"msg": "Danger potentiel. Restez à l'intérieur.", "acts": ["Éviter les sorties", "Suivi médical si besoin"]},
+            "asthmatique": {"msg": "Risque d'essoufflement. Traitement préventif.", "acts": ["Confinement partiel", "Masque FFP2 obligatoire"]}
+        },
+        "DANGEREUX": {
+            "label": "DANGEREUX", "color": "#FF5722",
+            "enfant": {"msg": "🚨 Risque élevé. Interdiction de sortie.", "acts": ["Rester confiné", "Purificateur d'air", "Suivi respiratoire"]},
+            "adulte": {"msg": "🚨 Air toxique. Masque FFP2/FFP3 obligatoire.", "acts": ["Zéro sport extérieur", "Limiter tout trajet"]},
+            "senior": {"msg": "🚨 Danger grave. Ne sortez sous aucun prétexte.", "acts": ["Confinement total", "Contact famille"]},
+            "asthmatique": {"msg": "🚨 Crise probable. Préparez l'urgence.", "acts": ["Confinement strict", "Appeler médecin si gêne"]}
         },
         "CRITIQUE": {
-            "enfant": {
-                "message": "🚨 Urgence sanitaire. Ne pas exposer les enfants à l'extérieur.",
-                "actions": ["Fermer hermétiquement", "Appeler les secours si détresse"]
-            },
-            "adulte": {
-                "message": "🚨 Pollution critique. Confinement recommandé.",
-                "actions": ["Rester confiné", "Masque FFP3 si sortie indispensable"]
-            },
-            "personne_agee": {
-                "message": "🚨 Risque vital. Alerte rouge pour les personnes âgées.",
-                "actions": ["Confinement total", "Assistance médicale immédiate"]
-            },
-            "asthmatique": {
-                "message": "🚨 Situation critique. Protocole d'urgence asthme à activer.",
-                "actions": ["Appeler les secours", "Utilisation immédiate des bronchodilatateurs"]
-            },
-        },
+            "label": "CRITIQUE", "color": "#B71C1C",
+            "enfant": {"msg": "💀 Urgence vitale. Confinement hermétique.", "acts": ["Évacuation si possible", "Appeler les secours si toux"]},
+            "adulte": {"msg": "💀 Pollution extrême. Danger immédiat.", "acts": ["Zéro sortie", "Masque FFP3 si urgence"]},
+            "senior": {"msg": "💀 Alerte rouge. Assistance médicale requise.", "acts": ["Vigilance absolue", "Aide à domicile"]},
+            "asthmatique": {"msg": "💀 Risque de crise majeure. Urgence.", "acts": ["Utiliser inhalateur", "Appeler secours si crise"]}
+        }
     },
     "en": {
-        "FAIBLE": {
-            "enfant": {
-                "message": "Satisfactory air quality. Outdoor activities are encouraged.",
-                "actions": ["Sports activities possible", "No restrictions"]
-            },
-            "adulte": {
-                "message": "Clean air. Enjoy outdoor activities without restriction.",
-                "actions": ["Normal activities", "Natural ventilation recommended"]
-            },
-            "personne_agee": {
-                "message": "Favorable conditions. Outdoor walks possible without special precautions.",
-                "actions": ["Recommended walk", "No mask needed"]
-            },
-            "asthmatique": {
-                "message": "Low risk. Keep your inhaler with you as a precaution.",
-                "actions": ["Going out possible", "Monitor your symptoms"]
-            },
+        "BON": {
+            "label": "GOOD", "color": "#4CAF50",
+            "enfant": {"msg": "Healthy air. Perfect for playing outside.", "acts": ["Normal activities", "Maximum ventilation"]},
+            "adulte": {"msg": "Optimal quality. Enjoy the outdoors.", "acts": ["Exercise possible", "No restrictions"]},
+            "senior": {"msg": "Ideal conditions. Outing recommended.", "acts": ["Walk outside", "Ventilate rooms"]},
+            "asthmatique": {"msg": "Pure air. Minimal irritation risk.", "acts": ["Normal activities", "Standard precaution"]}
         },
-        "MODÉRÉ": {
-            "enfant": {
-                "message": "Moderate air quality. Limit prolonged intense outdoor exertion.",
-                "actions": ["Reduce intense sports", "Ventilate indoor spaces"]
-            },
-            "adulte": {
-                "message": "Light risk for sensitive people. Reduce prolonged exposure.",
-                "actions": ["Limit physical activities", "Avoid high traffic areas"]
-            },
-            "personne_agee": {
-                "message": "Prudence advised. Prioritize indoor activities.",
-                "actions": ["Stay indoors if possible", "Consult doctor if breathing issues"]
-            },
-            "asthmatique": {
-                "message": "Moderate risk. Wear FFP2 mask outdoors.",
-                "actions": ["Wear FFP2 mask", "Avoid physical exertion"]
-            },
+        "MODERE": {
+            "label": "MODERATE", "color": "#FFC107",
+            "enfant": {"msg": "Moderate air. Avoid very intense games.", "acts": ["Calm play", "Occasional ventilation"]},
+            "adulte": {"msg": "Light haze. Caution for sensitive people.", "acts": ["Reduce intense cardio", "Avoid busy roads"]},
+            "senior": {"msg": "Caution advised. Short outings only.", "acts": ["Limit exposure", "Stay hydrated"]},
+            "asthmatique": {"msg": "Increased sensitivity. Keep your meds.", "acts": ["Mask recommended", "Monitor breathing"]}
         },
-        "ÉLEVÉ": {
-            "enfant": {
-                "message": "Degraded air quality. Stay indoors as much as possible.",
-                "actions": ["Cancel outings", "Close windows"]
-            },
-            "adulte": {
-                "message": "Poor air quality. Limit all outdoor activity.",
-                "actions": ["Telework if possible", "Wear FFP2 mask"]
-            },
-            "personne_agee": {
-                "message": "Danger for vulnerable people. Stay indoors.",
-                "actions": ["Do not go out", "Close doors and windows"]
-            },
-            "asthmatique": {
-                "message": "High risk. Asthma action plan activation recommended.",
-                "actions": ["Stay indoors mandatory", "Increase preventive treatment if prescribed"]
-            },
+        "SEVERE": {
+            "label": "SEVERE", "color": "#FF9800",
+            "enfant": {"msg": "Poor air. Prefer indoor activities.", "acts": ["No outdoor sports", "Keep windows closed"]},
+            "adulte": {"msg": "Marked pollution. Limit your efforts.", "acts": ["Remote work advised", "FFP2 mask outdoors"]},
+            "senior": {"msg": "Potential danger. Stay indoors.", "acts": ["Avoid going out", "Medical follow-up if needed"]},
+            "asthmatique": {"msg": "Shortness of breath risk. Preventive treatment.", "acts": ["Partial confinement", "FFP2 mask mandatory"]}
+        },
+        "DANGEREUX": {
+            "label": "DANGEROUS", "color": "#FF5722",
+            "enfant": {"msg": "🚨 High risk. No outdoor activities allowed.", "acts": ["Stay indoors", "Air purifier", "Breathing check"]},
+            "adulte": {"msg": "🚨 Toxic air. FFP2/FFP3 mask mandatory.", "acts": ["Zero outdoor sports", "Limit all travel"]},
+            "senior": {"msg": "🚨 Serious danger. Do not go out for any reason.", "acts": ["Total confinement", "Contact family"]},
+            "asthmatique": {"msg": "🚨 Probable attack. Prepare emergency plan.", "acts": ["Strict confinement", "Call doctor if tight"]}
         },
         "CRITIQUE": {
-            "enfant": {
-                "message": "🚨 Health emergency. Do not expose children outdoors.",
-                "actions": ["Seal windows", "Call emergency services if distress"]
-            },
-            "adulte": {
-                "message": "🚨 Critical pollution. Lockdown recommended.",
-                "actions": ["Stay confined", "FFP3 mask if outing is essential"]
-            },
-            "personne_agee": {
-                "message": "🚨 Vital risk. Red alert for the elderly.",
-                "actions": ["Total confinement", "Immediate medical assistance"]
-            },
-            "asthmatique": {
-                "message": "🚨 Critical situation. Emergency asthma protocol to activate.",
-                "actions": ["Call emergency services", "Immediate use of bronchodilators"]
-            },
-        },
+            "label": "CRITICAL", "color": "#B71C1C",
+            "enfant": {"msg": "💀 Life threatening. Hermetic confinement.", "acts": ["Evacuate if possible", "Call emergency services if coughing"]},
+            "adulte": {"msg": "💀 Extreme pollution. Immediate danger.", "acts": ["Zero outing", "FFP3 mask if emergency"]},
+            "senior": {"msg": "💀 Red alert. Medical assistance required.", "acts": ["Absolute vigilance", "Home assistance"]},
+            "asthmatique": {"msg": "💀 Major attack risk. Emergency.", "acts": ["Use inhaler", "Call help if attack starts"]}
+        }
     }
 }
 
-PROFIL_META_BILINGUE = {
-    "fr": {
-        "enfant": {"icone": "👶", "label": "Enfant (< 12 ans)"},
-        "adulte": {"icone": "🧑", "label": "Adulte"},
-        "personne_agee": {"icone": "👴", "label": "Personne âgée"},
-        "asthmatique": {"icone": "🫁", "label": "Personne asthmatique"},
-    },
-    "en": {
-        "enfant": {"icone": "👶", "label": "Child (< 12 years)"},
-        "adulte": {"icone": "🧑", "label": "Adult"},
-        "personne_agee": {"icone": "👴", "label": "Senior citizen"},
-        "asthmatique": {"icone": "🫁", "label": "Asthmatic person"},
-    }
-}
-
-NIVEAU_COULEUR = {
-    "FAIBLE": "#4CAF50",
-    "MODÉRÉ": "#FFC107",
-    "ÉLEVÉ": "#FF5722",
-    "CRITIQUE": "#B71C1C",
+PROFIL_META = {
+    "enfant": {"icone": "👶", "label_fr": "Enfant (< 12 ans)", "label_en": "Child (< 12 years)"},
+    "adulte": {"icone": "🧑", "label_fr": "Adulte", "label_en": "Adult"},
+    "senior": {"icone": "👴", "label_fr": "Personne âgée", "label_en": "Senior"},
+    "asthmatique": {"icone": "🫁", "label_fr": "Asthmatique", "label_en": "Asthmatic"},
 }
 
 def _find_col(df, candidates):
     for c in candidates:
-        if c in df.columns:
-            return c
+        if c in df.columns: return c
     return None
 
-
 def _get_niveau_actuel(df, ville: Optional[str] = None) -> str:
-    """Calcule le niveau IRS actuel à partir des dernières données disponibles."""
-    niveau_col = _find_col(df, ["niveau_sanitaire", "niveau_alerte", "label"])
-    pm25_col = _find_col(df, ["pm2_5_moyen", "pm2_5", "pm25", "PM2.5", "PM25"])
-    
-    if not pm25_col:
-        return "MODÉRÉ"
+    pm25_col = _find_col(df, ["pm2_5_moyen", "pm2_5", "pm25"])
+    if not pm25_col: return "MODERE"
     
     filtered_df = df
     city_col = _find_col(df, ["ville", "city"])
     if ville and city_col:
-        filtered_df = df[df[city_col] == ville]
+        filtered_df = df[df[city_col].str.lower() == ville.lower()]
     
-    if filtered_df.empty:
-        return "MODÉRÉ"
+    if filtered_df.empty: return "MODERE"
     
     if "date" in filtered_df.columns:
-        filtered_df = filtered_df.sort_values("date")
+        filtered_df = filtered_df.sort_values("date", ascending=False)
     
-    if niveau_col and niveau_col in filtered_df.columns:
-        last_row = filtered_df.tail(1).iloc[0]
-        niveau_str = str(last_row[niveau_col])
-        if "FAIBLE" in niveau_str:
-            return "FAIBLE"
-        elif "MODÉRÉ" in niveau_str or "MOYEN" in niveau_str:
-            return "MODÉRÉ"
-        elif "ÉLEVÉ" in niveau_str or "TRÈS" in niveau_str:
-            return "ÉLEVÉ"
-        elif "CRITIQUE" in niveau_str or "MAUVAIS" in niveau_str:
-            return "CRITIQUE"
+    last_val = filtered_df.iloc[0][pm25_col]
     
-    last_val = filtered_df.tail(1)[pm25_col].values[0] if pm25_col in filtered_df.columns else filtered_df[pm25_col].mean()
-
-    if last_val <= 10:
-        return "FAIBLE"
-    elif last_val <= 25:
-        return "MODÉRÉ"
-    elif last_val <= 50:
-        return "ÉLEVÉ"
-    else:
-        return "CRITIQUE"
-
+    # Seuils unifiés (update_daily.py)
+    if last_val <= 12: return "BON"
+    elif last_val <= 35.4: return "MODERE"
+    elif last_val <= 55.4: return "SEVERE"
+    elif last_val <= 150.4: return "DANGEREUX"
+    else: return "CRITIQUE"
 
 @router.get("/real", response_model=list[ProfilRecommandation])
 def get_recommandations(request: Request, ville: Optional[str] = None):
     """
-    Retourne les recommandations de santé pour les 4 profils selon le niveau IRS actuel.
+    Retourne les recommandations de santé pour les 4 profils selon le niveau actuel.
     Supporte l'anglais et le français via le header Accept-Language.
     """
-    # Détection de la langue
+    # Détection langue
     accept_lang = request.headers.get("accept-language", "fr")
     lang = "en" if "en" in accept_lang.lower() else "fr"
     
     try:
         df = get_dataframe()
-        
-        city_col = _find_col(df, ["ville", "city"])
-        if ville and city_col:
-            filtered = df[df[city_col] == ville]
-            if filtered.empty:
-                raise HTTPException(status_code=404, detail=f"Aucune donnée trouvée pour la ville: {ville}")
-        
         niveau = _get_niveau_actuel(df, ville)
-    except Exception as e:
-        # En cas d'erreur ou dataset absent, on reste sur MODÉRÉ
-        niveau = "MODÉRÉ"
+    except Exception:
+        niveau = "MODERE"
 
+    # Récupération des données selon la langue
+    lang_recos = RECOMMANDATIONS.get(lang, RECOMMANDATIONS["fr"])
+    t = lang_recos.get(niveau, lang_recos["MODERE"])
+    
     result = []
-    # On récupère les dictionnaires pour la langue choisie
-    meta_dict = PROFIL_META_BILINGUE.get(lang, PROFIL_META_BILINGUE["fr"])
-    reco_dict = RECOMMANDATIONS_BILINGUE.get(lang, RECOMMANDATIONS_BILINGUE["fr"])
-
-    for profil, meta in meta_dict.items():
-        reco = reco_dict[niveau][profil]
+    for key, meta in PROFIL_META.items():
+        reco = t[key]
         result.append(ProfilRecommandation(
-            profil=meta["label"],
+            profil=meta[f"label_{lang}"],
             icone=meta["icone"],
-            niveau_risque=niveau,
-            couleur=NIVEAU_COULEUR[niveau],
-            message=reco["message"],
-            actions=reco["actions"],
+            niveau_risque=t["label"],
+            couleur=t["color"],
+            message=reco["msg"],
+            actions=reco["acts"],
         ))
     return result

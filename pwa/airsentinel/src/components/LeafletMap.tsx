@@ -361,45 +361,33 @@ export default function LeafletMap() {
         </LayersControl>
       </MapContainer>
 
-      {/* ── Légende PM2.5 (Style amélioré et compact) ── */}
-      <div className="absolute bottom-6 left-4 z-[1000] bg-slate-900/90 backdrop-blur-md border border-white/20 rounded-xl p-3 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 min-w-[190px]">
-        <div className="flex flex-col gap-2">
-          <div className="space-y-1 border-b border-white/10 pb-2">
-            <h4 className="text-[11px] font-black text-[#00d4b1] uppercase tracking-wider flex items-center gap-1.5">
+      {/* ── Unified Legend (AirSentinel Standards) ── */}
+      <div className="absolute bottom-6 left-4 z-[1000] space-y-3">
+        <div className="glass-card p-4 border-white/10 flex flex-col gap-3 min-w-[200px] backdrop-blur-3xl bg-slate-950/80 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+          <div className="flex flex-col gap-1 mb-1 border-b border-white/5 pb-2">
+            <span className="text-[10px] font-black text-[#00d4b1] uppercase tracking-widest flex items-center gap-2">
               <Wind size={14} /> {t('map_pollution') || "Qualité de l'Air"}
-            </h4>
-            <p className="text-[9px] text-gray-300 font-medium">{t('oms_recommendations') || "Recommandations OMS (PM2.5)"}</p>
+            </span>
           </div>
-          
-          <div className="flex flex-col gap-1.5">
-            {[
-              { label: t('level_good'),      color: "#10b981", desc: "0–15",  detail: t('detail_good') },
-              { label: t('level_mod'),       color: "#fbbf24", desc: "15–35", detail: t('detail_mod') },
-              { label: t('level_high'),      color: "#f97316", desc: "35–50", detail: t('detail_high') },
-              { label: t('level_vhigh'),     color: "#ef4444", desc: "50–75", detail: t('detail_vhigh') },
-              { label: t('level_crit'),      color: "#7e22ce", desc: ">75",   detail: t('detail_crit') },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-2 bg-white/5 px-2 py-1.5 rounded-md border border-white/5">
-                <div 
-                  className="w-2.5 h-2.5 rounded-full border border-white/30 shrink-0" 
-                  style={{ backgroundColor: item.color, boxShadow: `0 0 10px ${item.color}66` }} 
-                />
-                <div className="flex flex-col w-full leading-tight">
-                  <div className="flex justify-between items-center w-full">
-                    <span className="text-[10px] font-bold text-white">
-                      {item.label}
-                    </span>
-                    <span className="text-[8px] font-bold" style={{ color: item.color }}>
-                      {item.desc}
-                    </span>
-                  </div>
-                  <span className="text-[8px] text-gray-400 mt-[1px]">
-                    {item.detail}
-                  </span>
-                </div>
+          {[
+            { key: 'BON',      color: "#4CAF50", desc: "0–12",  defaultLabel: "Bon" },
+            { key: 'MODERE',   color: "#FFC107", desc: "12–35", defaultLabel: "Modéré" },
+            { key: 'SEVERE',   color: "#FF9800", desc: "35–55", defaultLabel: "Sévère" },
+            { key: 'DANGEREUX',color: "#FF5722", desc: "55–150",defaultLabel: "Dangereux" },
+            { key: 'CRITIQUE', color: "#B71C1C", desc: ">150",  defaultLabel: "Critique" },
+          ].map((item) => (
+            <div key={item.key} className="flex items-center gap-3 group/item">
+              <div className="w-2.5 h-2.5 rounded-full shrink-0 shadow-lg group-hover/item:scale-125 transition-transform" style={{ backgroundColor: item.color, boxShadow: `0 0 10px ${item.color}44` }} />
+              <div className="flex justify-between items-center w-full">
+                <span className="text-[10px] font-black text-white/90 uppercase tracking-tighter leading-none">
+                  {t(item.key) || item.defaultLabel}
+                </span>
+                <span className="text-[8px] text-gray-500 font-bold tabular-nums">
+                  {item.desc} <span className="opacity-50 font-normal">µg/m³</span>
+                </span>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
       
