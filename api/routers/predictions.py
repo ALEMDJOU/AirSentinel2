@@ -36,14 +36,26 @@ def _find_col(df, candidates):
 
 # ─── Endpoints ─────────────────────────────────────────────────────
 @router.get("/short-term", response_model=list[PredictionPoint])
-def get_short_term():
+def get_short_term(city: Optional[str] = None):
     """
-    Retourne l'historique et les prédictions PM2.5.
+    Retourne l'historique et les prédictions PM2.5 pour une ville donnée.
     """
     try:
         df = get_dataframe()
     except FileNotFoundError as e:
         raise HTTPException(status_code=503, detail=str(e))
+
+    if not city:
+        city = "Douala" # Ville par défaut si non spécifiée
+
+    # Filtrer par ville (case-insensitive)
+    city_col = _find_col(df, ["ville", "city", "City", "Ville"])
+    if city_col:
+        df = df[df[city_col].str.lower() == city.lower()]
+    
+    if df.empty:
+        logger.warning(f"Aucune donnée trouvée pour la ville: {city}")
+        return []
 
     pm25_col = _find_col(df, ["pm2_5_moyen", "pm2_5", "pm25", "PM2.5"])
     date_col = "date" if "date" in df.columns else None
