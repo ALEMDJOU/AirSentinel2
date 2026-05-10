@@ -124,6 +124,9 @@ class AlertService:
                     user.last_alert_sent = datetime.now(timezone.utc)
                     await db.commit()
 
+            except Exception as e:
+                logger.error(f"[AlertService] Erreur pour {user.email} : {str(e)}")
+
 
     @staticmethod
     async def check_user_alert(user_id: int, db: AsyncSession):

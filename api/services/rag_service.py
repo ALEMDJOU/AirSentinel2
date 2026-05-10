@@ -52,7 +52,7 @@ class RAGService:
         # Recherche dans les villes
         for city, info in cls._knowledge_base.get("city_specific", {}).items():
             if city.lower() in query:
-                context_parts.append(f"VVILLE {city}: {info}")
+                context_parts.append(f"VILLE {city}: {info}")
 
         # Recherche dans les recos santé
         for target, info in cls._knowledge_base.get("health_tips_pro", {}).items():
