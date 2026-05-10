@@ -150,11 +150,15 @@ def get_analyses(city: Optional[str] = None):
     region_col = _find_col(df, ["region", "Region", "Area"])
     city_col   = _find_col(df, ["ville", "city", "Ville", "City"])
 
+    # On ne garde que les données jusqu'à aujourd'hui pour les analyses (situation actuelle)
+    today = pd.Timestamp.now().normalize()
+    df_current = df[df["date"] <= today] if "date" in df.columns else df
+
     # ─── EXTRACTION DES DONNÉES RÉCENTES POUR S'ALIGNER AVEC LA CARTE ───
     if city_col and "date" in df.columns:
-        latest_df = df.sort_values(by="date", ascending=False).drop_duplicates(subset=[city_col])
+        latest_df = df_current.sort_values(by="date", ascending=False).drop_duplicates(subset=[city_col])
     else:
-        latest_df = df.drop_duplicates(subset=[city_col]) if city_col else df
+        latest_df = df_current.drop_duplicates(subset=[city_col]) if city_col else df_current
 
     # 1. PM2.5 par région
     pm25_par_region = {}
