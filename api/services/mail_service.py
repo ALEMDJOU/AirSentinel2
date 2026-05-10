@@ -49,7 +49,7 @@ class EmailService:
     @classmethod
     async def send_air_quality_alert(cls, email: str, city: str, pm25: float, level: str, color: str):
         """Envoie un mail d'alerte PM2.5 stylisé via Brevo."""
-        subject = f"🚨 Alerte AirSentinel : Qualité de l'air {level} à {city}"
+        subject = f"Alerte AirSentinel : Qualité de l'air {level} à {city}"
         
         html_template = f"""
         <html>
@@ -79,6 +79,54 @@ class EmailService:
                 </div>
                 <div style="padding: 20px; background: #0f172a; text-align: center; font-size: 11px; color: #475569;">
                     &copy; 2026 AirSentinel Cameroon — Surveillance Intelligente. Tous droits réservés.
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        await cls._send_email_brevo(email, subject, html_template)
+
+    @classmethod
+    async def send_welcome_email(cls, email: str, name: str, city: str):
+        """Envoie un mail de bienvenue stylisé lors de l'inscription."""
+        subject = "Bienvenue sur AirSentinel : Surveillance de la qualité de l'air"
+        
+        html_template = f"""
+        <html>
+        <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 20px;">
+            <div style="max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+                <div style="background: linear-gradient(135deg, #10b981, #0ea5e9); padding: 40px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -1px;">Bienvenue, {name or 'Sentinel'} !</h1>
+                </div>
+                <div style="padding: 40px;">
+                    <p style="color: #94a3b8; font-size: 16px; line-height: 1.6;">
+                        Merci d'avoir rejoint <strong>AirSentinel</strong>, la première plateforme intelligente de surveillance de l'air au Cameroun.
+                    </p>
+                    
+                    <div style="margin: 30px 0; padding: 20px; background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; border-radius: 8px;">
+                        <h3 style="color: #10b981; margin-top: 0;">Votre abonnement local</h3>
+                        <p style="color: #e2e8f0; margin-bottom: 0;">
+                            Vous êtes actuellement abonné aux alertes pour la ville de <strong>{city}</strong>. 
+                        </p>
+                    </div>
+
+                    <h3 style="color: white; margin-top: 30px;">Comment ça marche ?</h3>
+                    <ul style="color: #94a3b8; padding-left: 20px; line-height: 1.8;">
+                        <li><strong>Surveillance 24/7</strong> : Nos modèles d'IA analysent les données météo de votre ville en continu.</li>
+                        <li><strong>Alertes Intelligentes</strong> : Si le taux de particules fines (PM2.5) dépasse le seuil de sécurité, vous recevrez un mail comme celui-ci.</li>
+                        <li><strong>Conseils de santé</strong> : Chaque alerte est accompagnée de recommandations pour protéger vos proches.</li>
+                    </ul>
+
+                    <div style="text-align: center; margin-top: 40px;">
+                        <a href="{settings.FRONTEND_URL}/dashboard" 
+                           style="display: inline-block; padding: 18px 36px; background: #10b981; color: white; text-decoration: none; border-radius: 14px; font-weight: 900; text-transform: uppercase; font-size: 14px; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);">
+                            Accéder à mon tableau de bord
+                        </a>
+                    </div>
+                </div>
+                <div style="padding: 25px; background: #0f172a; text-align: center; font-size: 12px; color: #475569; border-top: 1px solid rgba(255,255,255,0.05);">
+                    AirSentinel Cameroon — IndabaX 2026<br/>
+                    Propulsé par l'IA au service de la santé publique.
                 </div>
             </div>
         </body>

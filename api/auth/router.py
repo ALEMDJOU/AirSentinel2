@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,14 +10,20 @@ from api.models.user import User
 from api.schemas.user import UserCreate, UserLogin, UserResponse, Token, UserRegisterResponse
 from api.auth.service import hash_password, verify_password, create_access_token
 from api.auth.dependencies import get_current_user
+from api.services.mail_service import EmailService
 
 settings = get_settings()
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
+
 @router.post("/register", response_model=UserRegisterResponse)
-async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
+async def register(
+    user_in: UserCreate, 
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db)
+):
     """
     Enregistre un nouvel utilisateur et renvoie un token immédiatement.
     """
@@ -43,6 +49,14 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
+    
+    # Envoi du mail de bienvenue en arrière-plan
+    background_tasks.add_task(
+        EmailService.send_welcome_email, 
+        new_user.email, 
+        new_user.full_name, 
+        new_user.subscribed_city
+    )
     
     # Génération du token immédiat (pour éviter un second appel /login)
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
