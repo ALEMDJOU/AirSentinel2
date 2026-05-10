@@ -11,6 +11,7 @@ from api.schemas.user import UserCreate, UserLogin, UserResponse, Token, UserReg
 from api.auth.service import hash_password, verify_password, create_access_token
 from api.auth.dependencies import get_current_user
 from api.services.mail_service import EmailService
+from api.services.alert_service import AlertService
 
 settings = get_settings()
 
@@ -57,6 +58,9 @@ async def register(
         new_user.full_name, 
         new_user.subscribed_city
     )
+    
+    # Vérification immédiate de la qualité de l'air pour la ville choisie
+    background_tasks.add_task(AlertService.check_user_alert, new_user.id, db)
     
     # Génération du token immédiat (pour éviter un second appel /login)
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)

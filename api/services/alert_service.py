@@ -124,5 +124,55 @@ class AlertService:
                     user.last_alert_sent = datetime.now(timezone.utc)
                     await db.commit()
 
-            except Exception as e:
-                logger.error(f"[AlertService] Erreur pour {user.email} : {str(e)}")
+
+    @staticmethod
+    async def check_user_alert(user_id: int, db: AsyncSession):
+        """
+        Vérifie et envoie une alerte immédiate pour un utilisateur spécifique (ex: après inscription).
+        """
+        from api.models.user import User
+        stmt = select(User).where(User.id == user_id)
+        result = await db.execute(stmt)
+        user = result.scalars().first()
+
+        if not user or not user.subscribed_city or not user.is_alerts_enabled:
+            return
+
+        # Charger les dernières données réelles du dataset
+        from api.services.data_service import get_dataframe
+        try:
+            df = get_dataframe()
+            city_key = user.subscribed_city.lower().strip()
+            df_city = df[df["ville"].str.lower().str.strip() == city_key].sort_values("date").tail(1)
+            
+            if df_city.empty:
+                logger.warning(f"[AlertService] Pas de données pour {city_key}")
+                return
+            
+            real_data = df_city.iloc[0]
+            features = {
+                "dust": float(real_data.get("dust_moyen", 50.0)),
+                "co": float(real_data.get("co_moyen", 15.0)),
+                "uv": float(real_data.get("uv_moyen", 6.0)),
+                "temp": float(real_data.get("temperature_2m_mean", 25.0)),
+                "humidity": float(real_data.get("humidity_moyen", 60.0)),
+                "ozone": float(real_data.get("ozone_moyen", 40.0))
+            }
+
+            from api.routers.predictions import compute_interactive
+            from api.schemas.prediction import ComputeInput
+            prediction = compute_interactive(ComputeInput(city=user.subscribed_city, features=features))
+            
+            if prediction.predicted_pm25 > 15:
+                logger.info(f"[AlertService] ALERTE IMMÉDIATE ({prediction.predicted_pm25} µg/m³) pour {user.email}")
+                await EmailService.send_air_quality_alert(
+                    email=user.email,
+                    city=user.subscribed_city,
+                    pm25=prediction.predicted_pm25,
+                    level=prediction.level,
+                    color=prediction.color,
+                )
+                user.last_alert_sent = datetime.now(timezone.utc)
+                await db.commit()
+        except Exception as e:
+            logger.error(f"[AlertService] Erreur alerte immédiate : {e}")
