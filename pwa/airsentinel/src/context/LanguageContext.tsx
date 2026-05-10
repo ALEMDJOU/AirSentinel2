@@ -568,6 +568,7 @@ const translations: Record<Language, Record<string, string>> = {
     DEGRADE: "Degraded",
     MAUVAIS: "Unhealthy",
     CRITIQUE: "Critical",
+    map_all: "All",
 
     // Health Recommendations - Messages
     "Air d'une pureté exceptionnelle. Activités extérieures vivement encouragées.": "Exceptionally pure air. Outdoor activities are strongly encouraged.",

@@ -271,7 +271,7 @@ export default function LeafletMap() {
     (activeFilter === "ALL" || getPointLevel(p.pm25_moyen) === activeFilter)
   );
 
-  // Comptage par niveau pour afficher les badges
+  // Comptage par niveau pour le filtre cliquable de la légende
   const countByLevel = (key: LevelKey) =>
     key === "ALL" ? points.length : points.filter(p => getPointLevel(p.pm25_moyen) === key).length;
 

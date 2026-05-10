@@ -12,8 +12,6 @@ from typing import Optional
 import logging
 
 from api.services.data_service import get_dataframe
-from api.services.prediction_service import get_model
-from api.services.irs_service import classify_irs_score
 
 router = APIRouter(prefix="/carte", tags=["Carte"])
 logger = logging.getLogger(__name__)
@@ -44,33 +42,6 @@ def _find_col(df, candidates):
         if c in df.columns:
             return c
     return None
-
-def _irs_label_color(irs_val, status_label=None):
-    """
-    Détermine le label et la couleur en utilisant les seuils du modèle (ACP).
-    """
-    try:
-        seuils = get_model("seuils")
-    except Exception:
-        # Fallback si les modèles ne sont pas chargés
-        seuils = {"p50": 0.2, "p75": 0.5, "p90": 0.8}
-
-    if status_label:
-        l = status_label.upper()
-        if "FAIBLE" in l or "🟢" in l:
-            return "FAIBLE", "#4CAF50"
-        if "MODÉRÉ" in l or "🟡" in l:
-            return "MODÉRÉ", "#FFC107"
-        if "ÉLEVÉ" in l or "🟠" in l:
-            return "ÉLEVÉ", "#FF5722"
-        if "CRITIQUE" in l or "🔴" in l:
-            return "CRITIQUE", "#B71C1C"
-
-    # Utilisation de la logique de classification centralisée
-    if irs_val is None:
-        return "N/A", "#9E9E9E"
-    
-    return classify_irs_score(irs_val, seuils)
 
 
 # ─── Endpoints ─────────────────────────────────────────────────────
