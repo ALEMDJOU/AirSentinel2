@@ -12,7 +12,7 @@ import {
   useMap
 } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
-import { Navigation, Search, ZoomIn, ZoomOut, X, MapPin, Compass, Loader2, ThermometerSun } from "lucide-react";
+import { Navigation, Search, ZoomIn, ZoomOut, X, MapPin, Compass, Loader2, ThermometerSun, Wind } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import "leaflet.heat";
 import { useRouter } from "next/navigation";
@@ -277,10 +277,15 @@ export default function LeafletMap() {
 
            <LayersControl.Overlay checked name={t('map_stations')}>
                {points.filter(p => p.lat !== null && p.lon !== null).map((point) => {
-                 // Couleur basée sur PM2.5 (seuils OMS)
+                  // Couleur basée sur PM2.5 (seuils OMS)
                   const pm25 = point.pm25_moyen;
-                  const color = pm25 <= 10 ? "#4CAF50" : pm25 <= 25 ? "#FFC107" : pm25 <= 50 ? "#FF5722" : "#B71C1C";
-                  const pm25Label = pm25 <= 10 ? t('level_good') : pm25 <= 25 ? t('level_mod') : pm25 <= 50 ? t('level_high') : t('level_crit');
+                  let color = "#10b981"; // Bon
+                  let pm25Label = t('level_good') || "Bon";
+                  if (pm25 > 75) { color = "#7e22ce"; pm25Label = t('level_crit') || "Dangereux"; }
+                  else if (pm25 > 50) { color = "#ef4444"; pm25Label = t('level_vhigh') || "Très Mauvais"; }
+                  else if (pm25 > 35) { color = "#f97316"; pm25Label = t('level_high') || "Mauvais"; }
+                  else if (pm25 > 15) { color = "#fbbf24"; pm25Label = t('level_mod') || "Modéré"; }
+                  
                   const pm25Value = pm25.toFixed(1);
                  
                  return (
@@ -356,34 +361,40 @@ export default function LeafletMap() {
         </LayersControl>
       </MapContainer>
 
-      {/* ── Légende PM2.5 ── */}
-      <div className="absolute bottom-24 left-6 z-[1000] bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <div className="flex flex-col gap-4">
-          <div className="space-y-1">
-            <h4 className="text-[10px] font-black text-[var(--teal)] uppercase tracking-[0.15em] leading-none">
-              {t('map_pollution')}
+      {/* ── Légende PM2.5 (Style amélioré et compact) ── */}
+      <div className="absolute bottom-6 left-4 z-[1000] bg-slate-900/90 backdrop-blur-md border border-white/20 rounded-xl p-3 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 min-w-[190px]">
+        <div className="flex flex-col gap-2">
+          <div className="space-y-1 border-b border-white/10 pb-2">
+            <h4 className="text-[11px] font-black text-[#00d4b1] uppercase tracking-wider flex items-center gap-1.5">
+              <Wind size={14} /> {t('map_pollution') || "Qualité de l'Air"}
             </h4>
-            <p className="text-[9px] text-gray-400 font-medium">{t('oms_thresholds')}</p>
+            <p className="text-[9px] text-gray-300 font-medium">{t('oms_recommendations') || "Recommandations OMS (PM2.5)"}</p>
           </div>
           
-          <div className="grid grid-cols-1 gap-3">
+          <div className="flex flex-col gap-1.5">
             {[
-              { label: t('level_good'),      color: "#4CAF50", desc: "≤ 10 µg/m³" },
-              { label: t('level_mod'),  color: "#FFC107", desc: "11 – 25 µg/m³" },
-              { label: t('level_high'),   color: "#FF5722", desc: "26 – 50 µg/m³" },
-              { label: t('level_crit'), color: "#B71C1C", desc: "> 50 µg/m³" },
+              { label: t('level_good'),      color: "#10b981", desc: "0–15",  detail: t('detail_good') },
+              { label: t('level_mod'),       color: "#fbbf24", desc: "15–35", detail: t('detail_mod') },
+              { label: t('level_high'),      color: "#f97316", desc: "35–50", detail: t('detail_high') },
+              { label: t('level_vhigh'),     color: "#ef4444", desc: "50–75", detail: t('detail_vhigh') },
+              { label: t('level_crit'),      color: "#7e22ce", desc: ">75",   detail: t('detail_crit') },
             ].map((item) => (
-              <div key={item.label} className="flex items-center gap-3">
+              <div key={item.label} className="flex items-center gap-2 bg-white/5 px-2 py-1.5 rounded-md border border-white/5">
                 <div 
-                  className="w-3 h-3 rounded-full border-2 border-white/20" 
-                  style={{ backgroundColor: item.color, boxShadow: `0 0 12px ${item.color}44` }} 
+                  className="w-2.5 h-2.5 rounded-full border border-white/30 shrink-0" 
+                  style={{ backgroundColor: item.color, boxShadow: `0 0 10px ${item.color}66` }} 
                 />
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-white leading-none mb-0.5">
-                    {item.label}
-                  </span>
-                  <span className="text-[9px] text-gray-500 font-medium">
-                    {item.desc}
+                <div className="flex flex-col w-full leading-tight">
+                  <div className="flex justify-between items-center w-full">
+                    <span className="text-[10px] font-bold text-white">
+                      {item.label}
+                    </span>
+                    <span className="text-[8px] font-bold" style={{ color: item.color }}>
+                      {item.desc}
+                    </span>
+                  </div>
+                  <span className="text-[8px] text-gray-400 mt-[1px]">
+                    {item.detail}
                   </span>
                 </div>
               </div>
