@@ -37,6 +37,8 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import NotificationManager from "@/components/NotificationManager";
 import ChatBot from "@/components/ChatBot";
 import KeepAlive from "@/components/KeepAlive";
+import Onboarding from "@/components/Onboarding";
+import { VilleProvider } from "@/context/VilleContext";
 
 export default function RootLayout({
   children,
@@ -48,6 +50,7 @@ export default function RootLayout({
       <head />
       <body className={inter.className}>
         <LanguageProvider>
+        <VilleProvider>
         <Toaster 
           position="top-center"
           toastOptions={{
@@ -65,7 +68,9 @@ export default function RootLayout({
         <KeepAlive />
         <NotificationManager />
         <ChatBot />
+        <Onboarding />
         {children}
+        </VilleProvider>
         </LanguageProvider>
       </body>
     </html>

@@ -1,8 +1,7 @@
 *.xlsx
 *.csv
-# Allow data files
-!data/**/*.csv
-!data/**/*.xlsx
+# Ignore all data by default, allow only parquet
+data/*
 !data/**/*.parquet
 # Allow model files
 !models/**/*.pkl
@@ -16,6 +15,11 @@ __pycache__/
 node_modules/
 .venv/
 venv/
+.cache.sqlite
+.vercel/
+.next/
+build/
+dist/
 test.md
 *:Zone.Identifier
 

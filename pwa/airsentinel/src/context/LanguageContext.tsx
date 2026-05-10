@@ -297,6 +297,22 @@ const translations: Record<Language, Record<string, string>> = {
     reg_back: "Retour",
     reg_fill_fields: "Veuillez remplir tous les champs obligatoires.",
     login_email_placeholder: "votre@email.com",
+
+    // Onboarding
+    onboarding_welcome_title: "Respirez, on surveille pour vous.",
+    onboarding_welcome_desc: "Recevez des alertes en temps réel quand la pollution dépasse les seuils critiques dans votre ville.",
+    onboarding_location_title: "Où respirez-vous ?",
+    onboarding_location_desc: "Choisissez votre ville pour obtenir des données ultra-locales sur les particules fines (PM2.5).",
+    onboarding_notif_title: "Ne soyez plus pris de court.",
+    onboarding_notif_desc: "Nous vous envoyons une notification uniquement si l'air devient dangereux pour votre santé.",
+    onboarding_final_title: "Analyse en cours...",
+    onboarding_final_desc: "Nous connectons les capteurs les plus proches de votre position.",
+    onboarding_aha_title: "Vous êtes protégé !",
+    onboarding_aha_desc: "Félicitations ! Vous recevrez désormais des alertes pour {}.",
+    onboarding_cta_start: "C'est parti !",
+    onboarding_cta_next: "Suivant",
+    onboarding_cta_finish: "Accéder au tableau de bord",
+    onboarding_skip: "Passer",
   },
   en: {
     // Navbar
@@ -584,6 +600,22 @@ const translations: Record<Language, Record<string, string>> = {
     reg_back: "Back",
     reg_fill_fields: "Please fill in all required fields.",
     login_email_placeholder: "your@email.com",
+
+    // Onboarding
+    onboarding_welcome_title: "Breathe easy, we're watching for you.",
+    onboarding_welcome_desc: "Receive real-time alerts when pollution exceeds critical levels in your city.",
+    onboarding_location_title: "Where do you breathe?",
+    onboarding_location_desc: "Select your city to get ultra-local data on fine particulate matter (PM2.5).",
+    onboarding_notif_title: "Don't be caught off guard.",
+    onboarding_notif_desc: "We only send a notification if the air becomes dangerous for your health.",
+    onboarding_final_title: "Analysis in progress...",
+    onboarding_final_desc: "Connecting to the sensors closest to your location.",
+    onboarding_aha_title: "You are protected!",
+    onboarding_aha_desc: "Congratulations! You will now receive alerts for {}.",
+    onboarding_cta_start: "Let's go!",
+    onboarding_cta_next: "Next",
+    onboarding_cta_finish: "Access Dashboard",
+    onboarding_skip: "Skip",
   }
 };
 
