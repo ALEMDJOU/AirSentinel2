@@ -29,5 +29,11 @@ services:
         value: "HS256"
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: "60"
+      - key: SMTP_HOST
+        value: "smtp.gmail.com"
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        value: "fofackhenri36@gmail.com"
     healthCheckPath: /health
     autoDeploy: true
