@@ -105,14 +105,33 @@ def get_carte():
     for _, row in latest_df.iterrows():
         irs_val = float(row[irs_col]) if irs_col else None
         status_text = str(row[status_col]) if status_col else None
-        
+
+        # Utiliser le modèle ML pour le PM2.5 (cohérent avec les alertes)
+        city_name = str(row[city_col])
+        ml_pm25 = None
+        try:
+            from api.routers.predictions import compute_interactive
+            from api.schemas.prediction import ComputeInput
+            features = {
+                "dust":     float(row.get("dust_moyen", 50.0)),
+                "co":       float(row.get("co_moyen", 15.0)),
+                "uv":       float(row.get("uv_moyen", 6.0)),
+                "temp":     float(row.get("temperature_2m_mean", 25.0)),
+                "humidity": float(row.get("humidity_moyen", row.get("precipitation_sum", 60.0))),
+                "ozone":    float(row.get("ozone_moyen", 40.0)),
+            }
+            pred = compute_interactive(ComputeInput(city=city_name, features=features))
+            ml_pm25 = pred.predicted_pm25
+        except Exception:
+            ml_pm25 = round(float(row[pm25_col]), 2) if pm25_col else 0.0
+
         label, color = _irs_label_color(irs_val, status_text)
-        
+
         result.append(VillePoint(
-            city=row[city_col],
+            city=city_name,
             lat=float(row[lat_col]) if lat_col else None,
             lon=float(row[lon_col]) if lon_col else None,
-            pm25_moyen=round(float(row[pm25_col]), 2) if pm25_col else 0.0,
+            pm25_moyen=ml_pm25,
             irs_moyen=round(irs_val, 4) if irs_val is not None else None,
             irs_label=label,
             irs_color=color,

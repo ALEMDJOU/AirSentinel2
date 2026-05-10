@@ -1,4 +1,6 @@
 # api/services/alert_service.py
+# Version finale : utilise le modele ML AirSentinel (compute_interactive) comme source unique de verite
+# Cohérent avec la carte qui utilise également ce modèle.
 
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import select
@@ -11,34 +13,29 @@ from api.services.mail_service import EmailService
 logger = logging.getLogger(__name__)
 
 
-def _get_pm25_level_from_raw(pm25: float):
+def _load_city_features_map() -> dict:
     """
-    Retourne (label, couleur) à partir du PM2.5 brut.
-    Seuils alignés sur get_air_quality_level() dans update_daily.py et la carte.
-    """
-    if pm25 <= 12:
-        return "BON", "#4CAF50"
-    elif pm25 <= 35.4:
-        return "MODÉRÉ", "#FFC107"
-    elif pm25 <= 55.4:
-        return "SÉVÈRE", "#FF9800"
-    elif pm25 <= 150.4:
-        return "DANGEREUX", "#FF5722"
-    else:
-        return "CRITIQUE", "#B71C1C"
-
-
-def _load_city_pm25_map() -> dict:
-    """
-    Source de vérité unique : le dernier relevé par ville depuis le parquet,
-    identique à ce qu'affiche la carte.
+    Charge le dataset et retourne un dict {ville_lower: features_dict}
+    basé sur le dernier relevé réel par ville.
+    Ces features alimentent le modèle ML, identique à la carte.
     """
     from api.services.data_service import get_dataframe
     try:
         df = get_dataframe()
         df_latest = df.sort_values("date").groupby("ville").last().reset_index()
         df_latest["ville_key"] = df_latest["ville"].str.lower().str.strip()
-        return df_latest.set_index("ville_key").to_dict(orient="index")
+        result = {}
+        for _, row in df_latest.iterrows():
+            result[row["ville_key"]] = {
+                "dust":     float(row.get("dust_moyen", 50.0)),
+                "co":       float(row.get("co_moyen", 15.0)),
+                "uv":       float(row.get("uv_moyen", 6.0)),
+                "temp":     float(row.get("temperature_2m_mean", 25.0)),
+                "humidity": float(row.get("humidity_moyen", row.get("precipitation_sum", 60.0))),
+                "ozone":    float(row.get("ozone_moyen", 40.0)),
+                "ville_nom": str(row.get("ville", "")),
+            }
+        return result
     except Exception as e:
         logger.error(f"[AlertService] Impossible de charger le dataset : {e}")
         return {}
@@ -49,9 +46,13 @@ class AlertService:
     @staticmethod
     async def process_alerts(db: AsyncSession):
         """
-        Vérifie les PM2.5 RÉELS (parquet) pour chaque utilisateur abonné.
-        Source identique à la carte — garantit la cohérence carte ↔ emails.
+        Vérifie la qualité de l'air pour chaque utilisateur abonné
+        en utilisant le modèle ML AirSentinel (compute_interactive).
+        Source identique à la carte — cohérence totale.
         """
+        from api.routers.predictions import compute_interactive
+        from api.schemas.prediction import ComputeInput
+
         stmt = select(User).where(
             User.subscribed_city.isnot(None),
             User.subscribed_city != "",
@@ -61,10 +62,10 @@ class AlertService:
         users = result.scalars().all()
 
         if not users:
-            logger.info("[AlertService] Aucun utilisateur abonné pour le moment.")
+            logger.info("[AlertService] Aucun utilisateur abonné.")
             return
 
-        data_map = _load_city_pm25_map()
+        features_map = _load_city_features_map()
 
         for user in users:
             try:
@@ -73,28 +74,29 @@ class AlertService:
                     continue
 
                 city_key = user.subscribed_city.lower().strip()
+                features = features_map.get(city_key, {
+                    "dust": 50.0, "co": 15.0, "uv": 6.0,
+                    "temp": 30.0, "humidity": 60.0, "ozone": 42.0
+                })
 
-                if city_key not in data_map:
-                    logger.warning(f"[AlertService] Ville inconnue dans le dataset : {user.subscribed_city}")
-                    continue
+                # Prédiction ML — même modèle que la carte
+                prediction = compute_interactive(ComputeInput(
+                    city=user.subscribed_city,
+                    features={k: v for k, v in features.items() if k != "ville_nom"}
+                ))
 
-                # PM2.5 RÉEL — même source que la carte
-                pm25 = float(data_map[city_key].get("pm2_5_moyen", 0.0))
-                level, color = _get_pm25_level_from_raw(pm25)
-
-                logger.info(f"[AlertService] PM2.5 réel={pm25:.2f} µg/m³ pour {user.email} @ {user.subscribed_city}")
+                pm25 = prediction.predicted_pm25
+                logger.info(f"[AlertService] ML PM2.5={pm25:.2f} µg/m³ pour {user.email} @ {user.subscribed_city}")
 
                 if pm25 > 15:
-                    logger.info(f"[AlertService] SEUIL FRANCHI ({pm25:.2f} µg/m³) → envoi alerte {user.email}")
-
+                    logger.info(f"[AlertService] SEUIL FRANCHI ({pm25:.2f}) → alerte {user.email}")
                     await EmailService.send_air_quality_alert(
                         email=user.email,
                         city=user.subscribed_city,
                         pm25=pm25,
-                        level=level,
-                        color=color,
+                        level=prediction.level,
+                        color=prediction.color,
                     )
-
                     if user.fcm_token:
                         try:
                             from api.services.notification_service import NotificationService
@@ -102,7 +104,7 @@ class AlertService:
                                 token=user.fcm_token,
                                 city=user.subscribed_city,
                                 pm25=pm25,
-                                level=level,
+                                level=prediction.level,
                             )
                         except Exception as push_err:
                             logger.error(f"[AlertService] Erreur push : {push_err}")
@@ -116,34 +118,39 @@ class AlertService:
     @staticmethod
     async def trigger_immediate_alert(user: User, db: AsyncSession):
         """
-        Déclenche une vérification immédiate pour un utilisateur lors de son inscription.
-        Utilise le PM2.5 RÉEL du parquet (même source que la carte).
+        Alerte immédiate lors de l'inscription.
+        Utilise le modèle ML AirSentinel (identique à la carte).
         """
+        from api.routers.predictions import compute_interactive
+        from api.schemas.prediction import ComputeInput
+
         try:
             if not user.subscribed_city or not user.is_alerts_enabled:
                 return
 
-            data_map = _load_city_pm25_map()
+            features_map = _load_city_features_map()
             city_key = user.subscribed_city.lower().strip()
+            features = features_map.get(city_key, {
+                "dust": 50.0, "co": 15.0, "uv": 6.0,
+                "temp": 30.0, "humidity": 60.0, "ozone": 42.0
+            })
 
-            if city_key not in data_map:
-                logger.warning(f"[AlertService] Ville inconnue pour alerte immédiate : {user.subscribed_city}")
-                return
+            prediction = compute_interactive(ComputeInput(
+                city=user.subscribed_city,
+                features={k: v for k, v in features.items() if k != "ville_nom"}
+            ))
 
-            pm25 = float(data_map[city_key].get("pm2_5_moyen", 0.0))
-            level, color = _get_pm25_level_from_raw(pm25)
-
-            logger.info(f"[AlertService] ALERTE IMMÉDIATE PM2.5={pm25:.2f} µg/m³ pour {user.email}")
+            pm25 = prediction.predicted_pm25
+            logger.info(f"[AlertService] IMMÉDIATE ML PM2.5={pm25:.2f} µg/m³ pour {user.email}")
 
             if pm25 > 15:
                 await EmailService.send_air_quality_alert(
                     email=user.email,
                     city=user.subscribed_city,
                     pm25=pm25,
-                    level=level,
-                    color=color,
+                    level=prediction.level,
+                    color=prediction.color,
                 )
-
                 if user.fcm_token:
                     try:
                         from api.services.notification_service import NotificationService
@@ -151,7 +158,7 @@ class AlertService:
                             token=user.fcm_token,
                             city=user.subscribed_city,
                             pm25=pm25,
-                            level=level,
+                            level=prediction.level,
                         )
                     except Exception:
                         pass
