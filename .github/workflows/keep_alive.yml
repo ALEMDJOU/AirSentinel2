@@ -10,4 +10,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Wake up Render API
-        run: curl -I https://airsentinel-api.onrender.com/api/v1/health
+        run: curl -I https://airsentinel2.onrender.com/health
