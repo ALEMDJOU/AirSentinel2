@@ -9,8 +9,6 @@ services:
         value: 8000
       - key: DEBUG
         value: "false"
-      - key: ALLOWED_ORIGINS
-        value: "[\"http://localhost:3000\",\"http://127.0.0.1:3000\",\"http://localhost:3001\",\"http://localhost:8501\",\"https://airsentinel.onrender.com\",\"https://airsentinel-chi.vercel.app\"]"
       - key: DATASET_PATH
         value: "data/processed/dataset_final.parquet"
       - key: ML_MODELS_PATH
