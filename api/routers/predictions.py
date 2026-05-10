@@ -99,10 +99,22 @@ def get_short_term(city: Optional[str] = None):
             # Fallback sur la valeur brute si le modèle échoue
             pred_val = float(day_data[pm25_col]) if pm25_col in day_data else 25.0
             
+        # Préparer les features pour le frontend
+        raw_f = day_data.to_dict()
+        feat_dict = {
+            "dust": float(raw_f.get("dust_moyen", 0)),
+            "co": float(raw_f.get("co_moyen", 0)),
+            "uv": float(raw_f.get("uv_moyen", 0)),
+            "ozone": float(raw_f.get("ozone_moyen", 0)),
+            "temp": float(raw_f.get("temperature_2m_mean", 0)),
+            "humidity": float(raw_f.get("humidity_moyen", 0))
+        }
+
         result.append(PredictionPoint(
             date=str(day),
             pm25=round(float(pred_val), 2),
-            is_prediction=is_future
+            is_prediction=is_future,
+            features=feat_dict
         ))
 
     return result

@@ -23,6 +23,7 @@ class PredictionPoint(BaseModel):
     date: str
     pm25: float
     is_prediction: bool = False
+    features: Optional[dict[str, float]] = None
 
 class ComputeInput(BaseModel):
     """Entrée pour le simulateur interactif."""

@@ -46,6 +46,19 @@ export default function PredictionsPage() {
       try {
         const res = await predictionService.getShortTerm(ville);
         setData(res);
+        
+        // Initialiser les features du simulateur avec les valeurs réelles d'aujourd'hui
+        const todayPoint = res.filter(p => !p.is_prediction).pop();
+        if (todayPoint && todayPoint.features) {
+          setFeatures({
+            dust: todayPoint.features.dust || 0,
+            co: todayPoint.features.co || 0,
+            uv: todayPoint.features.uv || 0,
+            ozone: todayPoint.features.ozone || 0,
+            temp: todayPoint.features.temp || 0,
+            humidity: todayPoint.features.humidity || 0
+          });
+        }
       } catch (err) {
         console.error("Erreur chargement prédictions:", err);
         setError(t('error_load'));
