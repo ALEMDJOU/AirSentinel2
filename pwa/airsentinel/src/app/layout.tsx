@@ -37,7 +37,6 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import NotificationManager from "@/components/NotificationManager";
 import ChatBot from "@/components/ChatBot";
 import KeepAlive from "@/components/KeepAlive";
-import Onboarding from "@/components/Onboarding";
 import { VilleProvider } from "@/context/VilleContext";
 
 export default function RootLayout({
@@ -68,7 +67,6 @@ export default function RootLayout({
         <KeepAlive />
         <NotificationManager />
         <ChatBot />
-        <Onboarding />
         {children}
         </VilleProvider>
         </LanguageProvider>

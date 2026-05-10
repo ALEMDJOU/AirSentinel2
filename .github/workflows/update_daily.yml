@@ -1,9 +1,9 @@
-name: AirSentinel - Mise a jour quotidienne
+name: AirSentinel - Mise à jour quotidienne
 
 on:
   schedule:
-    - cron: '0 3 * * *' # S'exécute à 03:00 UTC tous les jours
-  workflow_dispatch: # Permet de le lancer manuellement depuis l'onglet Actions
+    - cron: '0 3 * * *' # 03:00 UTC tous les jours
+  workflow_dispatch: # Lancement manuel possible
 
 permissions:
   contents: write
@@ -11,27 +11,32 @@ permissions:
 jobs:
   update-data:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
 
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
+        with:
+          ref: master
 
       - name: Setup Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
-      - name: Installation des dependances
+      - name: Installation des dépendances
         run: |
+          pip install --upgrade pip
           pip install -r requirements.txt
-          pip install openmeteo-requests requests-cache retry-requests
+          pip install openmeteo-requests requests-cache retry-requests pyarrow
 
-      - name: Mise a jour des donnees
+      - name: Mise à jour des données
         run: python update_daily.py
 
-      - name: Commit et push des nouvelles donnees
+      - name: Commit et push des nouvelles données
         run: |
           git config --local user.email "bot@airsentinel.cm"
           git config --local user.name "AirSentinel Update Bot"
           git add data/processed/dataset_final.parquet
-          git diff --staged --quiet || (git commit -m "Auto-update: Données du $(date +'%Y-%m-%d')" && git push)
+          git diff --staged --quiet || (git commit -m "Auto-update: Données du $(date +'%Y-%m-%d')" && git push origin master)
