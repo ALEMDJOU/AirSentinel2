@@ -106,7 +106,8 @@ def get_carte():
                 pass
 
         try:
-            ml_pm25 = predict_pm25(clean_features)
+            region_name = str(row[region_col]) if region_col and region_col in row else "Centre"
+            ml_pm25 = predict_pm25(clean_features, region=region_name)
             # Sanity check : si le modèle retourne une valeur aberrante, fallback
             if ml_pm25 <= 0 or math.isnan(ml_pm25):
                 raise ValueError(f"Valeur ML aberrante : {ml_pm25}")

@@ -25,3 +25,4 @@ requests
 openmeteo-requests
 requests-cache
 retry-requests
+statsmodels==0.14.2

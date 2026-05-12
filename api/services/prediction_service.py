@@ -26,7 +26,8 @@ def load_all_models() -> None:
         "cols": "cols_irs.pkl",
         "seuils": "seuils_irs.pkl",
         "scaler_pm25": "scaler.pkl",
-        "features_list": "features.pkl"
+        "features_list": "features.pkl",
+        "arima": "arima_par_zone.pkl"
     }
     
     for key, filename in files_to_load.items():
@@ -59,28 +60,57 @@ def get_model(name: str):
         
     return _models[name]
 
-def predict_pm25(features_dict: dict) -> float:
+def _get_zone(region: str) -> str:
     """
-    Effectue une prédiction PM2.5 réelle en utilisant le meilleur_modele.pkl
-    et le scaler associé.
+    Zones INS Cameroun (2019) pour le modèle ARIMA.
+    """
+    ZONES_REGIONS = {
+        'Zone équatoriale':        ['Centre', 'Est', 'Sud', 'Littoral', 'Sud-Ouest', 'Ouest', 'Nord-Ouest'],
+        'Zone soudanienne':        ['Adamaoua', 'Nord'],
+        'Zone soudano-sahélienne': ['Extreme-Nord'],
+    }
+    for zone, regions in ZONES_REGIONS.items():
+        if region in regions:
+            return zone
+    return 'Zone équatoriale'
+
+def predict_pm25(features_dict: dict, region: str = "Centre", steps: int = 1) -> float:
+    """
+    Effectue une prédiction PM2.5 hybride (RL + ARIMA) en utilisant les modèles joblib.
     """
     try:
         model = get_model("modele")
         scaler = get_model("scaler_pm25")
         features_list = get_model("features_list")
+        arima_models = get_model("arima")
         
         import pandas as pd
-        # S'assurer que toutes les colonnes sont présentes, sinon mettre des valeurs par défaut (0.0)
+        import numpy as np
+        
+        # 1. Partie Régression (RL)
         input_data = {}
         for col in features_list:
             input_data[col] = float(features_dict.get(col, 0.0))
             
         X = pd.DataFrame([input_data])[features_list]
         X_scaled = scaler.transform(X)
-        prediction = model.predict(X_scaled)
+        p_rl = float(model.predict(X_scaled)[0])
         
-        return float(prediction[0])
+        # 2. Partie Temporelle (ARIMA)
+        zone = _get_zone(region)
+        try:
+            # On récupère la prédiction ARIMA pour l'horizon 'steps'
+            # steps=1 -> Aujourd'hui/Dernier relevé
+            p_arima = float(arima_models[zone].forecast(steps=steps).iloc[-1])
+        except Exception as arima_err:
+            logger.warning(f"Erreur ARIMA pour la zone {zone}, fallback à 0: {arima_err}")
+            p_arima = 0.0
+            
+        # 3. Combinaison Hybride
+        prediction = max(0, p_rl + p_arima)
+        
+        return float(prediction)
     except Exception as e:
-        logger.error(f"Erreur lors de la prédiction PM2.5 réelle : {e}")
-        # Fallback sur une valeur par défaut ou lever l'exception
-        return 0.0
+        logger.error(f"Erreur lors de la prédiction PM2.5 hybride : {e}")
+        # Fallback sur une valeur par défaut cohérente
+        return 25.0

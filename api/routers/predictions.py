@@ -91,8 +91,10 @@ def get_short_term(city: Optional[str] = None):
         is_future = day > last_date_val
         
         try:
-            # On passe toutes les caractéristiques du jour au modèle ML
-            pred_val = predict_pm25(day_data.to_dict())
+            # On passe toutes les caractéristiques du jour au modèle ML (avec région pour ARIMA)
+            raw_dict = day_data.to_dict()
+            region_name = str(raw_dict.get("region", "Centre"))
+            pred_val = predict_pm25(raw_dict, region=region_name)
             if pred_val <= 0: raise ValueError
         except Exception:
             # Fallback sur la valeur brute si le modèle échoue
@@ -219,7 +221,8 @@ def compute_interactive(payload: ComputeInput, request: Request):
 
     try:
         from api.services.prediction_service import predict_pm25
-        predicted = predict_pm25(f)
+        region_name = str(f.get("region", "Centre"))
+        predicted = predict_pm25(f, region=region_name)
         # Si le modèle retourne une valeur aberrante (ex: 0.0 suite à erreur), utiliser une fallback
         if predicted <= 0:
              # Fallback sur l'ancienne logique de baseline simplifiée

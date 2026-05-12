@@ -67,26 +67,22 @@ class AlertService:
                     continue
 
                 city_key = user.subscribed_city.lower().strip()
-                row_raw = features_map.get(city_key, {})
+                latest_city_data = features_map.get(city_key, {})
 
-                # Nettoyage des features pour le modèle (uniquement numériques)
-                clean_features = {}
-                for k, v in row_raw.items():
-                    if k in ["ville", "city", "date", "ville_key"]:
-                        continue
-                    try:
-                        val = float(v)
-                        clean_features[k] = 0.0 if math.isnan(val) else val
-                    except (ValueError, TypeError):
-                        continue
+                if not latest_city_data:
+                    logger.warning(f"[AlertService] Aucune donnée pour {user.subscribed_city}")
+                    continue
 
-                # Prédiction ML directe (meilleur_modele.pkl)
-                pm25 = predict_pm25(clean_features)
+                # Nettoyage et prédiction hybride (RL + ARIMA)
+                clean_features = {k: float(v) for k, v in latest_city_data.items() if isinstance(v, (int, float))}
+                region = latest_city_data.get('region', 'Centre')
+                pm25 = predict_pm25(clean_features, region=region)
+                
                 if pm25 <= 0 or math.isnan(pm25):
-                    pm25 = float(row_raw.get("pm2_5_moyen", row_raw.get("pm25", 25.0)))
+                    pm25 = float(latest_city_data.get("pm2_5_moyen", latest_city_data.get("pm25", 25.0)))
 
                 level_key, color = _pm25_level(pm25)
-                logger.info(f"[AlertService] ML PM2.5={pm25:.2f} µg/m³ pour {user.email} @ {user.subscribed_city} → {level_key}")
+                logger.info(f"[AlertService] ML Hybride PM2.5={pm25:.2f} µg/m³ pour {user.email} @ {user.subscribed_city} → {level_key}")
 
                 if pm25 > 15:
                     logger.info(f"[AlertService] SEUIL FRANCHI ({pm25:.2f}) → alerte {user.email}")
@@ -119,7 +115,7 @@ class AlertService:
     async def trigger_immediate_alert(user: User, db: AsyncSession):
         """
         Alerte immédiate lors de l'inscription.
-        Utilise le modèle ML AirSentinel (meilleur_modele.pkl).
+        Utilise le modèle ML Hybride (RL + ARIMA).
         """
         from api.services.prediction_service import predict_pm25
         from api.routers.carte import _pm25_level
@@ -131,26 +127,22 @@ class AlertService:
 
             features_map = _load_city_features_map()
             city_key = user.subscribed_city.lower().strip()
-            row_raw = features_map.get(city_key, {})
+            latest_city_data = features_map.get(city_key, {})
+
+            if not latest_city_data:
+                return
 
             # Nettoyage
-            clean_features = {}
-            for k, v in row_raw.items():
-                if k in ["ville", "city", "date", "ville_key"]:
-                    continue
-                try:
-                    val = float(v)
-                    clean_features[k] = 0.0 if math.isnan(val) else val
-                except (ValueError, TypeError):
-                    continue
-
-            # Prédiction ML directe
-            pm25 = predict_pm25(clean_features)
+            clean_features = {k: float(v) for k, v in latest_city_data.items() if isinstance(v, (int, float))}
+            region = latest_city_data.get('region', 'Centre')
+            
+            # Prédiction ML Hybride
+            pm25 = predict_pm25(clean_features, region=region)
             if pm25 <= 0 or math.isnan(pm25):
-                pm25 = float(row_raw.get("pm2_5_moyen", row_raw.get("pm25", 25.0)))
+                pm25 = float(latest_city_data.get("pm2_5_moyen", latest_city_data.get("pm25", 25.0)))
 
             level_key, color = _pm25_level(pm25)
-            logger.info(f"[AlertService] IMMÉDIATE ML PM2.5={pm25:.2f} µg/m³ pour {user.email} → {level_key}")
+            logger.info(f"[AlertService] IMMÉDIATE ML Hybride PM2.5={pm25:.2f} µg/m³ pour {user.email} → {level_key}")
 
             if pm25 > 15:
                 await EmailService.send_air_quality_alert(
