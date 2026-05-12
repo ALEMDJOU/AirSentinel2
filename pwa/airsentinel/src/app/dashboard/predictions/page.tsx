@@ -195,7 +195,10 @@ export default function PredictionsPage() {
                                dataKey="date" 
                                stroke="var(--text-secondary)"
                                fontSize={10}
-                               tickFormatter={(val) => new Date(val).toLocaleDateString('fr', { day: '2-digit', month: 'short' })}
+                               tickFormatter={(val) => {
+                                 const d = new Date(val);
+                                 return isNaN(d.getTime()) ? "" : d.toLocaleDateString('fr', { day: '2-digit', month: 'short' });
+                               }}
                                axisLine={false}
                                tickLine={false}
                                dy={10}
@@ -229,7 +232,7 @@ export default function PredictionsPage() {
                             />
                             {history.length > 0 && (
                                <ReferenceLine 
-                                  x={history[history.length-1].date} 
+                                  x={history[history.length - 1]?.date} 
                                   stroke="var(--text-secondary)" 
                                   strokeDasharray="5 5" 
                                   label={{ value: 'PRÉDICTION IA', position: 'top', fill: 'var(--text-secondary)', fontSize: 8, fontWeight: 900 }} 

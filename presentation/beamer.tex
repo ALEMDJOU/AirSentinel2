@@ -1,0 +1,253 @@
+\documentclass[10pt, aspectratio=169]{beamer}
+
+% --- Thème et Couleurs ---
+\usetheme{metropolis} % Thème moderne et épuré
+\setbeamercolor{background canvas}{bg=white}
+\definecolor{airsentinelTeal}{RGB}{0, 212, 177}
+\definecolor{darkGray}{RGB}{40, 40, 40}
+\setbeamercolor{palette primary}{fg=white, bg=airsentinelTeal}
+\setbeamercolor{title separator}{fg=airsentinelTeal}
+\setbeamercolor{progress bar}{fg=airsentinelTeal}
+\setbeamercolor{frametitle}{bg=darkGray, fg=white}
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{fontawesome5}
+\usepackage{hyperref}
+\usepackage{tikz}
+
+% --- Infos du Projet ---
+\title{AirSentinel : L'IA au service de la Qualité de l'Air}
+\subtitle{Plateforme prédictive et alertes sanitaires en temps réel au Cameroun}
+\author{Présenté par Henri-Joël ALEMDJOU}
+\date{\today}
+\institute{Compétition Tech Innovation}
+
+\begin{document}
+
+% --- Titre ---
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% --- 1. Contexte ---
+\section{1. Contexte \& Problématique}
+\begin{frame}{La Menace Invisible : La Qualité de l'Air au Cameroun}
+  \begin{columns}
+    \begin{column}{0.6\textwidth}
+      \begin{itemize}
+        \item \textbf{Crise sanitaire silencieuse} : L'exposition aux particules fines (PM2.5) cause des millions de décès prématurés dans le monde.
+        \item \textbf{Déficit d'infrastructures} : L'Afrique Centrale souffre d'un manque criant de capteurs de qualité de l'air au sol.
+        \item \textbf{Données inaccessibles} : Les populations vulnérables (asthmatiques, enfants) n'ont aucun moyen d'anticiper les pics de pollution.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \begin{center}
+        \textcolor{red}{\faExclamationTriangle[regular]} \\
+        \vspace{0.3cm}
+        \textit{La concentration en PM2.5 dans nos villes dépasse régulièrement les limites de 15 $\mu$g/m$^3$ fixées par l'OMS.}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- 2. Vision ---
+\begin{frame}{La Vision AirSentinel}
+  \begin{block}{Mission}
+    Démocratiser l'accès aux données environnementales grâce à une plateforme technologique combinant le \textbf{Big Data}, l'\textbf{Intelligence Artificielle} et une \textbf{Accessibilité Mobile} maximale.
+  \end{block}
+  \vspace{0.5cm}
+  \textbf{Nos trois engagements :}
+  \begin{enumerate}
+    \item \textbf{Anticiper} : Prédire la pollution jusqu'à J+2.
+    \item \textbf{Alerter} : Prévenir les utilisateurs avant les pics critiques.
+    \item \textbf{Éduquer} : Fournir des recommandations de santé claires (Standard OMS 2021).
+  \end{enumerate}
+\end{frame}
+
+% --- 3. Architecture ---
+\section{2. Architecture Technologique}
+\begin{frame}{Architecture Globale du Système (End-to-End)}
+  Une infrastructure découplée, robuste et hautement disponible.
+  \vspace{0.3cm}
+  \begin{center}
+    \begin{tikzpicture}[node distance=2.5cm, auto, scale=0.8, transform shape]
+      % Nodes
+      \node[draw, rounded corners, fill=blue!10, text width=2.5cm, align=center] (data) {Sources de Données (Satellites, API)};
+      \node[draw, rounded corners, fill=green!10, text width=2.5cm, align=center, right of=data, node distance=3.5cm] (backend) {\textbf{FastAPI} \\ Backend Python};
+      \node[draw, rounded corners, fill=orange!10, text width=2.5cm, align=center, above of=backend] (ai) {\textbf{Moteur IA} \\ (ARIMA + RL)};
+      \node[draw, rounded corners, fill=purple!10, text width=2.5cm, align=center, right of=backend, node distance=3.5cm] (frontend) {\textbf{Next.js PWA} \\ Interface Utilisateur};
+      \node[draw, rounded corners, fill=red!10, text width=2.5cm, align=center, below of=backend] (alerts) {\textbf{Alertes} \\ Firebase \& Brevo};
+      
+      % Arrows
+      \draw[->, thick] (data) -- (backend);
+      \draw[<->, thick] (backend) -- (ai);
+      \draw[<->, thick] (backend) -- (frontend);
+      \draw[->, thick] (backend) -- (alerts);
+      \draw[->, thick] (alerts) -- (frontend);
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+% --- 4. Le Moteur IA ---
+\section{3. L'Intelligence Artificielle}
+\begin{frame}{Moteur Prédictif : Une Approche Hybride Innovante}
+  La prédiction de la qualité de l'air est complexe car elle dépend du temps et de la météo. Notre solution : \textbf{Un modèle hybride}.
+  \vspace{0.3cm}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \textbf{1. Composante Temporelle (ARIMA)}
+      \begin{itemize}
+        \item Modélise les tendances historiques.
+        \item Capture les cycles saisonniers (saison sèche vs pluie).
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \textbf{2. Régression Linéaire (RL)}
+      \begin{itemize}
+        \item Intègre les variables exogènes immédiates.
+        \item Température, humidité, poussière (Dust), Monoxyde de Carbone (CO).
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.4cm}
+  \begin{block}{Résultat}
+    La fusion (P\_arima + P\_rl) permet d'obtenir des prédictions à court terme (J+1, J+2) d'une fiabilité supérieure aux modèles standards.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Indice de Risque Sanitaire (IRS)}
+  Au-delà des simples chiffres, nous calculons un \textbf{IRS (Indice de Risque Sanitaire)}.
+  \begin{itemize}
+    \item Utilisation d'une Analyse en Composantes Principales (\textbf{ACP}) sur plusieurs polluants (PM2.5, Ozone, NO2).
+    \item Classification stricte basée sur les \textbf{normes révisées de l'OMS (2021)}.
+    \item Le seuil d'alerte critique a été abaissé à \textbf{15 $\mu$g/m$^3$} pour garantir une prévention proactive.
+  \end{itemize}
+\end{frame}
+
+% --- 5. Application PWA ---
+\section{4. Expérience Utilisateur}
+\begin{frame}{L'Interface Frontend : PWA Next.js}
+  Une application web progressive conçue pour l'engagement et la performance.
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item \textbf{Technologie Web Progressive (PWA)} : S'installe sur smartphone sans passer par les App Stores.
+        \item \textbf{UI/UX Premium} : Design immersif (Dark Mode par défaut), composants interactifs et graphiques fluides (Recharts).
+        \item \textbf{Internationalisation (i18n)} : Support natif Français / Anglais pour une portée continentale.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+        \faMobileAlt[solid] \hspace{0.5cm} \faLaptop
+        \vspace{0.2cm} \\
+        \textit{Responsive, rapide, et adaptée aux connexions instables.}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% --- 6. Alertes ---
+\begin{frame}{Système d'Alerte Proactif}
+  Ne pas attendre que l'utilisateur ouvre l'application pour le protéger.
+  \vspace{0.3cm}
+  \begin{itemize}
+    \item \textbf{Scoring Automatisé} : Des tâches de fond scannent la base de données utilisateur en continu.
+    \item \textbf{Multi-canal} :
+      \begin{itemize}
+        \item \textit{Push Notifications} : Via Firebase Cloud Messaging pour des alertes instantanées sur mobile.
+        \item \textit{Emails} : Via Brevo API pour des rapports détaillés.
+      \end{itemize}
+    \item \textbf{Anti-Spam Intelligent} : Mécanisme de "cool-down" de 3 heures pour éviter de submerger les utilisateurs lors de pics prolongés.
+  \end{itemize}
+\end{frame}
+
+% --- 6. API Endpoints (1/2) ---
+\section{5. API \& Services Backend}
+\begin{frame}[fragile]{Écosystème API : Intelligence \& Prédiction (1/2)}
+  \begin{itemize}
+    \item \textbf{Moteur de Prédiction ML :}
+    \begin{itemize}
+      \item \texttt{GET /predictions/short-term} : Historique + Prédictions J+3 (ARIMA/RL).
+      \item \texttt{GET /predictions/monthly} : Tendances saisonnières par mois/année.
+      \item \texttt{POST /predictions/compute} : Simulation de scénarios (Laboratoire).
+      \item \texttt{POST /predictions/irs} : Calcul spécifique de l'Indice de Risque Sanitaire.
+    \end{itemize}
+    \item \textbf{Données \& Cartographie :}
+    \begin{itemize}
+      \item \texttt{GET /carte} : Flux géolocalisé pour le rendu de la carte interactive.
+      \item \texttt{GET /carte/analyses} : Statistiques globales (Polluants, Zones critiques).
+      \item \texttt{GET /dataset/info} : Métadonnées et fraîcheur du dataset Parquet.
+      \item \texttt{GET /villes} : Liste des zones couvertes par le réseau AirSentinel.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+% --- 6. API Endpoints (2/2) ---
+\begin{frame}[fragile]{Écosystème API : Utilisateurs \& Alertes (2/2)}
+  \begin{itemize}
+    \item \textbf{Gestion Utilisateurs \& Auth :}
+    \begin{itemize}
+      \item \texttt{POST /auth/register} : Inscription sécurisée des nouveaux sentinelles.
+      \item \texttt{POST /auth/login} : Authentification OAuth2 / JWT.
+      \item \texttt{GET /users/me} : Récupération du profil et préférences.
+      \item \texttt{PUT /users/profile} : Mise à jour des abonnements et zone de santé.
+    \end{itemize}
+    \item \textbf{Système de Notifications \& Santé :}
+    \begin{itemize}
+      \item \texttt{POST /users/subscribe-city} : Abonnement aux alertes par ville.
+      \item \texttt{POST /alerts/test} : Déclenchement de test de flux Firebase/Brevo.
+      \item \texttt{GET /health} : Diagnostic de santé du serveur et de la base de données.
+    \end{itemize}
+  \end{itemize}
+  \begin{center}
+    \textit{Une API REST robuste, scalable et prête pour l'intégration mobile.}
+  \end{center}
+\end{frame}
+
+% --- 7. Infrastructure ---
+\section{6. Déploiement \& Sécurité}
+\begin{frame}{Déploiement et Sécurité en Production}
+  Une architecture prête pour passer à l'échelle (Scale).
+  \begin{table}
+    \centering
+    \begin{tabular}{p{3cm} p{7cm}}
+      \toprule
+      \textbf{Aspect} & \textbf{Implémentation} \\
+      \midrule
+      \textbf{Hébergement API} & Déployé sur \textbf{Render} avec intégration continue (CI/CD) depuis GitHub. \\
+      \textbf{Base de Données} & \textbf{Supabase} (PostgreSQL) garantissant la fiabilité des profils utilisateurs. \\
+      \textbf{Data Storage} & Utilisation du format \textbf{Parquet} pour un traitement ultra-rapide des données historiques (Pandas). \\
+      \textbf{Sécurité} & Isolation totale des secrets (Firebase, Brevo, Groq) via \textbf{Variables d'Environnement}. \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+% --- 8. Conclusion ---
+\section{7. Perspectives}
+\begin{frame}{Perspectives d'Évolution et Marché}
+  \textbf{Un potentiel de développement immense au-delà du MVP :}
+  \vspace{0.3cm}
+  \begin{itemize}
+    \item \textbf{Déploiement IoT} : Création de nos propres capteurs physiques low-cost pour affiner les données hyper-locales au Cameroun.
+    \item \textbf{Partenariats B2B} : Fournir notre API prédictive aux hôpitaux, pharmacies et institutions gouvernementales.
+    \item \textbf{IA Générative} : Intégration avancée du LLM (Groq) pour des conseils de santé vocaux ou conversationnels.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[standout]
+  AirSentinel \\
+  \vspace{0.5cm}
+  \normalsize Respirez l'avenir, en toute sécurité. \\
+  \vspace{0.5cm}
+  \textit{Merci pour votre attention.} \\
+  \vspace{0.5cm}
+  \faQuestionCircle \ Place aux questions !
+\end{frame}
+
+\end{document}
