@@ -94,12 +94,19 @@ export default function PredictionsPage() {
   };
 
 
-  // Extraction intelligente basée sur les dates réelles
-  const todayStr = new Date().toISOString().split('T')[0];
-  const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-  const afterTomorrowStr = new Date(Date.now() + 172800000).toISOString().split('T')[0];
+  // Extraction stricte basée sur les dates calendaires (YYYY-MM-DD)
+  // On utilise toLocaleDateString pour garantir la date locale de l'utilisateur
+  const getLocalDateStr = (offset = 0) => {
+    const d = new Date();
+    d.setDate(d.getDate() + offset);
+    return d.toLocaleDateString('en-CA'); // Format YYYY-MM-DD
+  };
 
-  const today = data.find(p => p.date === todayStr) || data.filter(p => !p.is_prediction).pop();
+  const todayStr = getLocalDateStr(0);
+  const tomorrowStr = getLocalDateStr(1);
+  const afterTomorrowStr = getLocalDateStr(2);
+
+  const today = data.find(p => p.date === todayStr);
   const jPlus1 = data.find(p => p.date === tomorrowStr);
   const jPlus2 = data.find(p => p.date === afterTomorrowStr);
 
