@@ -61,6 +61,7 @@ def get_carte():
     lon_col    = _find_col(df, ["longitude", "lon", "lng"])
     irs_col    = _find_col(df, ["IRS", "irs", "irs_value"])
     status_col = _find_col(df, ["niveau_sanitaire", "niveau_alerte", "label"])
+    region_col = _find_col(df, ["region", "Region", "Area"])
 
     if not city_col:
         raise HTTPException(status_code=500, detail="Colonne ville introuvable.")

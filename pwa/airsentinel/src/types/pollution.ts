@@ -7,8 +7,12 @@ export interface KPIResponse {
   total_observations: number;
 }
 
-export interface AlerteHistorique {
-  niveau: string;
-  count: number;
-  color: string;
+export interface AlerteAnneeLevels {
+  FAIBLE: number;
+  MODERE: number;
+  ELEVE: number;
+  CRITIQUE: number;
 }
+
+// Format réel de l'API /alertes : { "2022": AlerteAnneeLevels, "2023": ... }
+export type AlerteHistorique = Record<string, AlerteAnneeLevels>;

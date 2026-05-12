@@ -11,7 +11,7 @@ const userService = {
     formData.append("file", file);
 
     const response = await apiClient.post<{ avatar_url: string }>(
-      "/users/me/avatar",
+      "users/me/avatar",
       formData,
       {
         headers: {
@@ -27,7 +27,7 @@ const userService = {
    * @param userData Updated user information.
    */
   async updateProfile(userData: Partial<User>): Promise<User> {
-    const response = await apiClient.patch<User>("/users/me", userData);
+    const response = await apiClient.patch<User>("users/me", userData);
     return response.data;
   },
 };

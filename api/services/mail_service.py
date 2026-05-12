@@ -139,7 +139,7 @@ class EmailService:
                     <div style="margin: 30px 0; padding: 20px; background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; border-radius: 8px;">
                         <h3 style="color: #10b981; margin-top: 0;">Votre abonnement local</h3>
                         <p style="color: #e2e8f0; margin-bottom: 0;">
-                            Vous êtes actuellement abonné aux alertes pour la ville de <strong>{city}</strong>. 
+                            Vous êtes actuellement abonné aux alertes pour la ville de <strong>{city or 'votre région'}</strong>. 
                         </p>
                     </div>
 

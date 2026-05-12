@@ -65,10 +65,15 @@ def _find_col(df: pd.DataFrame, candidates: list[str]):
             return col
     return None
 
-def apply_filters(df: pd.DataFrame, villes=None, regions=None, annee_min=2020, annee_max=2025) -> pd.DataFrame:
+def apply_filters(df: pd.DataFrame, villes=None, regions=None, annee_min=2020, annee_max=None) -> pd.DataFrame:
     """
     Applique des filtres géographiques et temporels sur le DataFrame.
+    annee_max défaut = année courante (pour compatibilité avec le Virtual Time Shift).
     """
+    from datetime import datetime
+    if annee_max is None:
+        annee_max = datetime.now().year
+
     filtered_df = df.copy()
     
     if villes:

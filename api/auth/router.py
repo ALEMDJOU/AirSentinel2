@@ -55,16 +55,26 @@ async def register(
     background_tasks.add_task(
         EmailService.send_welcome_email, 
         new_user.email, 
-        new_user.full_name, 
-        new_user.subscribed_city
+        new_user.full_name or "Sentinel", 
+        new_user.subscribed_city or "votre région"
     )
     
     # Vérification immédiate de la pollution pour envoyer une alerte si besoin
-    background_tasks.add_task(
-        AlertService.trigger_immediate_alert,
-        new_user,
-        db
-    )
+    # FIX BUG 4 : on ne peut pas passer `db` (session liée à la requête HTTP) à une
+    # background task, car la session est fermée avant que la tâche s'exécute.
+    # On passe plutôt l'ID de l'utilisateur et on crée une nouvelle session dans la tâche.
+    user_id = new_user.id
+    async def _trigger_alert_with_new_session():
+        from api.core.database import AsyncSessionLocal
+        from sqlalchemy import select
+        from api.models.user import User as UserModel
+        async with AsyncSessionLocal() as fresh_db:
+            result_u = await fresh_db.execute(select(UserModel).where(UserModel.id == user_id))
+            fresh_user = result_u.scalars().first()
+            if fresh_user:
+                await AlertService.trigger_immediate_alert(fresh_user, fresh_db)
+
+    background_tasks.add_task(_trigger_alert_with_new_session)
     
     # Génération du token immédiat (pour éviter un second appel /login)
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)

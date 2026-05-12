@@ -6,7 +6,7 @@ const mapService = {
    * Récupère la liste des points géolocalisés (villes) pour la carte.
    */
   async getMapPoints(): Promise<VillePoint[]> {
-    const response = await apiClient.get<VillePoint[]>("/carte");
+    const response = await apiClient.get<VillePoint[]>("carte");
     return response.data;
   },
 
@@ -16,7 +16,7 @@ const mapService = {
    */
   async getMapAnalyses(city?: string | null): Promise<CarteAnalyses> {
     const filter = (city && city !== "CAMEROON") ? `?city=${encodeURIComponent(city)}` : "";
-    const response = await apiClient.get<CarteAnalyses>(`/carte/analyses${filter}`);
+    const response = await apiClient.get<CarteAnalyses>(`carte/analyses${filter}`);
     return response.data;
   }
 };
