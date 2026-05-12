@@ -30,13 +30,11 @@ export default function SantePage() {
     fetchVilles();
   }, []);
 
-  if (loading) {
     return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
         <Loader2 className="w-12 h-12 text-[#ef4444] animate-spin" />
       </div>
     );
-  }
 
   const profiles = [
     {
@@ -78,7 +76,7 @@ export default function SantePage() {
       <header className="mb-10">
         <button
           onClick={() => router.push("/dashboard")}
-          className="group flex items-center gap-3 px-5 py-2.5 bg-slate-900/60 backdrop-blur-md border border-white/20 rounded-2xl text-white hover:border-[#ef4444]/50 hover:bg-[#ef4444]/5 transition-all active:scale-95 shadow-lg mb-8"
+          className="group flex items-center gap-3 px-5 py-2.5 bg-[var(--bg-secondary)]/80 backdrop-blur-md border border-[var(--border-color)] rounded-2xl text-[var(--text-primary)] hover:border-[#ef4444]/50 hover:bg-[#ef4444]/5 transition-all active:scale-95 shadow-lg mb-8"
         >
           <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform text-[#ef4444]" />
           <span className="font-black text-[11px] uppercase tracking-widest">{t('health_dash_link')}</span>
@@ -86,10 +84,10 @@ export default function SantePage() {
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-4xl font-black text-[#e0f2fe] mb-2 tracking-tight flex items-center gap-3">
+            <h1 className="text-4xl font-black text-[var(--text-primary)] mb-2 tracking-tight flex items-center gap-3">
               {t('health_title_1')}<span className="text-[#ef4444]">{t('health_title_2')}</span> <HeartPulse className="text-[#ef4444]" size={32} />
             </h1>
-            <p className="text-[#e0f2fe]/50 text-sm font-medium italic">
+            <p className="text-[var(--text-secondary)]/50 text-sm font-medium italic">
               {ville ? t('health_sub_city_selected') : t('health_sub_no_city')}
             </p>
           </div>
@@ -97,7 +95,7 @@ export default function SantePage() {
           {ville && (
             <button
               onClick={() => selectVille("")}
-              className="px-6 py-3 bg-[#00d4b1] text-white font-black uppercase tracking-tighter text-xs rounded-2xl shadow-[0_4px_20px_rgba(0,212,177,0.4)] hover:bg-[#00b89c] hover:scale-105 transition-all active:scale-95 flex items-center gap-2 shrink-0 border border-white/20"
+              className="px-6 py-3 bg-[var(--teal)] text-white font-black uppercase tracking-tighter text-xs rounded-2xl shadow-[0_4px_20px_rgba(0,212,177,0.4)] hover:bg-[var(--teal-dark)] hover:scale-105 transition-all active:scale-95 flex items-center gap-2 shrink-0 border border-white/20"
             >
               <MapPin size={16} fill="white" />
               {t('health_change_city')} ({ville})
@@ -107,38 +105,38 @@ export default function SantePage() {
       </header>
 
       {!ville ? (
-        <div className="glass-card p-10 flex flex-col items-center justify-center min-h-[400px] border-2 border-white/5 animate-in slide-in-from-bottom-5 duration-500">
-          <div className="w-24 h-24 rounded-full bg-[#00d4b1]/10 flex items-center justify-center mb-8 relative">
-            <div className="absolute inset-0 bg-[#00d4b1]/20 rounded-full blur-xl animate-pulse" />
-            <MapPin className="text-[#00d4b1] relative z-10" size={48} />
+        <div className="glass-card p-10 flex flex-col items-center justify-center min-h-[400px] border-2 border-[var(--border-color)] animate-in slide-in-from-bottom-5 duration-500">
+          <div className="w-24 h-24 rounded-full bg-[var(--teal)]/10 flex items-center justify-center mb-8 relative">
+            <div className="absolute inset-0 bg-[var(--teal)]/20 rounded-full blur-xl animate-pulse" />
+            <MapPin className="text-[var(--teal)] relative z-10" size={48} />
           </div>
           
-          <h2 className="text-3xl font-black text-white mb-4 text-center">{t('health_where_are_you')}</h2>
-          <p className="text-gray-400 text-center mb-10 max-w-md text-base leading-relaxed">
+          <h2 className="text-3xl font-black text-[var(--text-primary)] mb-4 text-center">{t('health_where_are_you')}</h2>
+          <p className="text-[var(--text-secondary)] text-center mb-10 max-w-md text-base leading-relaxed">
             {t('health_where_desc')}
           </p>
 
           <div className="relative w-full max-w-md">
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="w-full flex items-center justify-between px-8 py-6 bg-[#00d4b1]/10 border-2 border-[#00d4b1]/50 rounded-[2rem] text-white hover:bg-[#00d4b1]/20 transition-all shadow-[0_0_30px_rgba(0,212,177,0.15)] group"
+              className="w-full flex items-center justify-between px-8 py-6 bg-[var(--teal)]/10 border-2 border-[var(--teal)]/50 rounded-[2rem] text-[var(--text-primary)] hover:bg-[var(--teal)]/20 transition-all shadow-[0_0_30px_rgba(0,212,177,0.15)] group"
             >
               <div className="flex items-center gap-5">
-                <div className="w-12 h-12 rounded-2xl bg-[#00d4b1] flex items-center justify-center text-white shadow-xl scale-110">
+                <div className="w-12 h-12 rounded-2xl bg-[var(--teal)] flex items-center justify-center text-white shadow-xl scale-110">
                   <MapPin size={24} fill="white" />
                 </div>
                 <span className="font-bold text-xl">{t('health_select_city')}</span>
               </div>
-              <ChevronDown size={28} className={`text-[#00d4b1] transition-transform duration-500 ease-in-out ${showDropdown ? 'rotate-180' : ''}`} />
+              <ChevronDown size={28} className={`text-[var(--teal)] transition-transform duration-500 ease-in-out ${showDropdown ? 'rotate-180' : ''}`} />
             </button>
 
             {showDropdown && (
-              <div className="absolute top-full left-0 right-0 mt-4 bg-slate-900/95 backdrop-blur-2xl border border-white/10 rounded-[2rem] shadow-2xl overflow-hidden max-h-[350px] overflow-y-auto z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="absolute top-full left-0 right-0 mt-4 bg-[var(--bg-secondary)]/95 backdrop-blur-2xl border border-[var(--border-color)] rounded-[2rem] shadow-2xl overflow-hidden max-h-[350px] overflow-y-auto z-50 animate-in fade-in slide-in-from-top-4 duration-300">
                 {villes.map((v) => (
                   <button
                     key={v}
                     onClick={() => { selectVille(v); setShowDropdown(false); }}
-                    className="w-full text-left px-8 py-4 hover:bg-[#00d4b1]/20 text-white font-bold text-lg transition-all border-b border-white/5 last:border-0 hover:pl-10"
+                    className="w-full text-left px-8 py-4 hover:bg-[var(--teal)]/20 text-[var(--text-primary)] font-bold text-lg transition-all border-b border-[var(--border-color)] last:border-0 hover:pl-10"
                   >
                     {v}
                   </button>
@@ -158,8 +156,8 @@ export default function SantePage() {
               >
                 <div className="text-6xl">{profile.icon}</div>
                 <div>
-                  <h3 className="text-xl font-black text-white mb-2">{profile.title}</h3>
-                  <p className="text-sm text-gray-400">{profile.subtitle}</p>
+                  <h3 className="text-xl font-black text-[var(--text-primary)] mb-2">{profile.title}</h3>
+                  <p className="text-sm text-[var(--text-secondary)]/60">{profile.subtitle}</p>
                 </div>
                 <div className={`mt-2 flex items-center gap-2 ${profile.textColor}`}>
                   <span className="text-sm font-bold">{t('health_view_tips')}</span>
@@ -173,7 +171,7 @@ export default function SantePage() {
             <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400 shrink-0">
                 <span className="text-xl font-bold">i</span>
             </div>
-            <p className="text-xs text-gray-400 leading-relaxed font-medium">
+            <p className="text-xs text-[var(--text-secondary)]/60 leading-relaxed font-medium">
                {t('health_ai_note')}
             </p>
           </div>

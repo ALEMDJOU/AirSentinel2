@@ -111,7 +111,7 @@ export default function ProfilPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex items-center justify-center min-h-[60vh] bg-[var(--bg-primary)]">
         <Loader2 className="w-12 h-12 text-[var(--teal)] animate-spin" />
       </div>
     );
@@ -124,8 +124,8 @@ export default function ProfilPage() {
           <User size={28} />
         </div>
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tight">Mon Profil</h1>
-          <p className="text-gray-400">Gérez vos informations personnelles et vos alertes</p>
+          <h1 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">Mon Profil</h1>
+          <p className="text-[var(--text-secondary)]">Gérez vos informations personnelles et vos alertes</p>
         </div>
       </div>
 
@@ -134,7 +134,7 @@ export default function ProfilPage() {
         <div className="md:col-span-1 space-y-6">
           <div className="glass-card p-6 flex flex-col items-center border-2 border-white/5">
             <div className="relative group mb-6">
-              <div className="w-32 h-32 rounded-full border-4 border-[var(--teal)]/30 overflow-hidden bg-slate-800 flex items-center justify-center shadow-2xl group-hover:border-[var(--teal)] transition-all">
+              <div className="w-32 h-32 rounded-full border-4 border-[var(--teal)]/30 overflow-hidden bg-[var(--bg-secondary)] flex items-center justify-center shadow-2xl group-hover:border-[var(--teal)] transition-all">
                 {user?.avatar_url ? (
                   <img src={user.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
@@ -156,30 +156,30 @@ export default function ProfilPage() {
               />
             </div>
             
-            <h2 className="text-xl font-bold text-white mb-1 text-center">{user?.full_name}</h2>
-            <p className="text-gray-500 text-sm mb-6 text-center">{user?.email}</p>
+            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-1 text-center">{user?.full_name}</h2>
+            <p className="text-[var(--text-secondary)]/50 text-sm mb-6 text-center">{user?.email}</p>
             
-            <div className="w-full pt-6 border-t border-white/5">
+            <div className="w-full pt-6 border-t border-[var(--border-color)]">
               <button 
                 onClick={toggleAlerts}
                 className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 ${
                   user?.is_alerts_enabled 
                   ? "bg-[var(--teal)]/10 text-[var(--teal)] border border-[var(--teal)]/30" 
-                  : "bg-white/5 text-gray-500 border border-white/10"
+                  : "bg-[var(--bg-secondary)] text-[var(--text-secondary)]/50 border border-[var(--border-color)]"
                 }`}
               >
                 <div className="flex items-center gap-3">
                   {user?.is_alerts_enabled ? <Bell size={20} className="animate-wiggle" /> : <BellOff size={20} />}
                   <span className="font-bold text-sm">Alertes {user?.is_alerts_enabled ? 'actives' : 'inactives'}</span>
                 </div>
-                <div className={`w-10 h-5 rounded-full relative transition-colors ${user?.is_alerts_enabled ? 'bg-[var(--teal)]' : 'bg-slate-700'}`}>
+                <div className={`w-10 h-5 rounded-full relative transition-colors ${user?.is_alerts_enabled ? 'bg-[var(--teal)]' : 'bg-[var(--bg-primary)]'}`}>
                   <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${user?.is_alerts_enabled ? 'right-1' : 'left-1'}`} />
                 </div>
               </button>
             </div>
           </div>
           
-          <div className="glass-card p-5 border border-white/5 bg-slate-900/50">
+          <div className="glass-card p-5 border border-[var(--border-color)] bg-[var(--bg-secondary)]/50">
             <div className="flex items-center gap-3 text-[var(--teal)] mb-3">
               <Shield size={18} />
               <span className="font-bold text-sm uppercase tracking-wider">Sécurité</span>
@@ -208,7 +208,7 @@ export default function ProfilPage() {
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[var(--teal)]/50 transition-all"
+                  className="w-full bg-[var(--bg-secondary)]/50 border border-[var(--border-color)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--teal)]/50 transition-all"
                   placeholder="Votre nom"
                 />
               </div>
@@ -221,7 +221,7 @@ export default function ProfilPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[var(--teal)]/50 transition-all"
+                  className="w-full bg-[var(--bg-secondary)]/50 border border-[var(--border-color)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--teal)]/50 transition-all"
                   placeholder="votre@email.com"
                 />
               </div>

@@ -39,10 +39,10 @@ export default function CitySelector({ hideNational = false }: CitySelectorProps
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <Loader2 className="w-10 h-10 text-[#00d4b1] animate-spin" />
-        <span className="text-[10px] font-black tracking-widest text-[#00d4b1]/50 uppercase">{t('city_loading')}</span>
-      </div>
+    <div className="flex flex-col items-center justify-center py-24 gap-4">
+      <Loader2 className="w-10 h-10 text-[var(--teal)] animate-spin" />
+      <span className="text-[10px] font-black tracking-widest text-[var(--teal)]/50 uppercase">{t('city_loading')}</span>
+    </div>
     );
   }
 
@@ -50,8 +50,8 @@ export default function CitySelector({ hideNational = false }: CitySelectorProps
     <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">
-          <h2 className="text-3xl font-black text-white tracking-tight">{t('city_selector_title')}</h2>
-          <p className="text-gray-400 text-sm font-medium">{t('city_selector_desc')}</p>
+          <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">{t('city_selector_title')}</h2>
+          <p className="text-[var(--text-secondary)] text-sm font-medium">{t('city_selector_desc')}</p>
         </div>
 
         <div className="relative group max-w-sm w-full">
@@ -61,7 +61,7 @@ export default function CitySelector({ hideNational = false }: CitySelectorProps
             placeholder={t('city_search_placeholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-14 pr-6 text-white text-sm font-bold focus:border-[#00d4b1] outline-none transition-all placeholder:text-gray-600"
+            className="w-full bg-[var(--bg-secondary)]/50 border border-[var(--border-color)] rounded-2xl py-4 pl-14 pr-6 text-[var(--text-primary)] text-sm font-bold focus:border-[var(--teal)] outline-none transition-all placeholder:text-[var(--text-secondary)]/50"
           />
         </div>
       </div>
@@ -71,12 +71,12 @@ export default function CitySelector({ hideNational = false }: CitySelectorProps
         {!search && !hideNational && (
           <button
             onClick={() => setVille("CAMEROON")}
-            className="glass-card p-6 border-white/5 hover:border-[#0ea5e9]/30 hover:bg-[#0ea5e9]/5 transition-all duration-300 flex flex-col items-center text-center gap-3 group"
+            className="glass-card p-6 border-[var(--border-color)] hover:border-[#0ea5e9]/30 hover:bg-[#0ea5e9]/5 transition-all duration-300 flex flex-col items-center text-center gap-3 group"
           >
             <div className="w-12 h-12 rounded-2xl bg-[#0ea5e9]/10 flex items-center justify-center text-[#0ea5e9] group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(14,165,233,0.1)]">
               <span className="text-[10px] font-black group-hover:scale-125 transition-transform"><Globe size={24} /></span>
             </div>
-            <span className="text-xs font-black text-white uppercase tracking-wider group-hover:text-[#0ea5e9]">{t('city_national')}</span>
+            <span className="text-xs font-black text-[var(--text-primary)] uppercase tracking-wider group-hover:text-[#0ea5e9]">{t('city_national')}</span>
           </button>
         )}
 
@@ -84,7 +84,7 @@ export default function CitySelector({ hideNational = false }: CitySelectorProps
           <button
             key={city.city}
             onClick={() => setVille(city.city)}
-            className="glass-card p-6 border-white/5 hover:border-[#00d4b1]/30 hover:bg-[#00d4b1]/5 transition-all duration-300 flex flex-col items-center text-center gap-3 group relative overflow-hidden"
+            className="glass-card p-6 border-[var(--border-color)] hover:border-[var(--teal)]/30 hover:bg-[var(--teal)]/5 transition-all duration-300 flex flex-col items-center text-center gap-3 group relative overflow-hidden"
           >
             {/* Status Indicator Glow */}
             <div 
@@ -102,10 +102,10 @@ export default function CitySelector({ hideNational = false }: CitySelectorProps
               <MapPin size={24} />
             </div>
             <div className="space-y-1">
-              <span className="text-xs font-black text-white uppercase tracking-tight block group-hover:text-[#00d4b1]">{city.city}</span>
+              <span className="text-xs font-black text-[var(--text-primary)] uppercase tracking-tight block group-hover:text-[var(--teal)]">{city.city}</span>
               <div className="flex items-center justify-center gap-1">
                 <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: city.irs_color || '#64748b' }} />
-                <span className="text-[8px] font-black uppercase text-gray-500 tracking-widest">{city.irs_label || 'Actif'}</span>
+                <span className="text-[8px] font-black uppercase text-[var(--text-secondary)]/50 tracking-widest">{city.irs_label || 'Actif'}</span>
               </div>
             </div>
           </button>

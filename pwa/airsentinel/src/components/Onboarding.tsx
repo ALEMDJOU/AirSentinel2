@@ -42,9 +42,9 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#020c18]/80 backdrop-blur-md p-4 sm:p-6 transition-all duration-700">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 sm:p-6 transition-all duration-700">
       
-      <div className="relative w-full max-w-lg bg-[#020c18] rounded-[40px] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col min-h-[550px] animate-in fade-in zoom-in duration-700">
+      <div className="relative w-full max-w-lg bg-[var(--bg-primary)] rounded-[40px] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.5)] border border-[var(--border-color)] flex flex-col min-h-[550px] animate-in fade-in zoom-in duration-700">
         
         {/* Background Image restricted to component */}
         <div className="absolute inset-0 z-0">
@@ -56,7 +56,7 @@ export default function Onboarding() {
             priority
           />
           {/* Internal Gradient Overlay for Legibility */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#020c18] via-[#020c18]/80 to-[#020c18]/60" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/80 to-transparent" />
         </div>
 
         {/* Animated Accents inside the card */}
@@ -71,14 +71,14 @@ export default function Onboarding() {
                 <div 
                   key={i} 
                   className={`h-1.5 rounded-full transition-all duration-700 ${
-                    i === step ? "w-10 bg-[#00d4b1]" : i < step ? "w-5 bg-[#00d4b1]/40" : "w-5 bg-white/10"
+                    i === step ? "w-10 bg-[#00d4b1]" : i < step ? "w-5 bg-[#00d4b1]/40" : "w-5 bg-[var(--text-secondary)]/20"
                   }`} 
                 />
               ))}
             </div>
             <button 
               onClick={skipOnboarding}
-              className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-white transition-all hover:bg-white/5 py-2 px-4 rounded-full"
+              className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all hover:bg-[var(--text-secondary)]/5 py-2 px-4 rounded-full"
             >
               {t('onboarding_skip')}
             </button>
@@ -93,10 +93,10 @@ export default function Onboarding() {
               <div className="w-24 h-24 rounded-[30px] bg-gradient-to-br from-[#00d4b1]/20 to-[#00d4b1]/5 flex items-center justify-center mb-8 shadow-[0_0_40px_rgba(0,212,177,0.3)] border border-[#00d4b1]/20 animate-float">
                 <Wind className="w-12 h-12 text-[#00d4b1]" />
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-4 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl font-black text-[var(--text-primary)] leading-tight mb-4 tracking-tight">
                 {t('onboarding_welcome_title')}
               </h1>
-              <p className="text-gray-200 text-lg font-medium leading-relaxed max-w-[300px]">
+              <p className="text-[var(--text-secondary)] text-lg font-medium leading-relaxed max-w-[300px]">
                 {t('onboarding_welcome_desc')}
               </p>
               <button 
@@ -116,14 +116,14 @@ export default function Onboarding() {
             <div className="flex-1 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-right-12 duration-700">
               <div className="w-24 h-24 rounded-full bg-[#0ea5e9]/20 flex items-center justify-center mb-8 relative border border-[#0ea5e9]/30">
                 <Bell className="w-12 h-12 text-[#0ea5e9] animate-ring" />
-                <div className="absolute -top-1 -right-1 w-7 h-7 bg-red-500 rounded-full border-4 border-[#020c18] flex items-center justify-center">
+                <div className="absolute -top-1 -right-1 w-7 h-7 bg-red-500 rounded-full border-4 border-[var(--bg-primary)] flex items-center justify-center">
                   <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                 </div>
               </div>
-              <h2 className="text-3xl font-black text-white mb-4 leading-tight">
+              <h2 className="text-3xl font-black text-[var(--text-primary)] mb-4 leading-tight">
                 {t('onboarding_notif_title')}
               </h2>
-              <p className="text-gray-200 text-lg font-medium leading-relaxed max-w-[280px] mb-10">
+              <p className="text-[var(--text-secondary)] text-lg font-medium leading-relaxed max-w-[280px] mb-10">
                 {t('onboarding_notif_desc')}
               </p>
               
@@ -136,7 +136,7 @@ export default function Onboarding() {
                 </button>
                 <button 
                   onClick={nextStep}
-                  className="w-full py-2 text-white/40 font-bold hover:text-white transition-colors tracking-widest text-[10px] uppercase"
+                  className="w-full py-2 text-[var(--text-secondary)] font-bold hover:text-[var(--text-primary)] transition-colors tracking-widest text-[10px] uppercase"
                 >
                   {t('onboarding_skip')}
                 </button>
@@ -148,13 +148,13 @@ export default function Onboarding() {
           {step === 2 && (
             <div className="flex-1 flex flex-col items-center justify-center text-center animate-in fade-in duration-700">
               <div className="relative w-28 h-28 mb-10">
-                <div className="absolute inset-0 rounded-full border-[6px] border-white/5" />
+                <div className="absolute inset-0 rounded-full border-[6px] border-[var(--text-secondary)]/10" />
                 <div className="absolute inset-0 rounded-full border-[6px] border-t-[#00d4b1] animate-spin-slow" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <ShieldCheck className="w-12 h-12 text-[#00d4b1] animate-pulse" />
                 </div>
               </div>
-              <h2 className="text-3xl font-black text-white mb-3">
+              <h2 className="text-3xl font-black text-[var(--text-primary)] mb-3">
                 {t('onboarding_final_title')}
               </h2>
               <p className="text-[#00d4b1] text-sm font-black uppercase tracking-[0.3em] animate-pulse">
@@ -162,7 +162,7 @@ export default function Onboarding() {
               </p>
               
               <div className="mt-10 space-y-2">
-                <div className="flex items-center gap-3 text-white/40 text-[10px] font-bold uppercase tracking-widest bg-white/5 px-4 py-2 rounded-lg">
+                <div className="flex items-center gap-3 text-[var(--text-secondary)] text-[10px] font-bold uppercase tracking-widest bg-[var(--text-secondary)]/5 px-4 py-2 rounded-lg">
                   <div className="w-1 h-1 rounded-full bg-[#00d4b1] animate-ping" />
                   Configuration des alertes pour {ville}...
                 </div>
@@ -173,13 +173,13 @@ export default function Onboarding() {
           {/* STEP 3: AHA MOMENT */}
           {step === 3 && (
             <div className="flex-1 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-1000">
-              <div className="w-24 h-24 rounded-full bg-[#00d4b1] flex items-center justify-center mb-8 shadow-[0_0_60px_rgba(0,212,177,0.6)] border-4 border-white/20">
-                <CheckCircle className="w-12 h-12 text-[#020c18]" />
+              <div className="w-24 h-24 rounded-full bg-[#00d4b1] flex items-center justify-center mb-8 shadow-[0_0_60px_rgba(0,212,177,0.6)] border-4 border-[var(--bg-secondary)]">
+                <CheckCircle className="w-12 h-12 text-[var(--bg-primary)]" />
               </div>
-              <h2 className="text-4xl font-black text-white mb-4 tracking-tight">
+              <h2 className="text-4xl font-black text-[var(--text-primary)] mb-4 tracking-tight">
                 Félicitations !
               </h2>
-              <p className="text-white text-lg font-bold leading-relaxed max-w-[320px] mb-12 bg-white/10 py-5 px-6 rounded-3xl backdrop-blur-xl border border-white/10">
+              <p className="text-[var(--text-primary)] text-lg font-bold leading-relaxed max-w-[320px] mb-12 bg-[var(--bg-secondary)]/80 py-5 px-6 rounded-3xl backdrop-blur-xl border border-[var(--border-color)]">
                 {t('onboarding_aha_desc').replace('{}', ville || t('nav_user_placeholder'))}
               </p>
               <button 

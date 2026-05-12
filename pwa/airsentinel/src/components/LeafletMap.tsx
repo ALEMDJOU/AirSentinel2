@@ -72,28 +72,28 @@ function MapSearch({ points, onSelect, onSelectVille }: { points: VillePoint[], 
     <div className="absolute top-[70px] left-0 right-0 z-[1000] flex justify-center px-4 pointer-events-none">
       <div className="w-full max-w-[400px] pointer-events-auto">
         <div className="relative group">
-          <div className="absolute inset-x-0 -bottom-1 h-px bg-gradient-to-r from-transparent via-[#00d4b1]/50 to-transparent blur-sm opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
-          <div className="flex items-center bg-white border border-gray-100 rounded-3xl shadow-[0_15px_40px_rgba(0,0,0,0.12)] px-5 py-4 placeholder:text-gray-400">
-            <Search size={22} className="text-[#00d4b1] mr-3 shrink-0" />
+          <div className="absolute inset-x-0 -bottom-1 h-px bg-gradient-to-r from-transparent via-[var(--teal)]/50 to-transparent blur-sm opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
+          <div className="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-3xl shadow-[0_15px_40px_rgba(0,0,0,0.12)] px-5 py-4 placeholder:text-[var(--text-secondary)]/50">
+            <Search size={22} className="text-[var(--teal)] mr-3 shrink-0" />
             <input
               type="text"
               placeholder={t('map_search_placeholder')}
               value={query}
               onChange={(e) => handleSearch(e.target.value)}
-              className="bg-transparent border-none outline-none text-gray-800 text-base font-medium w-full placeholder:text-gray-400"
+              className="bg-transparent border-none outline-none text-[var(--text-primary)] text-base font-medium w-full placeholder:text-[var(--text-secondary)]/50"
             />
             {query && (
               <button 
                 onClick={() => handleSearch("")}
-                className="p-1 hover:bg-gray-50 rounded-full"
+                className="p-1 hover:bg-[var(--bg-primary)] rounded-full"
               >
-                <X size={20} className="text-gray-400" />
+                <X size={20} className="text-[var(--text-secondary)]" />
               </button>
             )}
           </div>
 
           {results.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl overflow-hidden py-2 max-h-[60vh] overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="absolute top-full left-0 right-0 mt-3 bg-[var(--bg-secondary)]/95 backdrop-blur-xl border border-[var(--border-color)] rounded-3xl shadow-2xl overflow-hidden py-2 max-h-[60vh] overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-300">
               {results.map((point) => (
                 <button
                   key={point.city}
@@ -103,16 +103,16 @@ function MapSearch({ points, onSelect, onSelectVille }: { points: VillePoint[], 
                     setQuery("");
                     setResults([]);
                   }}
-                  className="w-full text-left px-6 py-4 hover:bg-[#00d4b1]/5 flex items-center gap-4 transition-colors group border-b border-gray-50 last:border-0"
+                  className="w-full text-left px-6 py-4 hover:bg-[var(--teal)]/5 flex items-center gap-4 transition-colors group border-b border-[var(--border-color)] last:border-0"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-[#00d4b1]/10 flex items-center justify-center text-[#00d4b1] shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--teal)]/10 flex items-center justify-center text-[var(--teal)] shrink-0">
                     <MapPin size={20} />
                   </div>
                   <div>
-                    <div className="text-sm font-bold text-gray-800">{point.city}</div>
-                    <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight flex items-center gap-2">
-                        PM2.5: <span className="text-[#00d4b1]">{point.pm25_moyen} µg/m³</span>
-                        <span className="w-1 h-1 rounded-full bg-gray-200"></span>
+                    <div className="text-sm font-bold text-[var(--text-primary)]">{point.city}</div>
+                    <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-tight flex items-center gap-2">
+                        PM2.5: <span className="text-[var(--teal)]">{point.pm25_moyen} µg/m³</span>
+                        <span className="w-1 h-1 rounded-full bg-[var(--border-color)]"></span>
                         {point.irs_label || t('quality')}
                      </div>
                   </div>
@@ -169,24 +169,24 @@ function MapOverlayControls({ map }: { map: L.Map | null }) {
         <button
           onClick={handleLocate}
           disabled={locating}
-          className={`w-14 h-14 bg-[#00d4b1] text-white rounded-2xl shadow-xl flex items-center justify-center transition-all active:scale-90 ${locating ? 'opacity-70' : ''}`}
+          className={`w-14 h-14 bg-[var(--teal)] text-[var(--bg-secondary)] rounded-2xl shadow-xl flex items-center justify-center transition-all active:scale-90 ${locating ? 'opacity-70' : ''}`}
         >
-          <Navigation size={26} fill="white" className={locating ? 'animate-spin' : ''} />
+          <Navigation size={26} fill="currentColor" className={locating ? 'animate-spin' : ''} />
         </button>
         
         <button
           onClick={handleReset}
-          className="w-14 h-14 bg-white text-[#00d4b1] rounded-2xl shadow-xl flex items-center justify-center border border-gray-100 transition-all active:scale-95"
+          className="w-14 h-14 bg-[var(--bg-secondary)] text-[var(--teal)] rounded-2xl shadow-xl flex items-center justify-center border border-[var(--border-color)] transition-all active:scale-95"
         >
           <Compass size={26} />
         </button>
       </div>
 
-      <div className="flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden divide-y divide-gray-50">
-        <button onClick={handleZoomIn} className="w-14 h-14 flex items-center justify-center text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-all">
+      <div className="flex flex-col bg-[var(--bg-secondary)] rounded-2xl shadow-2xl border border-[var(--border-color)] overflow-hidden divide-y divide-[var(--border-color)]">
+        <button onClick={handleZoomIn} className="w-14 h-14 flex items-center justify-center text-[var(--text-primary)] hover:bg-[var(--bg-primary)] active:bg-[var(--bg-primary)] transition-all">
           <ZoomIn size={24} strokeWidth={2.5} />
         </button>
-        <button onClick={handleZoomOut} className="w-14 h-14 flex items-center justify-center text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-all">
+        <button onClick={handleZoomOut} className="w-14 h-14 flex items-center justify-center text-[var(--text-primary)] hover:bg-[var(--bg-primary)] active:bg-[var(--bg-primary)] transition-all">
           <ZoomOut size={24} strokeWidth={2.4} />
         </button>
       </div>
@@ -281,10 +281,10 @@ export default function LeafletMap() {
       <MapOverlayControls map={map} />
 
       {loading && (
-        <div className="absolute inset-0 z-[2000] bg-[#020c18]/40 backdrop-blur-sm flex items-center justify-center">
+        <div className="absolute inset-0 z-[2000] bg-[var(--bg-primary)]/40 backdrop-blur-sm flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
-             <Loader2 className="w-10 h-10 text-[#00d4b1] animate-spin" />
-             <p className="text-white text-sm font-medium">{t('map_sync')}</p>
+             <Loader2 className="w-10 h-10 text-[var(--teal)] animate-spin" />
+             <p className="text-[var(--text-primary)] text-sm font-medium">{t('map_sync')}</p>
           </div>
         </div>
       )}
@@ -297,7 +297,7 @@ export default function LeafletMap() {
         zoomControl={false}
         ref={(instance) => { if (instance) setMap(instance); }}
         style={{ width: "100%", height: "100%" }}
-        className="bg-[#020c18] !z-0"
+        className="bg-[var(--bg-primary)] !z-0"
       >
         <LayersControl position="topright">
           <LayersControl.BaseLayer checked name={t('map_plan')}>
@@ -349,25 +349,25 @@ export default function LeafletMap() {
                         {pm25Value} µg/m³
                      </LeafletTooltip>
                      <Popup>
-                        <div className="min-w-[160px] p-1 font-sans text-slate-800">
-                          <div className="text-lg font-bold mb-1 border-b pb-1">{point.city}</div>
+                        <div className="min-w-[160px] p-1 font-sans text-[var(--text-primary)]">
+                          <div className="text-lg font-bold mb-1 border-b border-[var(--border-color)] pb-1">{point.city}</div>
                           
                           <div className="space-y-2 mt-2">
                             <div className="flex flex-col gap-0.5">
-                              <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">{t('map_pollution')}</span>
-                              <div className="flex items-center gap-1.5 bg-gray-50 p-1.5 rounded-lg border border-gray-100">
+                              <span className="text-[10px] font-black text-[var(--text-secondary)]/50 uppercase tracking-wider">{t('map_pollution')}</span>
+                              <div className="flex items-center gap-1.5 bg-[var(--bg-primary)] p-1.5 rounded-lg border border-[var(--border-color)]">
                                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
-                                <span className="text-sm font-bold text-gray-800">
-                                  {point.pm25_moyen} <span className="text-[10px] font-normal text-gray-500">µg/m³</span>
+                                <span className="text-sm font-bold text-[var(--text-primary)]">
+                                  {point.pm25_moyen} <span className="text-[10px] font-normal text-[var(--text-secondary)]/50">µg/m³</span>
                                 </span>
                               </div>
                             </div>
 
                             <div className="flex flex-col gap-0.5">
-                              <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">{t('map_quality')}</span>
+                              <span className="text-[10px] font-black text-[var(--text-secondary)]/50 uppercase tracking-wider">{t('map_quality')}</span>
                               <div className="flex items-center gap-2">
                                 <span 
-                                  className="px-2 py-0.5 rounded text-[11px] font-bold text-white uppercase"
+                                  className="px-2 py-0.5 rounded text-[11px] font-black text-[var(--bg-secondary)] uppercase"
                                   style={{ backgroundColor: color }}
                                 >
                                   {pm25Label}
@@ -381,7 +381,7 @@ export default function LeafletMap() {
                               selectVille(point.city);
                               router.push("/dashboard/stats");
                             }}
-                            className="w-full mt-3 py-2 bg-[#020c18] text-white rounded-xl text-xs font-bold hover:bg-[#00d4b1] transition-colors active:scale-95"
+                            className="w-full mt-3 py-2 bg-[var(--teal)] text-[var(--bg-secondary)] rounded-xl text-xs font-black hover:bg-[var(--teal-dark)] transition-colors active:scale-95"
                           >
                             {t('map_view_stats')}
                           </button>
@@ -396,12 +396,12 @@ export default function LeafletMap() {
 
       {/* ── Légende cliquable ── */}
       <div className="absolute bottom-6 left-4 z-[1000] space-y-3">
-        <div className="glass-card p-4 border-white/10 flex flex-col gap-2.5 min-w-[200px] backdrop-blur-3xl bg-slate-950/80 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-          <div className="flex flex-col gap-1 mb-1 border-b border-white/5 pb-2">
-            <span className="text-[10px] font-black text-[#00d4b1] uppercase tracking-widest flex items-center gap-2">
+        <div className="glass-card p-4 border-[var(--border-color)] flex flex-col gap-2.5 min-w-[200px] backdrop-blur-3xl bg-[var(--bg-secondary)]/80 shadow-2xl">
+          <div className="flex flex-col gap-1 mb-1 border-b border-[var(--border-color)] pb-2">
+            <span className="text-[10px] font-black text-[var(--teal)] uppercase tracking-widest flex items-center gap-2">
               <Wind size={14} /> {t('map_pollution') || "Qualité de l'Air"}
             </span>
-            <span className="text-[8px] font-bold text-gray-500 uppercase tracking-tighter opacity-50">Standards OMS 2021 · Cliquer pour filtrer</span>
+            <span className="text-[8px] font-bold text-[var(--text-secondary)]/50 uppercase tracking-tighter opacity-50">Standards OMS 2021 · Cliquer pour filtrer</span>
           </div>
           {[
             { key: 'EXCELLENT', color: "#008000", desc: "0–5",    defaultLabel: "Excellent" },
@@ -416,14 +416,14 @@ export default function LeafletMap() {
               <button
                 key={item.key}
                 onClick={() => setActiveFilter(isActive ? "ALL" : item.key as LevelKey)}
-                className={`flex items-center gap-3 group/item w-full text-left rounded-lg px-1.5 py-1 transition-all ${isActive ? "bg-white/10" : "hover:bg-white/5"}`}
+                className={`flex items-center gap-3 group/item w-full text-left rounded-lg px-1.5 py-1 transition-all ${isActive ? "bg-[var(--teal)]/10" : "hover:bg-[var(--bg-primary)]"}`}
               >
                 <div className="w-2.5 h-2.5 rounded-full shrink-0 shadow-lg group-hover/item:scale-125 transition-transform" style={{ backgroundColor: item.color, boxShadow: `0 0 10px ${item.color}44` }} />
                 <div className="flex justify-between items-center w-full">
-                  <span className={`text-[10px] font-black uppercase tracking-tighter leading-none ${isActive ? "text-white" : "text-white/70"}`}>
+                  <span className={`text-[10px] font-black uppercase tracking-tighter leading-none ${isActive ? "text-[var(--text-primary)]" : "text-[var(--text-primary)]/70"}`}>
                     {t(item.key) || item.defaultLabel}
                   </span>
-                  <span className="text-[8px] text-gray-500 font-bold tabular-nums">
+                  <span className="text-[8px] text-[var(--text-secondary)]/50 font-bold tabular-nums">
                     {item.desc} <span className="opacity-50 font-normal">µg/m³</span>
                   </span>
                 </div>

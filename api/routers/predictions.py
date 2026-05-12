@@ -80,41 +80,62 @@ def get_short_term(city: Optional[str] = None):
     except ValueError:
         today_idx = len(all_dates) - 1
 
-    start_idx = max(0, today_idx - 20)
-    selected_dates = all_dates[start_idx : today_idx + 3]
-
-    result = []
+    # 1. Préparer l'historique (les 20 derniers points disponibles)
+    history_points = []
     from api.services.prediction_service import predict_pm25
+    import math
+
+    # On prend les 20 derniers jours présents dans le dataset
+    recent_dates = all_dates[max(0, today_idx - 19) : today_idx + 1]
     
-    for day in selected_dates:
-        day_data = df_sorted[df_sorted[date_col].dt.date == day].iloc[0]
-        is_future = day > last_date_val
-        
+    for day in recent_dates:
         try:
-            # On passe toutes les caractéristiques du jour au modèle ML (avec région pour ARIMA)
+            day_data = df_sorted[df_sorted[date_col].dt.date == day].iloc[-1]
             raw_dict = day_data.to_dict()
-            region_name = str(raw_dict.get("region", "Centre"))
-            pred_val = predict_pm25(raw_dict, region=region_name)
-            if pred_val <= 0: raise ValueError
+            feat_dict = {
+                "dust": float(raw_dict.get("dust_moyen", 0)),
+                "co": float(raw_dict.get("co_moyen", 0)),
+                "uv": float(raw_dict.get("uv_moyen", 0)),
+                "ozone": float(raw_dict.get("ozone_moyen", 0)),
+                "temp": float(raw_dict.get("temperature_2m_mean", 0)),
+                "humidity": float(raw_dict.get("humidity_moyen", 0))
+            }
+            history_points.append(PredictionPoint(
+                date=str(day),
+                pm25=round(float(raw_dict.get(pm25_col, 25.0)), 2),
+                is_prediction=False,
+                features=feat_dict
+            ))
         except Exception:
-            # Fallback sur la valeur brute si le modèle échoue
-            pred_val = float(day_data[pm25_col]) if pm25_col in day_data else 25.0
-            
-        # Préparer les features pour le frontend
-        raw_f = day_data.to_dict()
+            continue
+
+    # 2. Préparer les prédictions (J+1, J+2, J+3)
+    prediction_points = []
+    last_row = df_sorted.iloc[-1].to_dict() # Base pour les features
+    
+    for i in range(1, 4):
+        future_day = last_date_val + timedelta(days=i)
+        try:
+            region_name = str(last_row.get("region", "Centre"))
+            # Prédiction hybride avec horizon i
+            pred_val = predict_pm25(last_row, region=region_name, steps=i)
+            if pred_val <= 0 or math.isnan(pred_val): pred_val = 25.0
+        except Exception:
+            pred_val = 25.0
+
         feat_dict = {
-            "dust": float(raw_f.get("dust_moyen", 0)),
-            "co": float(raw_f.get("co_moyen", 0)),
-            "uv": float(raw_f.get("uv_moyen", 0)),
-            "ozone": float(raw_f.get("ozone_moyen", 0)),
-            "temp": float(raw_f.get("temperature_2m_mean", 0)),
-            "humidity": float(raw_f.get("humidity_moyen", 0))
+            "dust": float(last_row.get("dust_moyen", 0)),
+            "co": float(last_row.get("co_moyen", 0)),
+            "uv": float(last_row.get("uv_moyen", 0)),
+            "ozone": float(last_row.get("ozone_moyen", 0)),
+            "temp": float(last_row.get("temperature_2m_mean", 0)),
+            "humidity": float(last_row.get("humidity_moyen", 0))
         }
 
-        result.append(PredictionPoint(
-            date=str(day),
+        prediction_points.append(PredictionPoint(
+            date=str(future_day),
             pm25=round(float(pred_val), 2),
-            is_prediction=is_future,
+            is_prediction=True,
             features=feat_dict
         ))
 

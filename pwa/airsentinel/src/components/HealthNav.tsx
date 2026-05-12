@@ -31,7 +31,7 @@ export default function HealthNav({ currentPage }: HealthNavProps) {
     <div className="flex flex-wrap items-center gap-3 mb-6">
       <button
         onClick={() => router.push("/dashboard/sante")}
-        className="group flex items-center gap-3 px-5 py-2.5 bg-slate-900/60 backdrop-blur-md border border-white/20 rounded-2xl text-white hover:border-[#00d4b1]/50 hover:bg-[#00d4b1]/5 transition-all active:scale-95 shadow-lg shrink-0"
+        className="group flex items-center gap-3 px-5 py-2.5 bg-[var(--bg-secondary)] backdrop-blur-md border border-[var(--border-color)] rounded-2xl text-[var(--text-primary)] hover:border-[var(--teal)]/50 hover:bg-[var(--teal)]/5 transition-all active:scale-95 shadow-lg shrink-0"
       >
         <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform text-[#00d4b1]" />
         <span className="font-black text-[11px] uppercase tracking-widest">{t('health_all_profiles')}</span>
@@ -48,7 +48,7 @@ export default function HealthNav({ currentPage }: HealthNavProps) {
           </span>
         </div>
 
-        <div className="w-px h-8 bg-white/10 mx-2 hidden sm:block" />
+        <div className="w-px h-8 bg-[var(--border-color)] mx-2 hidden sm:block" />
 
         <div className="flex items-center gap-2">
           {pages.filter(p => p.id !== currentPage).map((page) => {
@@ -57,7 +57,7 @@ export default function HealthNav({ currentPage }: HealthNavProps) {
               <button
                 key={page.id}
                 onClick={() => handleSelectPage(page.href)}
-                className="group flex items-center gap-2 px-3 py-2 bg-slate-900/60 border border-white/10 rounded-2xl text-white/70 hover:text-white hover:border-[#00d4b1]/50 hover:bg-[#00d4b1]/10 transition-all active:scale-95 shadow-lg"
+                className="group flex items-center gap-2 px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--teal)]/50 hover:bg-[var(--teal)]/10 transition-all active:scale-95 shadow-lg"
                 title={`${t('health_switch_to')} ${page.label}`}
               >
                 <Icon size={18} className="group-hover:scale-110 transition-transform" />
@@ -71,7 +71,7 @@ export default function HealthNav({ currentPage }: HealthNavProps) {
       <div className="relative">
         <button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="flex items-center gap-3 px-5 py-2.5 bg-[#00d4b1] border border-white/20 rounded-2xl text-white shadow-[0_4px_20px_rgba(0,212,177,0.3)] hover:bg-[#00b89c] hover:scale-105 transition-all active:scale-95 shrink-0"
+          className="flex items-center gap-3 px-5 py-2.5 bg-[var(--teal)] border border-[var(--border-color)] rounded-2xl text-[var(--bg-secondary)] shadow-[0_4px_20px_rgba(0,212,177,0.3)] hover:bg-[var(--teal-dark)] hover:scale-105 transition-all active:scale-95 shrink-0"
         >
           <MapPin size={18} fill="white" />
           <span className="font-black text-[11px] uppercase tracking-widest max-w-[120px] truncate">{ville || t('health_change_city')}</span>
@@ -79,10 +79,10 @@ export default function HealthNav({ currentPage }: HealthNavProps) {
         </button>
 
         {showDropdown && (
-          <div className="absolute top-full right-0 mt-2 bg-[#020c18] border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[250px] overflow-y-auto z-50 min-w-[180px]">
+          <div className="absolute top-full right-0 mt-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl shadow-2xl overflow-hidden max-h-[250px] overflow-y-auto z-50 min-w-[180px]">
             <button
               onClick={() => { selectVille(""); setShowDropdown(false); }}
-              className="w-full text-left px-4 py-3 hover:bg-red-500/20 text-red-400 font-medium transition-colors border-b border-white/5"
+              className="w-full text-left px-4 py-3 hover:bg-red-500/20 text-red-400 font-medium transition-colors border-b border-[var(--border-color)]"
             >
               {t('health_reset')}
             </button>

@@ -34,6 +34,7 @@ export const viewport: Viewport = {
 import { Toaster } from "react-hot-toast";
 
 import { LanguageProvider } from "@/context/LanguageContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import NotificationManager from "@/components/NotificationManager";
 import ChatBot from "@/components/ChatBot";
 import KeepAlive from "@/components/KeepAlive";
@@ -48,6 +49,7 @@ export default function RootLayout({
     <html lang="fr">
       <head />
       <body className={inter.className}>
+        <ThemeProvider>
         <LanguageProvider>
         <VilleProvider>
         <Toaster 
@@ -55,10 +57,10 @@ export default function RootLayout({
           toastOptions={{
             duration: 4000,
             style: {
-              background: "rgba(15, 23, 42, 0.9)",
-              color: "#fff",
-              backdropFilter: "blur(10px)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
+              background: "var(--bg-secondary)",
+              color: "var(--text-primary)",
+              backdropFilter: "var(--glass-blur)",
+              border: "1px solid var(--border-color)",
               fontSize: "14px",
               borderRadius: "12px",
             },
@@ -70,6 +72,7 @@ export default function RootLayout({
         {children}
         </VilleProvider>
         </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

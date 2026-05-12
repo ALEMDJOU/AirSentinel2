@@ -55,3 +55,8 @@ api/firebase-service-account.json
 /pwa/airsentinel/manifest-checksum.txt
 /pwa/airsentinel/store_icon.png
 /pwa/airsentinel/android-wrapper
+
+# Scratch and Temporary files
+scratch/
+*.sqlite
+.cache/

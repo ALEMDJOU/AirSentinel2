@@ -38,14 +38,15 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 sm:p-6 bg-hero-joel overflow-hidden">
       {/* Dark gradient overlay to ensure text readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#020c18]/80 via-[#020c18]/60 to-[#020c18]/90 backdrop-blur-[2px]"></div>
+      {/* Gradient overlay adapting to theme */}
+      <div className="absolute inset-0 bg-[var(--bg-primary)] opacity-80 backdrop-blur-[2px]"></div>
 
       <div className="relative z-10 w-full max-w-[400px] animate-fade-up my-8">
         {/* Main Glass Card */}
         <div className="glass-card w-full min-h-[550px] pt-8 pb-16 sm:pb-24 px-5 sm:px-8 flex flex-col items-center relative overflow-hidden">
 
           {/* Back Button */}
-          <Link href="/" className="absolute top-6 left-6 text-gray-400 hover:text-white transition-colors z-30">
+          <Link href="/" className="absolute top-6 left-6 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors z-30">
             <ArrowLeft className="w-6 h-6" />
           </Link>
 
@@ -66,15 +67,15 @@ export default function LoginPage() {
 
           {/* Header Text */}
           <div className="text-center w-full mb-6">
-            <h1 className="text-2xl font-bold text-white tracking-tight">
+            <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
               AirSentinel Cameroun
             </h1>
-            <p className="text-sm text-gray-300 mt-1">
+            <p className="text-sm text-[var(--text-secondary)] mt-1">
               {t('hero_title_2')} {t('hero_title_3')}
             </p>
           </div>
 
-          <h2 className="text-[1.35rem] font-medium text-white mb-6">
+          <h2 className="text-[1.35rem] font-medium text-[var(--text-primary)] mb-6">
             {t('login_title')}
           </h2>
 
@@ -82,7 +83,7 @@ export default function LoginPage() {
 
             {/* Email Field */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-[13px] text-gray-300 ml-1">{t('login_email')}</label>
+              <label className="text-[13px] text-[var(--text-secondary)] ml-1">{t('login_email')}</label>
               <div className="relative group">
                 <input
                   type="email"
@@ -90,7 +91,7 @@ export default function LoginPage() {
                   placeholder={t('login_email_placeholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-[1.1cm] bg-[#1e293b]/40 border border-white/10 rounded-xl pl-4 pr-[3.5rem] text-white text-sm placeholder:text-gray-500 focus:outline-none focus:border-[var(--teal)] focus:ring-1 focus:ring-[var(--teal)]/50 transition-all"
+                  className="w-full h-[1.1cm] bg-[var(--bg-secondary)]/40 border border-[var(--border-color)] rounded-xl pl-4 pr-[3.5rem] text-[var(--text-primary)] text-sm placeholder:text-[var(--text-secondary)]/50 focus:outline-none focus:border-[var(--teal)] focus:ring-1 focus:ring-[var(--teal)]/50 transition-all"
                   required
                 />
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-[var(--teal)]">
@@ -101,7 +102,7 @@ export default function LoginPage() {
 
             {/* Password Field */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-[13px] text-gray-300 ml-1">{t('login_password')}</label>
+              <label className="text-[13px] text-[var(--text-secondary)] ml-1">{t('login_password')}</label>
               <div className="relative group">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -109,13 +110,13 @@ export default function LoginPage() {
                   placeholder={t('login_password')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full h-[1.1cm] bg-[#1e293b]/40 border border-white/10 rounded-xl pl-4 pr-[5.5rem] text-white text-sm placeholder:text-gray-500 focus:outline-none focus:border-[var(--teal)] focus:ring-1 focus:ring-[var(--teal)]/50 transition-all mb-1"
+                  className="w-full h-[1.1cm] bg-[var(--bg-secondary)]/40 border border-[var(--border-color)] rounded-xl pl-4 pr-[5.5rem] text-[var(--text-primary)] text-sm placeholder:text-[var(--text-secondary)]/50 focus:outline-none focus:border-[var(--teal)] focus:ring-1 focus:ring-[var(--teal)]/50 transition-all mb-1"
                   required
                 />
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center gap-2">
                   <Lock className="w-5 h-5 text-[var(--teal)] opacity-90 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
                   <div
-                    className="flex items-center text-gray-400 hover:text-white cursor-pointer transition-colors"
+                    className="flex items-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer transition-colors"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
@@ -123,7 +124,7 @@ export default function LoginPage() {
                 </div>
               </div>
               <div className="w-full flex justify-end">
-                <Link href="#" className="text-[12px] text-gray-400 hover:text-[var(--teal)] transition-colors">
+                <Link href="#" className="text-[12px] text-[var(--text-secondary)] hover:text-[var(--teal)] transition-colors">
                   {t('login_forgot')}
                 </Link>
               </div>
@@ -141,9 +142,9 @@ export default function LoginPage() {
           </form>
 
           {/* Footer Text */}
-          <div className="mt-20 text-[15px] text-gray-300 text-center">
+          <div className="mt-20 text-[15px] text-[var(--text-secondary)] text-center">
             {t('login_no_account')}{" "}
-            <Link href="/register" className="text-white hover:text-[var(--teal)] font-medium transition-colors">
+            <Link href="/register" className="text-[var(--text-primary)] hover:text-[var(--teal)] font-medium transition-colors">
               {t('login_signup')}
             </Link>
           </div>

@@ -44,6 +44,16 @@ def _find_col(df, candidates):
     return None
 
 
+def _pm25_level(pm25: float):
+    """Classifie le PM2.5 selon les seuils OMS 2021."""
+    if pm25 <= 5:   return "EXCELLENT", "#008000"
+    if pm25 <= 15:  return "BON",       "#4CAF50"
+    if pm25 <= 25:  return "MODERE",    "#FFC107"
+    if pm25 <= 50:  return "DEGRADE",   "#FF9800"
+    if pm25 <= 100: return "MAUVAIS",   "#FF5722"
+    return "CRITIQUE", "#B71C1C"
+
+
 # ─── Endpoints ─────────────────────────────────────────────────────
 @router.get("", response_model=list[VillePoint])
 def get_carte():
@@ -79,15 +89,6 @@ def get_carte():
     from api.services.prediction_service import predict_pm25
     import math
 
-    def _pm25_level(pm25: float):
-        """Classifie le PM2.5 selon les seuils OMS 2021."""
-        if pm25 <= 5:   return "EXCELLENT", "#008000"
-        if pm25 <= 15:  return "BON",       "#4CAF50"
-        if pm25 <= 25:  return "MODERE",    "#FFC107"
-        if pm25 <= 50:  return "DEGRADE",   "#FF9800"
-        if pm25 <= 100: return "MAUVAIS",   "#FF5722"
-        return "CRITIQUE", "#B71C1C"
-
     result = []
     for _, row in latest_df.iterrows():
         irs_val    = float(row[irs_col]) if irs_col else None
@@ -106,8 +107,15 @@ def get_carte():
             except (ValueError, TypeError):
                 pass
 
+        # Gestion sécurisée du nom de la région
+        region_name = "Centre"
         try:
-            region_name = str(row[region_col]) if region_col and region_col in row else "Centre"
+            if region_col and region_col in row:
+                region_name = str(row[region_col])
+        except Exception:
+            pass
+
+        try:
             ml_pm25 = predict_pm25(clean_features, region=region_name)
             # Sanity check : si le modèle retourne une valeur aberrante, fallback
             if ml_pm25 <= 0 or math.isnan(ml_pm25):

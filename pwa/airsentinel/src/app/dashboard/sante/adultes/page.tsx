@@ -72,18 +72,18 @@ export default function AdultesPage() {
           <div className="w-20 h-20 rounded-full bg-[#00d4b1]/10 flex items-center justify-center mb-6">
             <MapPin className="text-[#00d4b1]" size={40} />
           </div>
-          <h2 className="text-2xl font-black text-white mb-4 text-center">{t('health_city_choose')}</h2>
-          <p className="text-gray-400 text-center mb-8 max-w-md">
+          <h2 className="text-2xl font-black text-[var(--text-primary)] mb-4 text-center">{t('health_city_choose')}</h2>
+          <p className="text-[var(--text-secondary)] text-center mb-8 max-w-md">
             {t('health_req_city').replace('{}', t('health_prof_adults').toLowerCase())}
           </p>
 
           <div className="relative w-full max-w-md">
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="w-full flex items-center justify-between px-6 py-5 bg-[#00d4b1]/10 border-2 border-[#00d4b1]/50 rounded-3xl text-white hover:bg-[#00d4b1]/20 transition-all shadow-[0_0_20px_rgba(0,212,177,0.1)] group"
+              className="w-full flex items-center justify-between px-6 py-5 bg-[#00d4b1]/10 border-2 border-[#00d4b1]/50 rounded-3xl text-[var(--text-primary)] hover:bg-[#00d4b1]/20 transition-all shadow-[0_0_20px_rgba(0,212,177,0.1)] group"
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-[#00d4b1] flex items-center justify-center text-white shadow-lg">
+                <div className="w-10 h-10 rounded-xl bg-[#00d4b1] flex items-center justify-center text-[var(--text-primary)] shadow-lg">
                   <MapPin size={20} fill="white" />
                 </div>
                 <span className="font-bold text-lg">{t('health_select_city')}</span>
@@ -97,7 +97,7 @@ export default function AdultesPage() {
                   <button
                     key={v}
                     onClick={() => handleSelectVille(v)}
-                    className="w-full text-left px-6 py-3 hover:bg-[#00d4b1]/10 text-white font-medium transition-colors"
+                    className="w-full text-left px-6 py-3 hover:bg-[#00d4b1]/10 text-[var(--text-primary)] font-medium transition-colors"
                   >
                     {v}
                   </button>
@@ -130,14 +130,14 @@ export default function AdultesPage() {
         <HealthNav currentPage="adultes" />
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-black text-white mb-1">{t('health_title_1')}{t('health_prof_adults')}</h1>
+            <h1 className="text-3xl font-black text-[var(--text-primary)] mb-1">{t('health_title_1')}{t('health_prof_adults')}</h1>
             <p className="text-[#00d4b1] text-base font-bold flex items-center gap-2">
               <MapPin size={16} /> {ville}
             </p>
           </div>
           <button
             onClick={() => selectVille("")}
-            className="px-6 py-3 bg-[#00d4b1] text-white font-black uppercase tracking-tighter text-xs rounded-2xl shadow-[0_4px_20px_rgba(0,212,177,0.4)] hover:bg-[#00b89c] hover:scale-105 transition-all active:scale-95 flex items-center gap-2 shrink-0 border border-white/20"
+            className="px-6 py-3 bg-[#00d4b1] text-[var(--text-primary)] font-black uppercase tracking-tighter text-xs rounded-2xl shadow-[0_4px_20px_rgba(0,212,177,0.4)] hover:bg-[#00b89c] hover:scale-105 transition-all active:scale-95 flex items-center gap-2 shrink-0 border border-white/20"
           >
             <MapPin size={16} fill="white" />
             {t('health_change_city')}
@@ -148,15 +148,15 @@ export default function AdultesPage() {
       <div className={`glass-card mb-8 overflow-hidden relative border-2 ${isCritical ? 'border-red-500/50 shadow-[0_0_30px_rgba(239,68,68,0.3)]' : 'border-white/5'} transition-all`}>
         {isCritical && (
           <div className="bg-red-600 px-6 py-3 flex items-center gap-3">
-            <AlertTriangle className="text-white" size={24} />
-            <span className="text-white font-black text-lg tracking-wide">{t('health_alert_pollution').replace('{}', t(rec?.niveau_risque || "").toUpperCase())}</span>
+            <AlertTriangle className="text-[var(--text-primary)]" size={24} />
+            <span className="text-[var(--text-primary)] font-black text-lg tracking-wide">{t('health_alert_pollution').replace('{}', t(rec?.niveau_risque || "").toUpperCase())}</span>
           </div>
         )}
         <div className="p-6 md:p-8">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="text-7xl">{rec?.icone || "🧑"}</div>
             <div className="flex-1 text-center md:text-left">
-              <h3 className="text-2xl font-black text-white mb-2">{rec?.profil || t('health_prof_adults')}</h3>
+              <h3 className="text-2xl font-black text-[var(--text-primary)] mb-2">{rec?.profil || t('health_prof_adults')}</h3>
               <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-white/10 bg-white/5">
                 <div className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: globalColor, boxShadow: `0 0 12px ${globalColor}` }} />
                 <span className="text-base font-black uppercase tracking-[0.2em]" style={{ color: globalColor }}>
@@ -170,17 +170,17 @@ export default function AdultesPage() {
 
 
       <div className="glass-card p-6 mb-8 border-white/5">
-        <h4 className="text-lg font-black text-white mb-4 flex items-center gap-2">
+        <h4 className="text-lg font-black text-[var(--text-primary)] mb-4 flex items-center gap-2">
           <AlertTriangle className="text-amber-400" size={20} />
           {t('health_alert_msg')}
         </h4>
-        <p className="text-lg text-white leading-relaxed font-medium">
+        <p className="text-lg text-[var(--text-primary)] leading-relaxed font-medium">
           &quot;{t(rec?.message || "") || t('health_loading')}&quot;
         </p>
       </div>
 
       <div className="glass-card p-6 border-white/5">
-        <h4 className="text-lg font-black text-white mb-6 flex items-center gap-2">
+        <h4 className="text-lg font-black text-[var(--text-primary)] mb-6 flex items-center gap-2">
           <ShieldCheck className="text-[#00d4b1]" size={20} />
           {t('health_priority_actions')}
         </h4>
@@ -216,8 +216,8 @@ export default function AdultesPage() {
       <div className="mt-16 p-10 glass-card border-white/5 flex flex-col items-center gap-8 relative overflow-hidden group">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00d4b1]/30 to-transparent" />
         <div className="flex flex-col items-center gap-1">
-          <h4 className="text-2xl font-black text-white">{t('health_continue_explore')}</h4>
-          <p className="text-gray-400 text-sm font-medium">{t('health_discover_other')}</p>
+          <h4 className="text-2xl font-black text-[var(--text-primary)]">{t('health_continue_explore')}</h4>
+          <p className="text-[var(--text-secondary)] text-sm font-medium">{t('health_discover_other')}</p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-6 w-full">

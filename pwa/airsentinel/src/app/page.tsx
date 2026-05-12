@@ -24,9 +24,10 @@ function Navbar() {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        background: "rgba(2,12,24,0.85)",
+        background: "var(--bg-primary)",
+        opacity: 0.9,
         backdropFilter: "blur(12px)",
-        borderBottom: "1px solid rgba(0,212,177,0.15)",
+        borderBottom: "1px solid var(--border-color)",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -35,16 +36,16 @@ function Navbar() {
           style={{
             fontSize: "18px",
             fontWeight: 700,
-            color: "#e0f2fe",
+            color: "var(--text-primary)",
             letterSpacing: "-0.02em",
           }}
         >
-          Air<span style={{ color: "#00d4b1" }}>Sentinel</span>
+          Air<span style={{ color: "var(--teal)" }}>Sentinel</span>
         </span>
       </div>
       <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
         <LanguageSwitcher />
-        <a href="#pilliers" style={{ color: "rgba(224,242,254,0.7)", fontSize: "14px", textDecoration: "none" }} className="max-sm:hidden">
+        <a href="#pilliers" style={{ color: "var(--text-secondary)", fontSize: "14px", textDecoration: "none" }} className="max-sm:hidden">
           {t('nav_features')}
         </a>
         <Link href="/login" title={t('nav_login')} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "36px", height: "36px", borderRadius: "50%", background: "rgba(0,212,177,0.1)", border: "1px solid rgba(0,212,177,0.25)", transition: "all 0.3s" }} onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,212,177,0.2)"} onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0,212,177,0.1)"}>
@@ -61,8 +62,8 @@ function StatBadge({ value, label }: { value: string; label: string }) {
       className="glass-card"
       style={{ padding: "14px 22px", textAlign: "center", minWidth: "110px" }}
     >
-      <div style={{ fontSize: "22px", fontWeight: 700, color: "#00d4b1" }}>{value}</div>
-      <div style={{ fontSize: "11px", color: "rgba(224,242,254,0.55)", marginTop: "3px", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+      <div style={{ fontSize: "22px", fontWeight: 700, color: "var(--teal)" }}>{value}</div>
+      <div style={{ fontSize: "11px", color: "var(--text-secondary)", opacity: 0.8, marginTop: "3px", letterSpacing: "0.06em", textTransform: "uppercase" }}>
         {label}
       </div>
     </div>
@@ -89,8 +90,8 @@ function PillarCard({
       </div>
       
       <div className="space-y-3">
-        <h3 className="text-xl font-bold text-[#e0f2fe] tracking-tight">{title}</h3>
-        <p className="text-sm text-gray-400 leading-relaxed font-medium">
+        <h3 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">{title}</h3>
+        <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">
           {description}
         </p>
       </div>
@@ -115,7 +116,7 @@ function MiniChart() {
       className="glass-card"
       style={{ padding: "16px", marginTop: "8px" }}
     >
-      <div style={{ fontSize: "12px", color: "rgba(224,242,254,0.5)", marginBottom: "8px" }}>
+      <div style={{ fontSize: "12px", color: "var(--text-secondary)", opacity: 0.7, marginBottom: "8px" }}>
         {t('pillar_ai_title')} — {t('stats_national')}
       </div>
       <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ overflow: "visible" }}>
@@ -210,10 +211,10 @@ function CameroonMap({ points }: { points: any[] }) {
                 textAnchor="middle"
                 y={-12}
                 style={{
-                  fill: "#e0f2fe",
+                  fill: "var(--text-primary)",
                   fontSize: "12px",
                   fontWeight: "bold",
-                  textShadow: "0px 2px 4px rgba(0,0,0,0.8)",
+                  textShadow: "0px 2px 4px var(--bg-primary)",
                   pointerEvents: "none"
                 }}
               >
@@ -238,7 +239,7 @@ function TechBadge({ name, icon }: { name: string; icon: React.ReactNode }) {
       <div className="text-[var(--teal)] opacity-80 group-hover:opacity-100 transition-opacity">
         {icon}
       </div>
-      <div className="text-[13px] font-bold text-gray-400 uppercase tracking-widest">{name}</div>
+      <div className="text-[13px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">{name}</div>
     </div>
   );
 }
@@ -255,9 +256,10 @@ function PWAFooter() {
         left: 0,
         right: 0,
         zIndex: 100,
-        background: "rgba(2,12,24,0.85)",
+        background: "var(--bg-primary)",
+        opacity: 0.9,
         backdropFilter: "blur(12px)",
-        borderTop: "1px solid rgba(0,212,177,0.15)",
+        borderTop: "1px solid var(--border-color)",
         padding: "12px 24px",
         paddingBottom: "max(12px, env(safe-area-inset-bottom))", // Support iPhone safe area
         display: "flex",
@@ -265,19 +267,19 @@ function PWAFooter() {
         alignItems: "center",
       }}
     >
-      <Link href="/" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", color: "#00d4b1", textDecoration: "none", width: "25%" }}>
+      <Link href="/" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", color: "var(--teal)", textDecoration: "none", width: "25%" }}>
         <Home size={22} />
         <span style={{ fontSize: "10px", fontWeight: 600 }}>{t('nav_home')}</span>
       </Link>
-      <Link href="/dashboard" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", color: "rgba(224,242,254,0.5)", textDecoration: "none", width: "25%", transition: "color 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.color = "#00d4b1"} onMouseLeave={(e) => e.currentTarget.style.color = "rgba(224,242,254,0.5)"}>
+      <Link href="/dashboard" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", color: "var(--text-secondary)", textDecoration: "none", width: "25%", transition: "color 0.2s" }}>
         <MapIcon size={22} />
         <span style={{ fontSize: "10px", fontWeight: 500 }}>{t('footer_carte')}</span>
       </Link>
-      <Link href="#pilliers" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", color: "rgba(224,242,254,0.5)", textDecoration: "none", width: "25%", transition: "color 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.color = "#00d4b1"} onMouseLeave={(e) => e.currentTarget.style.color = "rgba(224,242,254,0.5)"}>
+      <Link href="#pilliers" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", color: "var(--text-secondary)", textDecoration: "none", width: "25%", transition: "color 0.2s" }}>
         <Bell size={22} />
         <span style={{ fontSize: "10px", fontWeight: 500 }}>{t('nav_features')}</span>
       </Link>
-      <Link href="/login" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", color: "rgba(224,242,254,0.5)", textDecoration: "none", width: "25%", transition: "color 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.color = "#00d4b1"} onMouseLeave={(e) => e.currentTarget.style.color = "rgba(224,242,254,0.5)"}>
+      <Link href="/login" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", color: "var(--text-secondary)", textDecoration: "none", width: "25%", transition: "color 0.2s" }}>
         <User size={22} />
         <span style={{ fontSize: "10px", fontWeight: 500 }}>{t('nav_user_placeholder')}</span>
       </Link>
@@ -305,7 +307,7 @@ export default function LandingPage() {
       style={{
         minHeight: "100vh",
         backgroundAttachment: "fixed",
-        color: "#e0f2fe",
+        color: "var(--text-primary)",
         fontFamily: "Inter, sans-serif",
         overflowX: "hidden",
       }}
@@ -409,7 +411,7 @@ export default function LandingPage() {
         <p
           style={{
             fontSize: "clamp(14px, 2vw, 17px)",
-            color: "rgba(224,242,254,0.65)",
+            color: "var(--text-secondary)",
             maxWidth: "520px",
             margin: "16px auto 36px",
             lineHeight: 1.7,
@@ -472,7 +474,7 @@ export default function LandingPage() {
             fontSize: "clamp(22px, 3vw, 34px)",
             fontWeight: 800,
             marginBottom: "40px",
-            color: "#e0f2fe",
+            color: "var(--text-primary)",
           }}
         >
           {t('pillars_title')}
@@ -529,12 +531,12 @@ export default function LandingPage() {
             fontSize: "clamp(20px, 3vw, 30px)",
             fontWeight: 800,
             marginBottom: "10px",
-            color: "#e0f2fe",
+            color: "var(--text-primary)",
           }}
         >
           {t('tech_title')}
         </h2>
-        <p style={{ color: "rgba(224,242,254,0.5)", marginBottom: "36px", fontSize: "14px" }}>
+        <p style={{ color: "var(--text-secondary)", opacity: 0.6, marginBottom: "36px", fontSize: "14px" }}>
           {t('tech_subtitle')}
         </p>
 
@@ -568,7 +570,8 @@ export default function LandingPage() {
             style={{
               fontSize: "16px",
               lineHeight: 1.8,
-              color: "rgba(224,242,254,0.85)",
+              color: "var(--text-primary)",
+              opacity: 0.85,
               fontStyle: "italic",
               marginBottom: "24px",
             }}
@@ -582,10 +585,10 @@ export default function LandingPage() {
               <Code size={28} />
             </div>
             <div style={{ textAlign: "left" }}>
-              <div style={{ fontWeight: 700, color: "#e0f2fe", fontSize: "15px" }}>
+              <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "15px" }}>
                 {t('quote_author')}
               </div>
-              <div style={{ fontSize: "12px", color: "rgba(224,242,254,0.5)" }}>
+              <div style={{ fontSize: "12px", color: "var(--text-secondary)", opacity: 0.6 }}>
                 {t('quote_role')}
               </div>
             </div>
@@ -600,8 +603,9 @@ export default function LandingPage() {
           zIndex: 1,
           textAlign: "center",
           padding: "40px 24px",
-          borderTop: "1px solid rgba(0,212,177,0.12)",
-          color: "rgba(224,242,254,0.3)",
+          borderTop: "1px solid var(--border-color)",
+          color: "var(--text-secondary)",
+          opacity: 0.5,
           fontSize: "12px",
           letterSpacing: "0.06em",
         }}

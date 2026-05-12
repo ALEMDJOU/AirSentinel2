@@ -11,6 +11,7 @@ import { User, Home, LogOut, Loader2, Bell, BellOff, Mail, Globe } from "lucide-
 import { notify } from "@/utils/toast";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Navbar() {
   const { t, lang, setLang } = useLanguage();
@@ -80,21 +81,22 @@ export default function Navbar() {
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-[100] px-4 sm:px-8 h-16 flex items-center justify-between border-b border-white/5 bg-[#020c18]/80 backdrop-blur-xl"
+      className="fixed top-0 left-0 right-0 z-[100] px-4 sm:px-8 h-16 flex items-center justify-between border-b border-[var(--border-color)] bg-[var(--bg-primary)]/80 backdrop-blur-xl"
     >
       <div className="flex items-center gap-2.5">
         <Image src="/LogoAir.png" alt="AirSentinel Logo" width={34} height={34} className="drop-shadow-[0_0_10px_rgba(0,212,177,0.3)]" />
-        <span className="text-lg font-bold text-white tracking-tight">
+        <span className="text-lg font-bold text-[var(--text-primary)] tracking-tight">
           Air<span className="text-[var(--teal)]">Sentinel</span>
         </span>
       </div>
 
       <div className="flex items-center gap-4 sm:gap-6">
-        <Link href="/" className="max-sm:hidden flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors">
+        <Link href="/" className="max-sm:hidden flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
           <Home size={16} />
           <span>{t('nav_home')}</span>
         </Link>
 
+        <ThemeToggle />
         <LanguageSwitcher />
 
         {currentUser && (
@@ -104,7 +106,7 @@ export default function Navbar() {
               relative flex items-center gap-2 px-3 h-9 rounded-full border transition-all duration-300 group
               ${currentUser.is_alerts_enabled 
                 ? "bg-[var(--teal)]/10 border-[var(--teal)]/40 text-[var(--teal)] shadow-[0_0_15px_rgba(0,212,177,0.2)]" 
-                : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20"}
+                : "bg-[var(--bg-secondary)]/5 border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/10 hover:border-[var(--border-color)]"}
             `}
             title={currentUser.is_alerts_enabled ? `${t('nav_alerts_active')} (${currentUser.subscribed_city})` : t('activate_alerts')}
           >
@@ -126,9 +128,9 @@ export default function Navbar() {
         {isLoading ? (
           <Loader2 className="w-5 h-5 text-[var(--teal)] animate-spin" />
         ) : currentUser ? (
-          <div className="flex items-center gap-3 pl-4 border-l border-white/10">
+          <div className="flex items-center gap-3 pl-4 border-l border-[var(--border-color)]">
             <div className="max-sm:hidden text-right">
-              <p className="text-[13px] font-medium text-white leading-tight">
+              <p className="text-[13px] font-medium text-[var(--text-primary)] leading-tight">
                 {currentUser.full_name || t('nav_user_placeholder')}
               </p>
             </div>
@@ -136,7 +138,7 @@ export default function Navbar() {
             <div className="relative group">
               <div 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="w-9 h-9 rounded-full border-2 border-[var(--teal)]/30 overflow-hidden bg-slate-800 flex items-center justify-center cursor-pointer group-hover:border-[var(--teal)] transition-all"
+                className="w-9 h-9 rounded-full border-2 border-[var(--teal)]/30 overflow-hidden bg-[var(--bg-primary)] flex items-center justify-center cursor-pointer group-hover:border-[var(--teal)] transition-all"
               >
                 {currentUser.avatar_url ? (
                   <Image 
@@ -152,16 +154,16 @@ export default function Navbar() {
               
               {/* Profile Dropdown */}
               <div className={`
-                absolute top-12 right-0 bg-[#0f172a]/95 border border-white/10 p-2 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] whitespace-nowrap min-w-[190px] backdrop-blur-2xl transition-all duration-300
+                absolute top-12 right-0 bg-[var(--bg-secondary)] border border-[var(--border-color)] p-2 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] whitespace-nowrap min-w-[190px] backdrop-blur-2xl transition-all duration-300
                 ${isMenuOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2 lg:group-hover:opacity-100 lg:group-hover:visible lg:group-hover:translate-y-0'}
               `}>
-                <div className="px-3 py-2 border-b border-white/5 mb-2">
-                  <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">{t('account')}</p>
+                <div className="px-3 py-2 border-b border-[var(--border-color)] mb-2">
+                  <p className="text-[10px] uppercase tracking-widest text-[var(--text-secondary)] font-bold">{t('account')}</p>
                 </div>
                 <Link 
                   href="/dashboard/profil"
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-200 hover:bg-[var(--teal)]/10 hover:text-[var(--teal)] transition-all mb-1 group/item"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-[var(--text-primary)] hover:bg-[var(--teal)]/10 hover:text-[var(--teal)] transition-all mb-1 group/item"
                 >
                   <div className="w-8 h-8 rounded-lg bg-[var(--teal)]/10 flex items-center justify-center group-hover/item:bg-[var(--teal)]/20 transition-colors">
                     <User size={16} className="text-[var(--teal)]" />

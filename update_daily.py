@@ -147,7 +147,7 @@ def compute_irs(df):
 def main():
     if not os.path.exists(DATASET_PATH): return
     df_old = pd.read_parquet(DATASET_PATH)
-    start = (df_old['date'].max() - timedelta(days=7)).strftime('%Y-%m-%d') # Re-fetch les 7 derniers jours pour stabiliser les lags
+    start = (df_old['date'].max() - timedelta(days=3)).strftime('%Y-%m-%d') # Re-fetch les 3 derniers jours pour stabiliser les lags
     end = (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d') # Fetch 3 jours au total (Aujourd'hui + 2)
     
     df_new = fetch_data(CITIES, start, end)

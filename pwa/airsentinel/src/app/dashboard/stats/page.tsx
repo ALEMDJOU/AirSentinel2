@@ -48,13 +48,9 @@ export default function StatsPage() {
   // isNational reste utile pour le header
   const isNational = !ville || ville === "CAMEROON";
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-[#00d4b1] animate-spin" />
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-[var(--teal)] animate-spin" />
       </div>
-    );
-  }
 
   // Si aucune ville n'est sélectionnée (ou sélection délibérée du National)
   // On peut décider de forcer le sélecteur si ville est strictement null ET que 
@@ -71,20 +67,20 @@ export default function StatsPage() {
           src="/joel3.jpg"
           alt="Statistiques Background"
           fill
-          className="object-cover opacity-20 scale-105"
+          className="object-cover opacity-10 scale-105"
           priority
         />
-        <div className="absolute inset-0 bg-[#020617]/90 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-[var(--bg-primary)] opacity-90 backdrop-blur-[2px]" />
       </div>
 
       <div className="p-6 pb-64 max-w-6xl mx-auto relative z-10">
         {!ville ? (
           <div className="py-12">
             <header className="mb-12">
-               <h1 className="text-5xl font-black text-white mb-3 tracking-tighter">
-                 {t('footer_stats')} <span className="text-[#00d4b1]">{t('stats_analytics')}</span>
+               <h1 className="text-5xl font-black text-[var(--text-primary)] mb-3 tracking-tighter">
+                 {t('footer_stats')} <span className="text-[var(--teal)]">{t('stats_analytics')}</span>
                </h1>
-               <p className="text-gray-400 text-sm font-medium">{t('stats_explore_desc')}</p>
+               <p className="text-[var(--text-secondary)] text-sm font-medium">{t('stats_explore_desc')}</p>
             </header>
             <CitySelector />
           </div>
@@ -101,17 +97,17 @@ export default function StatsPage() {
                 
                 <button 
                   onClick={() => setVille(null)}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-[10px] font-bold text-gray-300 transition-all active:scale-95 group"
+                  className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl text-[10px] font-bold text-[var(--text-secondary)] transition-all active:scale-95 group"
                 >
-                  <RefreshCcw size={14} className="text-[#00d4b1] group-hover:rotate-180 transition-transform duration-500" />
+                  <RefreshCcw size={14} className="text-[var(--teal)] group-hover:rotate-180 transition-transform duration-500" />
                   {t('stats_change_city')}
                 </button>
               </div>
               
-              <h1 className="text-5xl font-black text-white mb-3 tracking-tighter leading-none">
-                {t('stats_analyse')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00d4b1] to-[#0ea5e9]">{ville === "CAMEROON" ? t('stats_data_nat') : t('stats_data_city').replace('{}', ville)}</span>
+              <h1 className="text-5xl font-black text-[var(--text-primary)] mb-3 tracking-tighter leading-none">
+                {t('stats_analyse')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--teal)] to-[#0ea5e9]">{ville === "CAMEROON" ? t('stats_data_nat') : t('stats_data_city').replace('{}', ville)}</span>
               </h1>
-              <p className="text-gray-400 text-sm font-medium max-w-md antialiased">
+              <p className="text-[var(--text-secondary)] text-sm font-medium max-w-md antialiased">
                 {ville === "CAMEROON" 
                   ? t('stats_desc_nat').replace('{x}', String(kpis?.total_observations || 0))
                   : t('stats_desc_city').replace('{y}', ville).replace('{x}', String(kpis?.total_observations || 0))
@@ -129,17 +125,17 @@ export default function StatsPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               {/* Top Cities Table — col pleine largeur */}
-              <div className="lg:col-span-2 glass-card p-8 border-white/5 border-l-4 border-l-[#ef4444]/50 flex flex-col">
-                 <h3 className="text-xl font-bold text-white mb-6 tracking-tight">{t('stats_top5')}</h3>
+              <div className="lg:col-span-2 glass-card p-8 border-[var(--border-color)] border-l-4 border-l-[#ef4444]/50 flex flex-col">
+                 <h3 className="text-xl font-bold text-[var(--text-primary)] mb-6 tracking-tight">{t('stats_top5')}</h3>
                  <div className="space-y-4 flex-1 overflow-y-auto pr-2">
                     {analyses?.top_5_villes_critiques?.map((city: any, idx: number) => (
-                       <div key={city.city} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 group hover:bg-white/10 transition-all duration-300">
+                       <div key={city.city} className="flex items-center justify-between p-4 bg-[var(--bg-secondary)]/50 rounded-2xl border border-[var(--border-color)] group hover:bg-[var(--bg-secondary)] transition-all duration-300">
                           <div className="flex items-center gap-4">
                              <span className="text-lg font-black text-[#ef4444]/40 group-hover:text-[#ef4444]">{idx + 1}</span>
-                             <span className="text-sm font-bold text-gray-200">{city.city}</span>
+                             <span className="text-sm font-bold text-[var(--text-primary)]">{city.city}</span>
                           </div>
                           <div className="flex flex-col items-end">
-                             <span className="text-sm font-black text-white">{city.pm25_moyen}</span>
+                             <span className="text-sm font-black text-[var(--text-primary)]">{city.pm25_moyen}</span>
                              <span className="text-[8px] font-black text-[#ef4444] uppercase tracking-widest">µg/m³</span>
                           </div>
                        </div>
@@ -157,10 +153,10 @@ export default function StatsPage() {
               </div>
 
               {/* Polluants Mix */}
-              <div className="glass-card p-8 border-white/5 relative group">
+              <div className="glass-card p-8 border-[var(--border-color)] relative group">
                  <div className="flex items-center gap-3 mb-6">
-                    <Layers className="text-[#00d4b1]" size={20} />
-                    <h3 className="text-lg font-bold text-white">{t('stats_mix')}</h3>
+                    <Layers className="text-[var(--teal)]" size={20} />
+                    <h3 className="text-lg font-bold text-[var(--text-primary)]">{t('stats_mix')}</h3>
                  </div>
                  
                  <div className="space-y-5">
@@ -207,7 +203,7 @@ function StatCard({ icon, label, value, unit, color, isText }: any) {
         {icon}
       </div>
       <div>
-        <div className={`font-black text-white tracking-tight ${isText ? 'text-2xl pt-1' : 'text-3xl'}`}>
+        <div className={`font-black text-[var(--text-primary)] tracking-tight ${isText ? 'text-2xl pt-1' : 'text-3xl'}`}>
           {value}
         </div>
         <div 

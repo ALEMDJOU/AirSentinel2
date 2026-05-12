@@ -234,9 +234,9 @@ export default function ChatBot() {
     <>
       <style>{`
         .chat-glass { 
-            background: #0f172a; 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            box-shadow: 0 20px 50px -12px rgba(0,0,0,0.6); 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            box-shadow: var(--shadow); 
         }
         .sentinel-scroll::-webkit-scrollbar { width: 4px; }
         .sentinel-scroll::-webkit-scrollbar-thumb { 
@@ -260,7 +260,7 @@ export default function ChatBot() {
           {/* Header */}
           <div 
             onMouseDown={onWinDragStart} 
-            className="flex-shrink-0 cursor-grab active:cursor-grabbing bg-slate-900/40 backdrop-blur-xl border-b border-white/5 p-4 flex items-center justify-between"
+            className="flex-shrink-0 cursor-grab active:cursor-grabbing bg-[var(--bg-secondary)]/40 backdrop-blur-xl border-b border-[var(--border-color)] p-4 flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
               <div className="relative">
@@ -270,7 +270,7 @@ export default function ChatBot() {
                 <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white tracking-tight">SentinelIA</h3>
+                <h3 className="text-sm font-bold text-[var(--text-primary)] tracking-tight">SentinelIA</h3>
                 <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                     <span className="text-[10px] text-slate-400 font-medium uppercase tracking-widest">{t('bot_online')}</span>
@@ -278,23 +278,23 @@ export default function ChatBot() {
               </div>
             </div>
             <div className="flex items-center gap-1">
-                <button onClick={resetChat} title={t('bot_reset')} className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all">
+                <button onClick={resetChat} title={t('bot_reset')} className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-primary)]/5 rounded-lg transition-all">
                     <RotateCcw size={14} />
                 </button>
-                <button onClick={() => setIsOpen(false)} className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all">
+                <button onClick={() => setIsOpen(false)} className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-primary)]/5 rounded-lg transition-all">
                     <X size={16} />
                 </button>
             </div>
           </div>
 
           {/* Messages Body */}
-          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#0b1120] sentinel-scroll relative">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-[var(--bg-primary)]/30 sentinel-scroll relative">
             {messages.map((msg) => (
               <div key={msg.id} className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"} animate-message`}>
                 <div className={`max-w-[85%] p-3.5 rounded-2xl text-[13px] leading-relaxed shadow-sm ${
                     msg.role === "user" 
                     ? "bg-emerald-500 text-white font-medium rounded-tr-none shadow-emerald-500/10" 
-                    : "bg-slate-800/60 text-slate-200 border border-white/5 rounded-tl-none"
+                    : "bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-tl-none"
                 }`}>
                   <div dangerouslySetInnerHTML={{ __html: parseMarkdown(msg.content) }} />
                 </div>
@@ -310,7 +310,7 @@ export default function ChatBot() {
                         <button 
                             key={s} 
                             onClick={() => sendMessage(s)}
-                            className="text-[11px] bg-slate-800/30 hover:bg-emerald-500/10 border border-white/5 hover:border-emerald-500/30 text-slate-400 hover:text-emerald-400 px-3.5 py-1.5 rounded-full transition-all flex items-center gap-2"
+                            className="text-[11px] bg-[var(--bg-secondary)] hover:bg-emerald-500/10 border border-[var(--border-color)] hover:border-emerald-500/30 text-[var(--text-secondary)] hover:text-emerald-400 px-3.5 py-1.5 rounded-full transition-all flex items-center gap-2"
                         >
                             <Sparkles size={10} />
                             {s}
@@ -321,7 +321,7 @@ export default function ChatBot() {
 
             {isLoading && (
               <div className="flex justify-start animate-pulse">
-                <div className="bg-slate-800/40 border border-white/5 p-3 rounded-2xl rounded-tl-none flex gap-1.5 items-center">
+                <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-3 rounded-2xl rounded-tl-none flex gap-1.5 items-center">
                     <span className="w-1.5 h-1.5 bg-emerald-500/60 rounded-full animate-bounce" />
                     <span className="w-1.5 h-1.5 bg-emerald-500/60 rounded-full animate-bounce [animation-delay:0.2s]" />
                     <span className="w-1.5 h-1.5 bg-emerald-500/60 rounded-full animate-bounce [animation-delay:0.4s]" />
@@ -332,8 +332,8 @@ export default function ChatBot() {
           </div>
 
           {/* Footer Input */}
-          <div className="flex-shrink-0 bg-slate-900/50 backdrop-blur-md p-3 border-t border-white/5">
-            <div className="flex items-end gap-2 bg-slate-800/40 border border-white/5 rounded-xl p-2 focus-within:border-emerald-500/30 transition-all duration-300">
+          <div className="flex-shrink-0 bg-[var(--bg-secondary)]/50 backdrop-blur-md p-3 border-t border-[var(--border-color)]">
+            <div className="flex items-end gap-2 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-xl p-2 focus-within:border-emerald-500/30 transition-all duration-300">
               <textarea 
                 ref={inputRef} 
                 rows={1} 
@@ -346,7 +346,7 @@ export default function ChatBot() {
                     } 
                 }} 
                 placeholder={t('bot_placeholder')} 
-                className="flex-1 bg-transparent border-none focus:ring-0 text-[13px] text-white py-1.5 px-2 resize-none max-h-32 sentinel-scroll placeholder:text-slate-500" 
+                className="flex-1 bg-transparent border-none focus:ring-0 text-[13px] text-[var(--text-primary)] py-1.5 px-2 resize-none max-h-32 sentinel-scroll placeholder:text-[var(--text-secondary)]/50" 
               />
               <button 
                 onClick={() => sendMessage()} 
@@ -370,7 +370,7 @@ export default function ChatBot() {
         style={{ ...fStyle, position: "fixed", zIndex: 1001 }}
         className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-500 cursor-grab active:cursor-grabbing hover:scale-105 active:scale-95 group ${
           isOpen 
-          ? "bg-slate-800 text-white rotate-180 border border-white/10" 
+          ? "bg-[var(--bg-secondary)] text-[var(--text-primary)] rotate-180 border border-[var(--border-color)]" 
           : "bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-emerald-500/30"
         }`}
       >

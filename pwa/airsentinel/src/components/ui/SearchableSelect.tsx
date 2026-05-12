@@ -51,13 +51,13 @@ export default function SearchableSelect({
 
   return (
     <div className="flex flex-col gap-1.5 w-full relative" ref={containerRef}>
-      {displayLabel && <label className="text-[13px] text-gray-300 ml-1">{displayLabel}</label>}
+      {displayLabel && <label className="text-[13px] text-[var(--text-secondary)] ml-1">{displayLabel}</label>}
       
       <div 
         className={cn(
           "relative group cursor-pointer transition-all duration-300",
-          "w-full h-[1.1cm] bg-[#1e293b]/40 border border-white/10 rounded-xl px-4 flex items-center justify-between",
-          isOpen ? "border-[var(--teal)] ring-1 ring-[var(--teal)]/50" : "hover:bg-[#1e293b]/60"
+          "w-full h-[1.1cm] bg-[var(--bg-secondary)]/40 border border-[var(--border-color)] rounded-xl px-4 flex items-center justify-between",
+          isOpen ? "border-[var(--teal)] ring-1 ring-[var(--teal)]/50" : "hover:bg-[var(--bg-secondary)]/60"
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -65,14 +65,14 @@ export default function SearchableSelect({
           <MapPin className="w-4 h-4 text-[var(--teal)] flex-shrink-0" />
           <span className={cn(
             "text-sm truncate",
-            value ? "text-white" : "text-gray-500"
+            value ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]/50"
           )}>
             {value || t('select_city')}
           </span>
         </div>
         
         <ChevronDown className={cn(
-          "w-4 h-4 text-gray-400 transition-transform duration-300",
+          "w-4 h-4 text-[var(--text-secondary)] transition-transform duration-300",
           isOpen && "rotate-180"
         )} />
       </div>
@@ -80,7 +80,7 @@ export default function SearchableSelect({
       {/* Dropdown Menu */}
       {isOpen && (
         <div className="absolute top-[calc(100%+8px)] left-0 w-full z-50 animate-in fade-in zoom-in-95 duration-200">
-          <div className="glass-card !bg-[#0f172a]/95 !border-white/10 shadow-2xl rounded-2xl overflow-hidden backdrop-blur-xl">
+          <div className="glass-card !bg-[var(--bg-secondary)] !border-[var(--border-color)] shadow-2xl rounded-2xl overflow-hidden backdrop-blur-xl">
             
             {/* Search Input */}
             <div className="p-3 border-b border-white/5 relative">
@@ -115,7 +115,7 @@ export default function SearchableSelect({
                     key={option}
                     className={cn(
                       "group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all",
-                      value === option ? "bg-[var(--teal)]/10 text-[var(--teal)]" : "text-gray-300 hover:bg-white/5 hover:text-white"
+                      value === option ? "bg-[var(--teal)]/10 text-[var(--teal)]" : "text-[var(--text-secondary)] hover:bg-[var(--teal)]/5 hover:text-[var(--teal)]"
                     )}
                     onClick={(e) => {
                       e.stopPropagation();
