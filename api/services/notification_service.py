@@ -10,17 +10,38 @@ logger = logging.getLogger(__name__)
 
 # Initialisation de Firebase (guard contre double initialisation)
 try:
-    cred_path = os.path.join(os.path.dirname(__file__), "..", "firebase-service-account.json")
-    if os.path.exists(cred_path):
-        # Évite l'erreur "app already exists" si le module est rechargé
-        if not firebase_admin._apps:
+    if not firebase_admin._apps:
+        cred = None
+        # Priorité 1 : Fichier local (dev)
+        cred_path = os.path.join(os.path.dirname(__file__), "..", "firebase-service-account.json")
+        if os.path.exists(cred_path):
             cred = credentials.Certificate(cred_path)
+            logger.info("[Firebase] Initialisation via fichier JSON local.")
+        
+        # Priorité 2 : Variable d'environnement (Production / Render)
+        else:
+            firebase_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT")
+            if firebase_json:
+                import json
+                try:
+                    # Nettoyage des caractères d'échappement potentiels si collé brute
+                    cleaned_json = firebase_json.strip()
+                    if cleaned_json.startswith("'") or cleaned_json.startswith('"'):
+                        cleaned_json = cleaned_json[1:-1]
+                    
+                    cred_dict = json.loads(cleaned_json)
+                    cred = credentials.Certificate(cred_dict)
+                    logger.info("[Firebase] Initialisation via variable d'environnement.")
+                except Exception as e:
+                    logger.error(f"[Firebase] Erreur lors du parsing de FIREBASE_SERVICE_ACCOUNT : {e}")
+
+        if cred:
             firebase_admin.initialize_app(cred)
             logger.info("[Firebase] SDK initialisé avec succès.")
         else:
-            logger.info("[Firebase] SDK déjà initialisé, skip.")
+            logger.warning("[Firebase] Aucune configuration trouvée (ni fichier ni variable ENV).")
     else:
-        logger.warning("[Firebase] Fichier de clé non trouvé. Les notifications seront simulées.")
+        logger.info("[Firebase] SDK déjà initialisé.")
 except Exception as e:
     logger.error(f"[Firebase] Erreur d'initialisation : {e}")
 
@@ -35,6 +56,10 @@ class NotificationService:
         if not token:
             logger.warning("[Firebase] Token FCM vide, notification annulée.")
             return None
+
+        if not firebase_admin._apps:
+            logger.warning("[Firebase] Aucune application Firebase initialisée. Notification simulée.")
+            return "simulated_success_id"
 
         # Les valeurs dans data doivent être des strings (exigence FCM)
         sanitized_data = {str(k): str(v) for k, v in (data or {}).items()}

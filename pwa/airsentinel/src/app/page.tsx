@@ -5,6 +5,7 @@ import { User, Home, Map as MapIcon, Bell, BrainCircuit, Activity, ShieldAlert, 
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const geoUrl = "/cameroon-regions.json";
 
@@ -44,6 +45,7 @@ function Navbar() {
         </span>
       </div>
       <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+        <ThemeToggle />
         <LanguageSwitcher />
         <a href="#pilliers" style={{ color: "var(--text-secondary)", fontSize: "14px", textDecoration: "none" }} className="max-sm:hidden">
           {t('nav_features')}

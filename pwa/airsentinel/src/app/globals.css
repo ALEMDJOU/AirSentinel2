@@ -8,6 +8,7 @@
   
   /* Light Mode (Default) - Warm Off-white Premium */
   --bg-primary: #fdfcfb; /* Blanc cassé chaleureux */
+  --bg-rgb: 253, 252, 251;
   --bg-secondary: #ffffff;
   --bg-card: rgba(255, 255, 255, 0.9);
   --bg-card-hover: rgba(255, 255, 255, 1);
@@ -20,6 +21,7 @@
 
 [data-theme="dark"] {
   --bg-primary: #020c18;
+  --bg-rgb: 2, 12, 24;
   --bg-secondary: #031223;
   --bg-card: rgba(255, 255, 255, 0.04);
   --bg-card-hover: rgba(255, 255, 255, 0.08);
@@ -169,8 +171,13 @@ body {
 }
 
 .bg-hero-joel {
-  background-image: linear-gradient(160deg, rgba(var(--bg-rgb), 0.45) 0%, rgba(var(--bg-rgb), 0.4) 100%), url("/joel1.jpg");
+  background-image: linear-gradient(
+    to bottom, 
+    rgba(var(--bg-rgb), 0.35) 0%, 
+    rgba(var(--bg-rgb), 0.55) 100%
+  ), url("/joel1.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
 }

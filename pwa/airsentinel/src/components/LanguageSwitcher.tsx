@@ -1,10 +1,18 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Globe } from "lucide-react";
 
 export default function LanguageSwitcher() {
   const { lang, setLang } = useLanguage();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
     <button 

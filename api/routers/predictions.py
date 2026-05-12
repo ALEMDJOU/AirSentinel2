@@ -139,7 +139,7 @@ def get_short_term(city: Optional[str] = None):
             features=feat_dict
         ))
 
-    return result
+    return history_points + prediction_points
 
 
 @router.get("/monthly", response_model=list[MonthlyPM25])

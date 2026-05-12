@@ -35,5 +35,15 @@ services:
         value: "587"
       - key: SMTP_USER
         value: "fofackhenri36@gmail.com"
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+    healthCheckPath: /health
+    autoDeploy: true
     healthCheckPath: /health
     autoDeploy: true
