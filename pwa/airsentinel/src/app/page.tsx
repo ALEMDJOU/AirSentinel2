@@ -142,14 +142,18 @@ function MiniChart() {
 }
 
 // Carte Cameroun interactive via react-simple-maps
-function CameroonMap() {
+function CameroonMap({ points }: { points: any[] }) {
   const { t } = useLanguage();
-  const mapData = [
-    { name: "Garoua", coordinates: [13.4, 9.3], val: "0.95" },
-    { name: "Douala", coordinates: [9.7, 4.05], val: "9.39" },
-    { name: "Yaoundé", coordinates: [11.5, 3.8], val: "0.98" },
-    { name: "Bafoussam", coordinates: [10.4, 5.48], val: "0.96" }
+  
+  // Si pas de points API, on utilise un fallback pour ne pas avoir une carte vide
+  const defaultPoints = [
+    { city: "Garoua", lat: 9.3, lon: 13.4, pm25_moyen: 25.5 },
+    { city: "Douala", lat: 4.05, lon: 9.7, pm25_moyen: 45.2 },
+    { city: "Yaoundé", lat: 3.8, lon: 11.5, pm25_moyen: 32.1 },
+    { city: "Bafoussam", lat: 5.48, lon: 10.42, pm25_moyen: 28.4 }
   ];
+
+  const mapData = points.length > 0 ? points : defaultPoints;
 
   return (
     <div
@@ -195,8 +199,8 @@ function CameroonMap() {
               ))
             }
           </Geographies>
-          {mapData.map(({ name, coordinates, val }) => (
-            <Marker key={name} coordinates={coordinates as [number, number]}>
+          {mapData.map((p) => (
+            <Marker key={p.city || p.name} coordinates={[p.lon || p.coordinates[0], p.lat || p.coordinates[1]]}>
               <circle r={6} fill="#0ea5e9" opacity={0.9} />
               <circle r={6} fill="transparent" stroke="#0ea5e9" strokeWidth={2}>
                 <animate attributeName="r" values="6;16;6" dur="2s" repeatCount="indefinite" />
@@ -213,7 +217,7 @@ function CameroonMap() {
                   pointerEvents: "none"
                 }}
               >
-                {val}
+                {p.pm25_moyen?.toFixed(1) || p.val}
               </text>
             </Marker>
           ))}
@@ -282,9 +286,19 @@ function PWAFooter() {
 }
 
 // ── Page principale ──────────────────────────────────────────────────────────
+import { useState, useEffect } from "react";
+import mapService from "@/services/mapService";
 
 export default function LandingPage() {
   const { t } = useLanguage();
+  const [points, setPoints] = useState<any[]>([]);
+
+  useEffect(() => {
+    mapService.getMapPoints()
+      .then(data => setPoints(data))
+      .catch(err => console.error("Erreur chargement map points:", err));
+  }, []);
+
   return (
     <main
       className="bg-hero-joel"
@@ -493,7 +507,7 @@ export default function LandingPage() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center" }}>
-            <CameroonMap />
+            <CameroonMap points={points} />
           </div>
         </div>
       </section>

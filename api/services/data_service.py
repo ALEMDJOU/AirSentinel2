@@ -5,20 +5,18 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Variable globale pour stocker le DataFrame en mémoire (Singleton)
+# Variables globales pour stocker le DataFrame et le timestamp du fichier
 _df = None
+_last_mtime = 0
 
 def get_dataframe() -> pd.DataFrame:
     """
-    Charge le dataset Parquet en mémoire une seule fois et retourne le DataFrame.
-    Gère le cas où le fichier n'existe pas.
+    Charge le dataset Parquet en mémoire.
+    Recharge automatiquement si le fichier sur le disque a été modifié.
     """
-    global _df
-    if _df is not None:
-        return _df
-        
+    global _df, _last_mtime
+    
     settings = get_settings()
-    # On part de la racine du projet pour s'assurer que 'data/' est toujours trouvé
     project_root = Path(__file__).resolve().parent.parent.parent
     dataset_path = project_root / settings.DATASET_PATH
     
@@ -26,29 +24,36 @@ def get_dataframe() -> pd.DataFrame:
         logger.error(f"Fichier introuvable: {dataset_path}")
         raise FileNotFoundError(f"Le fichier de données '{dataset_path}' n'existe pas.")
         
+    # Vérification de la date de modification
+    current_mtime = dataset_path.stat().st_mtime
+    
+    if _df is not None and current_mtime <= _last_mtime:
+        return _df
+
+    logger.info(f"Chargement (ou rechargement) du dataset depuis {dataset_path}...")
     try:
         try:
-            _df = pd.read_parquet(dataset_path, engine='fastparquet')
+            new_df = pd.read_parquet(dataset_path, engine='fastparquet')
         except Exception:
-            # Fallback: certains envs n'ont pas fastparquet, on essaie pyarrow
-            _df = pd.read_parquet(dataset_path, engine='pyarrow')
+            new_df = pd.read_parquet(dataset_path, engine='pyarrow')
 
         # ─── VIRTUAL TIME SHIFT (Live Demo Mode) ───
-        # On ne décale QUE si les données sont en retard. 
-        # Si on a déjà des prévisions (max_date >= today), on garde le futur intact.
-        if 'date' in _df.columns:
-            max_date = _df['date'].max()
+        if 'date' in new_df.columns:
+            max_date = new_df['date'].max()
             today = pd.Timestamp.now().normalize()
             if not pd.isna(max_date) and max_date < today:
                 delta = today - max_date
-                _df['date'] = _df['date'] + delta
-                logger.info(f"Dataset décalé de {delta.days} jours pour correspondre à la date actuelle ({today.date()})")
-            else:
-                logger.info("Dataset déjà à jour ou contenant des prévisions futures. Pas de décalage nécessaire.")
+                new_df['date'] = new_df['date'] + delta
+                logger.info(f"Dataset décalé de {delta.days} jours pour correspondre à la date actuelle")
 
-        logger.info(f"Dataset chargé avec succès depuis {dataset_path}")
+        _df = new_df
+        _last_mtime = current_mtime
+        logger.info(f"Dataset chargé avec succès. Taille: {len(_df)} lignes")
     except Exception as e:
         logger.error(f"Erreur lors du chargement du Parquet : {e}")
+        if _df is not None:
+            logger.warning("Utilisation de l'ancienne version en mémoire suite à l'erreur.")
+            return _df
         raise
     
     return _df
