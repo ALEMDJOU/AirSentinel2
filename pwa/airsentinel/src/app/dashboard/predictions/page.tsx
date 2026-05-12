@@ -94,12 +94,16 @@ export default function PredictionsPage() {
   };
 
 
-  const predictions = data.filter(p => p.is_prediction);
-  const history = data.filter(p => !p.is_prediction);
-  const today = history[history.length - 1];   // Aujourd'hui = dernière valeur réelle
-  const jPlus1 = predictions[0];               // Demain
-  const jPlus2 = predictions[1];               // Après-demain
-  const lastReal = today?.pm25 || 0;
+  // Extraction intelligente basée sur les dates réelles
+  const todayStr = new Date().toISOString().split('T')[0];
+  const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  const afterTomorrowStr = new Date(Date.now() + 172800000).toISOString().split('T')[0];
+
+  const today = data.find(p => p.date === todayStr) || data.filter(p => !p.is_prediction).pop();
+  const jPlus1 = data.find(p => p.date === tomorrowStr);
+  const jPlus2 = data.find(p => p.date === afterTomorrowStr);
+
+  const lastReal = today?.pm25 || 25;
   const trendPct = jPlus1 ? ((jPlus1.pm25 - lastReal) / lastReal) * 100 : 0;
 
   if (loading) {

@@ -109,16 +109,22 @@ def get_short_term(city: Optional[str] = None):
         except Exception:
             continue
 
-    # 2. Préparer les prédictions (J+1, J+2, J+3)
+    # 2. Préparer les prédictions (Aujourd'hui, J+1, J+2)
     prediction_points = []
-    last_row = df_sorted.iloc[-1].to_dict() # Base pour les features
+    last_row = df_sorted.iloc[-1].to_dict()
+    last_data_date = pd.to_datetime(last_row[date_col]).date()
+    target_dates = [last_date_val, last_date_val + timedelta(days=1), last_date_val + timedelta(days=2)]
     
-    for i in range(1, 4):
-        future_day = last_date_val + timedelta(days=i)
+    for target_day in target_dates:
+        if any(p.date == str(target_day) for p in history_points):
+            continue
+            
+        gap_days = (target_day - last_data_date).days
+        if gap_days < 1: gap_days = 1
+
         try:
             region_name = str(last_row.get("region", "Centre"))
-            # Prédiction hybride avec horizon i
-            pred_val = predict_pm25(last_row, region=region_name, steps=i)
+            pred_val = predict_pm25(last_row, region=region_name, steps=gap_days)
             if pred_val <= 0 or math.isnan(pred_val): pred_val = 25.0
         except Exception:
             pred_val = 25.0
@@ -133,7 +139,7 @@ def get_short_term(city: Optional[str] = None):
         }
 
         prediction_points.append(PredictionPoint(
-            date=str(future_day),
+            date=str(target_day),
             pm25=round(float(pred_val), 2),
             is_prediction=True,
             features=feat_dict
