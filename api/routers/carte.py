@@ -174,6 +174,7 @@ def get_analyses(city: Optional[str] = None):
 
     # Application du modèle ML pour aligner les stats avec la carte
     from api.services.prediction_service import predict_pm25
+    import math
     if pm25_col:
         for idx, row in latest_df.iterrows():
             clean_features = {}
