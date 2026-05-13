@@ -13,10 +13,13 @@ export default function KeepAlive() {
     
     const pingServer = async () => {
       try {
-        // On utilise /health car c'est un endpoint léger déjà existant
-        await fetch(`${apiUrl}/health`, { 
+        // Nettoyage de l'URL pour pointer vers la racine du serveur (et enlever les doubles slashes)
+        let rootUrl = apiUrl.split('/api/')[0];
+        if (rootUrl.endsWith('/')) rootUrl = rootUrl.slice(0, -1);
+        
+        await fetch(`${rootUrl}/health`, { 
           method: "GET",
-          mode: "no-cors", // On s'en fiche de la réponse, on veut juste toucher le serveur
+          mode: "no-cors",
           cache: "no-store" 
         });
         console.log("Ping de réveil envoyé au backend.");

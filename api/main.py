@@ -212,6 +212,7 @@ def accueil():
 
 
 @app.get("/health", tags=["Santé"])
+@app.get("//health", include_in_schema=False)
 def health():
     """Endpoint de vérification de l'état de l'API."""
     return {"status": "healthy", "version": "1.0.0"}

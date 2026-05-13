@@ -166,9 +166,9 @@ def _get_niveau_actuel(df, ville: Optional[str] = None) -> str:
         return "MODERE"
 
     filtered_df = df.copy()
-    city_col = _find_col(df, ["ville", "city"])
+    city_col = _find_col(df, ["ville", "city", "City", "Ville"])
     if ville and city_col:
-        filtered_df = df[df[city_col] == ville]
+        filtered_df = df[df[city_col].str.lower() == ville.lower()]
 
     if filtered_df.empty:
         return "MODERE"
@@ -203,11 +203,12 @@ def get_recommandations(ville: Optional[str] = None):
     try:
         df = get_dataframe()
 
-        city_col = _find_col(df, ["ville", "city"])
+        city_col = _find_col(df, ["ville", "city", "City", "Ville"])
         if ville and city_col:
-            filtered = df[df[city_col] == ville]
+            filtered = df[df[city_col].str.lower() == ville.lower()]
             if filtered.empty:
                 raise HTTPException(status_code=404, detail=f"Aucune donnée trouvée pour la ville: {ville}")
+
 
         niveau = _get_niveau_actuel(df, ville)
     except FileNotFoundError:
