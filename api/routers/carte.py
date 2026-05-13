@@ -168,9 +168,31 @@ def get_analyses(city: Optional[str] = None):
 
     # ─── EXTRACTION DES DONNÉES RÉCENTES POUR S'ALIGNER AVEC LA CARTE ───
     if city_col and "date" in df.columns:
-        latest_df = df.sort_values(by="date", ascending=False).drop_duplicates(subset=[city_col])
+        latest_df = df.sort_values(by="date", ascending=False).drop_duplicates(subset=[city_col]).copy()
     else:
-        latest_df = df.drop_duplicates(subset=[city_col]) if city_col else df
+        latest_df = df.drop_duplicates(subset=[city_col]).copy() if city_col else df.copy()
+
+    # Application du modèle ML pour aligner les stats avec la carte
+    from api.services.prediction_service import predict_pm25
+    if pm25_col:
+        for idx, row in latest_df.iterrows():
+            clean_features = {}
+            for k, v in row.to_dict().items():
+                try:
+                    val = float(v)
+                    clean_features[k] = 0.0 if math.isnan(val) else val
+                except (ValueError, TypeError):
+                    pass
+            region_name = "Centre"
+            if region_col and region_col in row:
+                region_name = str(row[region_col])
+            
+            try:
+                ml_pm25 = predict_pm25(clean_features, region=region_name)
+                if ml_pm25 > 0 and not math.isnan(ml_pm25):
+                    latest_df.at[idx, pm25_col] = round(ml_pm25, 2)
+            except Exception:
+                pass
 
     # 1. PM2.5 par région
     pm25_par_region = {}
