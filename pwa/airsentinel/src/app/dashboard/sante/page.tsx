@@ -30,11 +30,13 @@ export default function SantePage() {
     fetchVilles();
   }, []);
 
+  if (loading) {
     return (
       <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
         <Loader2 className="w-12 h-12 text-[#ef4444] animate-spin" />
       </div>
     );
+  }
 
   const profiles = [
     {
